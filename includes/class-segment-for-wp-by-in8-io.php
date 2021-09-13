@@ -3,8 +3,8 @@
 /**
  * The file that defines the core plugin class
  *
- * @link       https://juangonzalez.com.au
- * @since      1.0.0
+ * @link       https://github.com/omgwtfwow/segment-for-wp-by-in8-io
+ * @since      2.0.0
  *
  * @package    Segment_For_Wp_By_In8_Io
  * @subpackage Segment_For_Wp_By_In8_Io/includes
