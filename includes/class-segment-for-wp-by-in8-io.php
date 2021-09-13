@@ -140,6 +140,7 @@ class Segment_For_Wp_By_In8_Io
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/segment_php/lib/Segment.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/wp-background-processing/wp-background-processing.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/action-scheduler/action-scheduler.php';
         require plugin_dir_path(dirname(__FILE__)) . 'includes/class-segment-for-wp-by-in8-io-track-server.php';
 
 
@@ -421,9 +422,12 @@ class Segment_For_Wp_By_In8_Io
 
         //SERVER SIDE
         if (self::server_side_ready()) {
+
             $segment_php = new Segment_For_Wp_By_In8_Io_Segment_Php_Lib($this->get_plugin_name(), $this->get_version(), $settings);
             $this->loader->add_action('init', $segment_php, 'init_segment', 1);
+//            $this->loader->add_action('init', $segment_php, 'init_scheduler', 1);
             $this->loader->add_action('segment_4_wp_file_consumer', $segment_php, 'file_consumer', 1);
+            $this->loader->add_action('async_task', $segment_php, 'async_task', 1, 1);
 
             // SIGNUPS SERVER SIDE
             if (array_key_exists('track_signups_fieldset', $settings)) {
