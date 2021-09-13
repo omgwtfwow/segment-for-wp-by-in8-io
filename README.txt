@@ -2,8 +2,8 @@
 Contributors: juanin8
 Donate link: https://www.juangonzalez.com.au
 Tags: segment, tracking, analytics
-Requires at least: 4.0.1
-Tested up to: 5.7.1
+Requires at least: 5.6
+Tested up to: 5.8.1
 Requires PHP: 7.0.0
 Stable tag: trunk
 License: GPLv3 or later
@@ -13,17 +13,21 @@ Segment Analytics for WordPress. Event tracking integrated into hundreds of 3rd 
 
 == Description ==
 
-The original/official Segment Analytics plugin for WordPress has been deprecated and not updated for a few years. I used the original code as the foundation and added extra features, functionality and fixes.
+Segment Analytics for WordPress.
+Uses Segment's official PHP libraries for Server Side events, as well as a lot of other features functionality.
+I completely rewrote this plugin from the previous version.
+Client side and server side tracking.
+Client side events fire upon validation (ie, for submissions)
+Server side events are scheduled and happen asynchronously, so users don't have to wait for processing of these events, it won't slow them down.
 
-I will try to write more documentation.
+There are annotations throughout the plugin to explain the different features.
 
-It's all very self-explanatory if you've worked with Segment, but hit me up if you have any questions, suggestions or ideas.
-
-* Built-in support for Ninja Forms and Gravity Forms
-* Supports WooCommerce events, you can re-name them and also include some data in the identify call
-* Supports client side (JS API) and server-side tracking (HTTP API)
+* Set a User ID based on user custom field, email, or WP user id
+* Built-in support for WooCommerce, Ninja Forms, Gravity Forms and WordPress native events.
+* Re-name events, choose what traits to include in Identify calls, etc...
+* Supports client side (JS API) and server-side tracking (PHP API)
 * Ability to filter out roles, custom post types and the admin area
-* Rename your events, and easily include userID and email properties in each one
+* Easily include userID and email properties in track calls
 * Ability to include custom user traits in identify calls using meta keys
 
 == Installation ==
@@ -35,7 +39,7 @@ It's all very self-explanatory if you've worked with Segment, but hit me up if y
 == Upgrade Notice ==
 
 PLEASE READ!! You'll need to reconfigure the plugin again, so test it first and backup before upgrading.
-The new version of the plugin is much better, but you will need to set it up again.
+The new version of the plugin is much much better, but you will need to set it up again.
 
 == Screenshots ==
 
@@ -44,7 +48,7 @@ The new version of the plugin is much better, but you will need to set it up aga
 3. Rename your events, and easily include userID and email properties in each one
 4. Support for Ninja Forms and Gravity Forms
 5. Ability to include custom user traits in identify calls using meta keys
-6. Supports WooCommerce events, you can re-name them and also include some data in the identify call
+6. Supports WooCommerce events, you can re-name them and track them server side, etc...
 
 == Frequently Asked Questions ==
 
@@ -55,11 +59,12 @@ The new version of the plugin is much better, but you will need to set it up aga
 == Changelog ==
 
 = 2.0.0 =
-* Re-wrote the whole plugin
-* Now implements Segment's official PHP Library for Server Side events
+* Re-wrote the whole plugin. Much better now.
+* Now uses Segment's official PHP Library for Server Side events
 * More advanced options and extra functionality. Pull data from user_meta, post_meta, etc... to populate identify calls, page calls and track calls.
 * Better implementation of client side tracking
 * Better performance and reliability
+* Made all of the server side tracking asynchronous
 
 = 1.0.9 =
 * More updates to bring woocommerce integration inline with their 'new' functions vs legacy ones I used to begin with
