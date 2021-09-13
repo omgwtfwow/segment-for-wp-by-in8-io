@@ -148,8 +148,25 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server, $args);
             $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
 
-
             if ($event_name) {
+
+                if (!$user_id && Segment_For_Wp_By_In8_Io::is_ecommerce_order_hook($action)) {
+                    //if settings to try
+                    if (array_key_exists('woocommerce_match_logged_out_users', $settings["track_woocommerce_fieldset"])) {
+                        if ($settings["track_woocommerce_fieldset"]["woocommerce_match_logged_out_users"] == "yes") {
+                            if (array_key_exists('billing_email', $properties)) {
+                                $order_email = $properties["billing_email"];
+                                if (filter_var($order_email, FILTER_VALIDATE_EMAIL)) {
+                                    if (email_exists($order_email)) {
+                                        $user = get_user_by('email', $order_email);
+                                        $user_id = Segment_For_Wp_By_In8_Io::get_user_id($user->ID);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
 
                 if ($user_id) {
 
@@ -215,7 +232,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
                     ));
                 }
-
 
             }
         }
@@ -584,7 +600,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['order_id'] = $order_id;
         $args['timestamp']=time();
         as_enqueue_async_action( 'async_task', array($args), $this->plugin_name );
-
 
     }
 

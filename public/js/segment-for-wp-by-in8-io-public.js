@@ -1,54 +1,13 @@
 (function ($) {
     'use strict';
 
-    /**
-     * All of the code for your public-facing JavaScript source
-     * should reside in this file.
-     *
-     * Note: It has been assumed you will write jQuery code here, so the
-     * $ function reference has been prepared for usage within the scope
-     * of this function.
-     *
-     * This enables you to define handlers, for when the DOM is ready:
-     *
-     * $(function() {
-     *
-     * });
-     *
-     * When the window is loaded:
-     *
-     * $( window ).load(function() {
-     *
-     * });
-     *
-     * ...and/or other possibilities.
-     *
-     * Ideally, it is not considered best practise to attach more than a
-     * single DOM-ready or window-load handler for a particular page.
-     * Although scripts in the WordPress core, Plugins and Themes may be
-     * practising this, we should strive to set a better example in our own work.
-     */
 
     function get_cookie_names() {
         return document.cookie.split(/=[^;]*(?:;\s*|$)/);
     }
 
-    function delete_segment_4_wp_cookies() {
-        let pattern = new RegExp(/^segment_4_wp_/);
-        let cookie_names = get_cookie_names();
-        for (let i = 0; i < cookie_names.length; i++) {
-            let cookie_name = cookie_names[i];
-            if (pattern.test(cookie_name)) {
-                Cookies.set(cookie_name, '');
-                Cookies.remove(cookie_name);
-
-            }
-        }
-
-    }
 
     function delete_cookie(event) {
-
 
         let reg_1 = new RegExp(/^segment_4_wp_/);
         let reg_2 = event;

@@ -338,6 +338,7 @@ class Segment_For_Wp_By_In8_Io
                                     $this->loader->add_action('woocommerce_cart_item_restored', $plugin_public, 'woocommerce_cart_item_restored', 5, 2);
                                 }
                             }
+
                             // REMOVE FROM CART
                             if (array_key_exists("track_woocommerce_events_product_removed", $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"])) {
                                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["track_woocommerce_events_product_removed"] == 'yes') {
@@ -1114,7 +1115,7 @@ class Segment_For_Wp_By_In8_Io
 
                 // PRODUCT ADDED
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["track_woocommerce_events_product_added"] == 'yes') {
-                    if (Segment_For_Wp_By_In8_Io_Cookie::check_cookie('woocommerce_add_to_cart', 'short')) {
+                    if (Segment_For_Wp_By_In8_Io_Cookie::check_cookie('woocommerce_add_to_cart')) {
                         $data = Segment_For_Wp_By_In8_Io_Cookie::get_cookie('woocommerce_add_to_cart');
                         $cookie_name = Segment_For_Wp_By_In8_Io_Cookie::get_cookie_name('woocommerce_add_to_cart');
                         $event_name = self::get_event_name('woocommerce_add_to_cart');
@@ -1127,7 +1128,7 @@ class Segment_For_Wp_By_In8_Io
                         );
                         $i++;
                     }
-                    if (Segment_For_Wp_By_In8_Io_Cookie::check_cookie('woocommerce_cart_item_restored', 'short')) {
+                    if (Segment_For_Wp_By_In8_Io_Cookie::check_cookie('woocommerce_cart_item_restored')) {
                         $data = Segment_For_Wp_By_In8_Io_Cookie::get_cookie('woocommerce_cart_item_restored');
                         $event_name = self::get_event_name('woocommerce_cart_item_restored');
                         $cookie_name = Segment_For_Wp_By_In8_Io_Cookie::get_cookie_name('woocommerce_cart_item_restored');
@@ -1815,9 +1816,12 @@ class Segment_For_Wp_By_In8_Io
         if ($settings["include_user_ids"] == "yes") {
             if (isset($wp_user_id) && $wp_user_id !== 0) {
                 $user_id = self::get_user_id($wp_user_id);
-                $properties["user_id"] = $user_id;
-                $user = get_userdata($wp_user_id);
-                $properties["user_email"] = $user->user_email;
+                if ($user_id) {
+                    $properties["user_id"] = $user_id;
+                    $user = get_userdata($wp_user_id);
+                    $properties["user_email"] = $user->user_email;
+                }
+
             } else {
                 if (is_user_logged_in()) {
                     $wp_user_id = get_current_user_id();
@@ -2252,6 +2256,28 @@ class Segment_For_Wp_By_In8_Io
         );
 
         return in_array($action_hook, $ecommerce_hooks);
+
+    }
+
+    /**
+     * Check if it's an ecommerce event hooks
+     *
+     * @param $action_hook
+     *
+     * @return bool
+     */
+    public static function is_ecommerce_order_hook($action_hook)
+    {
+
+        $ecommerce_order_hooks = array(
+            'woocommerce_order_status_pending',
+            'woocommerce_order_status_processing',
+            'woocommerce_order_status_completed',
+            'woocommerce_payment_complete',
+            'woocommerce_order_status_cancelled',
+        );
+
+        return in_array($action_hook, $ecommerce_order_hooks);
 
     }
 

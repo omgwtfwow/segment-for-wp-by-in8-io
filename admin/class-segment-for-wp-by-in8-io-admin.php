@@ -190,11 +190,10 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 				),
                 array(
-                    'type'       => 'content',
-                    'class'      => 'class-name',
-                    'content'    => '<h3>Advanced Options</h3>',
+                    'type' => 'content',
+                    'class' => 'class-name',
+                    'content' => '<h3>Advanced Options</h3><p>Server side events are asynchronous. They are timestamped with the correct time when the event occurs, and then they are sent later when they are processed according to your settings.</p>',
                     'wrap_class' => 'no-border-bottom',
-
                 ),
 				array(
 					'id'          => 'segment_php_consumer',
@@ -202,9 +201,9 @@ class Segment_For_Wp_By_In8_Io_Admin {
 					'title'       => 'PHP Consumer',
 					'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">More info about these</a>',
 					'options'     => array(
-						'socket' => 'Socket: More real time, less performant. Asynchronous.',
-						'file'   => 'File: If you\'re processing more than hundreds of requests per second, use this. If you don\'t receive at least a few page view a minute, don\'t use this one. Asynchronous. More performant, less real time.',
-					),
+                        'socket' => 'Socket: Default. If you\'re dealing with less than 100s of requests per second.',
+                        'file' => 'File: Useful if you\'re dealing with 100s of requests per second.',
+                    ),
 					'default'     => 'socket',
 					'dependency'  => array( 'php_api_key', '!=', '' ),
 					'wrap_class'  => 'no-border-bottom',
@@ -2236,20 +2235,23 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 	public function cron_schedules( $schedules ) {
         $settings = $this->settings;
-
+        $interval = 1;
 		if ( ! isset( $schedules["s4wp_file_consumer"] ) ) {
 
-            $interval = $settings["segment_php_consumer_file_cron_interval"];
+            if (array_key_exists('segment_php_consumer_file_cron_interval', $settings)) {
+                $interval = $settings["segment_php_consumer_file_cron_interval"];
 
-            if(!is_numeric($interval)){
-                $interval = 1;
+                if (!is_numeric($interval)) {
+                    $interval = 1;
+                }
             }
 
-			$schedules["s4wp_file_consumer"] = array(
-				'interval' => 60*$interval,
-				'display'  => __( 'Every ' .  $interval . ' minutes.' )
-			);
-		}
+
+            $schedules["s4wp_file_consumer"] = array(
+                'interval' => 60 * $interval,
+                'display' => __('Every ' . $interval . ' minutes.')
+            );
+        }
 
 
 		return $schedules;

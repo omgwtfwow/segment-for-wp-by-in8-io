@@ -66,13 +66,18 @@ class Segment_For_Wp_By_In8_Io_Track
                     }
                     if ($event_name != "") {
                         if (!is_user_logged_in()) {
-                            if (array_key_exists('wc_user_id', $event_props)) {
-                                if (strpos($hook, 'woocommerce_order') !== false || $hook === 'woocommerce_payment_complete') {
-                                    if (array_key_exists("woocommerce_match_logged_out_users", $settings["track_woocommerce_fieldset"])) {
-                                        if ($settings["track_woocommerce_fieldset"]["woocommerce_match_logged_out_users"] === "yes") {
-                                            $user_id = $event_props['wc_user_id'];
-                                            $event_opts['userId'] = $user_id;
-                                            unset($event_props['wc_user_id']);
+                            if (Segment_For_Wp_By_In8_Io::is_ecommerce_order_hook($hook)) {
+                                if (array_key_exists("woocommerce_match_logged_out_users", $settings["track_woocommerce_fieldset"])) {
+                                    if ($settings["track_woocommerce_fieldset"]["woocommerce_match_logged_out_users"] === "yes") {
+                                        if (array_key_exists('billing_email', $event_props)) {
+                                            $order_email = $event_props["billing_email"];
+                                            if (filter_var($order_email, FILTER_VALIDATE_EMAIL)) {
+                                                if (email_exists($order_email)) {
+                                                    $user = get_user_by('email', $order_email);
+                                                    $user_id = Segment_For_Wp_By_In8_Io::get_user_id($user->ID);
+                                                    $event_opts['userId'] = $user_id;
+                                                }
+                                            }
                                         }
                                     }
                                 }
