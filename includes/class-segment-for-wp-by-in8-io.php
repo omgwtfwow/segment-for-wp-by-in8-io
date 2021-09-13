@@ -139,7 +139,6 @@ class Segment_For_Wp_By_In8_Io
          * The class for the Segment PHP library
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/segment_php/lib/Segment.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/wp-background-processing/wp-background-processing.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/action-scheduler/action-scheduler.php';
         require plugin_dir_path(dirname(__FILE__)) . 'includes/class-segment-for-wp-by-in8-io-track-server.php';
 
