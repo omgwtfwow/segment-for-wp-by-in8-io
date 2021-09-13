@@ -79,9 +79,9 @@ if (window.history.replaceState) {
                                             if ('refresh' in response.data) {
                                                 if (response.data.refresh === true) {
 
-                                                    setTimeout(() => {
-                                                        window.location.reload();
-                                                    }, 500)
+                                                    // setTimeout(() => {
+                                                    //     window.location.reload();
+                                                    // }, 500)
 
                                                 }
                                             }

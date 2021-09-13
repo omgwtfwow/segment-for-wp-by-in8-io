@@ -1,6 +1,20 @@
-function s4wp_run_gf_tracking(form, entry, redirect = false, ajax_url, ajax_nonce, gf_event_name, gf_event_props = {}, identify = false, user_id, user_traits = {}) {
+function s4wp_run_gf_tracking(
+    form,
+    entry,
+    redirect,
+    ajax_url,
+    ajax_nonce,
+    gf_event_name,
+    gf_event_props = {},
+    identify = false,
+    user_id,
+    user_traits = {}) {
 
     (function ($) {
+
+        form = JSON.parse(form);
+        entry = JSON.parse(entry);
+        gf_event_props = JSON.parse(gf_event_props);
 
         function remove_server_cookie(event_name) {
 

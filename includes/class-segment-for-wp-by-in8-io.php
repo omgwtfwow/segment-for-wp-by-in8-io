@@ -139,6 +139,7 @@ class Segment_For_Wp_By_In8_Io
          * The class for the Segment PHP library
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/segment_php/lib/Segment.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/wp-background-processing/wp-background-processing.php';
         require plugin_dir_path(dirname(__FILE__)) . 'includes/class-segment-for-wp-by-in8-io-track-server.php';
 
 
@@ -294,7 +295,7 @@ class Segment_For_Wp_By_In8_Io
         $this->loader->add_action('wp_logout', $plugin_public, 'wp_logout', 9, 1);
 
         //COMMENTS
-        if (array_key_exists('track_ninja_forms_fieldset', $settings)) {
+        if (array_key_exists('track_comments_fieldset', $settings)) {
             if ($settings['track_comments_fieldset']['track_comments'] == "yes") {
                 $this->loader->add_action('wp_insert_comment', $plugin_public, 'wp_insert_comment', 9, 2);
             }
@@ -334,7 +335,7 @@ class Segment_For_Wp_By_In8_Io
                                         $this->loader->add_action('woocommerce_ajax_added_to_cart', $plugin_public, 'woocommerce_ajax_added_to_cart');
                                         $this->loader->add_action('woocommerce_after_cart', $plugin_public, 'woocommerce_after_cart', 9, 2);
                                     }
-					                $this->loader->add_action( 'woocommerce_cart_item_restored', $plugin_public, 'woocommerce_cart_item_restored', 5, 2 );
+                                    $this->loader->add_action('woocommerce_cart_item_restored', $plugin_public, 'woocommerce_cart_item_restored', 5, 2);
                                 }
                             }
                             // REMOVE FROM CART
@@ -342,7 +343,8 @@ class Segment_For_Wp_By_In8_Io
                                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["track_woocommerce_events_product_removed"] == 'yes') {
                                     $this->loader->add_action('woocommerce_remove_cart_item', $plugin_public, 'woocommerce_remove_cart_item', 9, 2);
                                     $this->loader->add_action('wp_ajax_public_wc_cart_events', $plugin_public, 'wc_cart_events');
-                                    $this->loader->add_action('wp_ajax_nopriv_public_wc_cart_events', $plugin_public, 'wc_cart_events');                                }
+                                    $this->loader->add_action('wp_ajax_nopriv_public_wc_cart_events', $plugin_public, 'wc_cart_events');
+                                }
                             }
 
                             // ORDER PENDING
@@ -426,7 +428,7 @@ class Segment_For_Wp_By_In8_Io
             // SIGNUPS SERVER SIDE
             if (array_key_exists('track_signups_fieldset', $settings)) {
                 if ($settings["track_signups_fieldset"]["track_signups_server"] == 'yes' && $settings["track_signups_fieldset"]["track_signups"] == "yes") {
-                    $this->loader->add_action('register_new_user', $segment_php, 'register_new_user');
+                    $this->loader->add_action('user_register', $segment_php, 'user_register', 1, 1);
                 }
             }
 
@@ -469,10 +471,11 @@ class Segment_For_Wp_By_In8_Io
                 if (array_key_exists('track_woocommerce', $settings["track_woocommerce_fieldset"])) {
                     if ($settings["track_woocommerce_fieldset"]["track_woocommerce"] == 'yes') {
                         if (array_key_exists('woocommerce_events', $settings["track_woocommerce_fieldset"])) {
-                            //ADD TO CART SERVER
                             if (array_key_exists('woocommerce_events_settings', $settings["track_woocommerce_fieldset"]["woocommerce_events"])) {
-                                if (array_key_exists('woocommerce_events_product_added_server', $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"])) {
-                                    if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_added_server"] == 'yes') {
+
+                                //ADD TO CART SERVER
+                                if (array_key_exists('track_woocommerce_events_product_added_server', $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"])) {
+                                    if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["track_woocommerce_events_product_added_server"] == 'yes') {
                                         $this->loader->add_action('woocommerce_add_to_cart', $segment_php, 'woocommerce_add_to_cart', 9, 6);
                                         $this->loader->add_action('woocommerce_after_cart_item_quantity_update', $segment_php, 'woocommerce_after_cart_item_quantity_update', 9, 4);
                                         $this->loader->add_action('woocommerce_cart_item_restored', $segment_php, 'woocommerce_cart_item_restored', 9, 4);
@@ -692,6 +695,21 @@ class Segment_For_Wp_By_In8_Io
     }
 
     /**
+     * get anonymous id from ajs cookie
+     *
+     * @return string|null
+     */
+    public static function get_ajs_user_id()
+    {
+        if (array_key_exists('ajs_user_id', $_COOKIE)) {
+            $ajs_user_id = str_replace('"', "", stripslashes($_COOKIE["ajs_user_id"]));
+            return sanitize_text_field($ajs_user_id);
+        }
+
+        return null;
+    }
+
+    /**
      * @param $cookie_data
      * @param $cookie_name
      *
@@ -773,34 +791,47 @@ class Segment_For_Wp_By_In8_Io
             'display_name' => 'Display Name',
             'user_registered' => 'Signup Date',
             'user_url' => 'URL',
-            'description' => 'Description',
-            'ID' => 'ID'
+            'description' => 'Description'
         );
 
         if (array_key_exists("included_user_traits", $settings)) {
             if (count($settings["included_user_traits"]) > 0) {
-                if (isset($wp_user_id) && $wp_user_id !== 0 && $wp_user_id !== null) {
+                if (isset($wp_user_id) && $wp_user_id !== 0) {
                     $user_data = get_userdata($wp_user_id);
                     $user_data_keys = array(
-                        'ID' => 'ID',
                         'user_login' => 'username',
                         'user_nicename' => 'nicename',
                         'user_email' => 'email',
                         'user_url' => 'website',
-                        'user_registered' => 'createdAt',
-                        'display_name' => 'displayName'
+                        'user_registered' => 'created_at',
+                        'display_name' => 'display_name',
                     );
                     $included_traits = $settings['included_user_traits'];
-                    foreach ($included_traits as $included_trait) {
-                        $trait_key = $included_trait;
+                    foreach ($included_traits as $trait_key) {
                         if ($trait_key != '') {
-                            if (array_key_exists($trait_key, $user_data_keys)) {
-                                $traits[$user_data_keys[$trait_key]] = $user_data->$trait_key;
-                            } else {
-                                $trait_value = get_user_meta($wp_user_id, $trait_key, true);
-                                $traits[$trait_key] = $trait_value;
-                            }
 
+                            if (array_key_exists($trait_key, $user_data_keys)) {
+                                $key = $user_data_keys[$trait_key];
+                                if($key ==='created_at') {
+                                    $datetime = new DateTime($user_data->$trait_key);
+                                    $traits[$key] =   $datetime->format('c');
+                                }
+                                else{
+                                    $traits[$key] = $user_data->$trait_key;
+
+                                }
+                            }
+                            else {
+                                $key = ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $trait_key)), '_');
+                                $trait_value = get_user_meta($wp_user_id, $trait_key, true);
+                                if($key ==='created_at') {
+                                    $datetime = new DateTime($trait_value);
+                                    $traits[$key] =   $datetime->format('c');
+                                }
+                                else{
+                                    $traits[$key] = $trait_value;
+                                }
+                            }
 
                         }
 
@@ -810,7 +841,7 @@ class Segment_For_Wp_By_In8_Io
         }
         if (array_key_exists("custom_user_traits", $settings)) {
             if (count($settings["custom_user_traits"]) > 0) {
-                if (isset($wp_user_id) && $wp_user_id !== 0 && $wp_user_id !== null) {
+                if (isset($wp_user_id) && $wp_user_id !== 0) {
                     $custom_traits = $settings["custom_user_traits"];
                     foreach ($custom_traits as $custom_trait) {
                         $trait_key = $custom_trait['custom_user_traits_key'];
@@ -1009,7 +1040,7 @@ class Segment_For_Wp_By_In8_Io
                 if (Segment_For_Wp_By_In8_Io_Cookie::check_cookie('ninja_forms_after_submission', 'short')) {
                     $data = Segment_For_Wp_By_In8_Io_Cookie::get_cookie('ninja_forms_after_submission');
                     $cookie_name = Segment_For_Wp_By_In8_Io_Cookie::get_cookie_name('ninja_forms_after_submission');
-                    $event_name = '';
+//                  $event_name = self::get_event_name('ninja_forms_after_submission', $data);
 //					$wp_user_id ='';
                     $properties = array();
                     if (isset($data['event_name'])) {
@@ -1319,10 +1350,10 @@ class Segment_For_Wp_By_In8_Io
      * Returns the event name for action hooks
      *
      * @param $action
-     *
+     * @param null $data
      * @return string
      */
-    public static function get_event_name($action)
+    public static function get_event_name($action, $data = null)
     {
 
         $settings = self::get_settings();
@@ -1381,9 +1412,35 @@ class Segment_For_Wp_By_In8_Io
             } else {
                 return 'Comment posted';
             }
+        } elseif ($action == 'ninja_forms_after_submission' || $action == 'ninja_forms_after_submission_server') {
+            foreach ($data["args"][0]["fields"] as $field) {
+                if ($field["value"] != "") {
+                    if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_event_name_field"]) {
+                        return sanitize_text_field($field["value"]);
+                    }
+                }
+            }
+            return 'Completed Form';
+        } elseif ($action == 'gform_after_submission' || $action == 'gform_after_submission_server') {
+            $entry = $data["args"][0];
+            $form = $data["args"][1];
+            $gf_event_name_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_event_name_field"]);
+
+            foreach ($form['fields'] as $field) {
+                if ($gf_event_name_field != '') {
+                    if ($field["adminLabel"] == $gf_event_name_field) {
+                        $gf_event_name = rgar($entry, $field["id"]);
+                        if ($gf_event_name != '') {
+                            return sanitize_text_field($gf_event_name);
+                        }
+                    }
+                }
+            }
+
+            return 'Completed Form';
         }
 
-        elseif(self::woocommerce_active()) {
+        elseif (self::woocommerce_active()) {
 
             if ($action == 'woocommerce_add_to_cart' ||
                 $action == 'woocommerce_add_to_cart_fragments' ||
@@ -1397,16 +1454,14 @@ class Segment_For_Wp_By_In8_Io
                 } else {
                     return 'Product Added';
                 }
-            }
-            elseif ($action == 'woocommerce_add_to_cart_server' || $action == 'woocommerce_cart_item_restored_server') {
+            } elseif ($action == 'woocommerce_add_to_cart_server' || $action == 'woocommerce_cart_item_restored_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_added_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_added_server_event_name"];
                 } else {
                     return 'Product Added';
                 }
 
-            }
-            elseif ($action == 'woocommerce_remove_cart_item' || $action == 'segment_4_wp_wc_cart_ajax_item_removed') {
+            } elseif ($action == 'woocommerce_remove_cart_item' || $action == 'segment_4_wp_wc_cart_ajax_item_removed') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_removed"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_removed"];
                 } else {
@@ -1414,7 +1469,8 @@ class Segment_For_Wp_By_In8_Io
                 }
 
             }
-            elseif ($action == 'woocommerce_remove_cart_item' || $action == 'woocommerce_remove_cart_item_server') {
+
+                elseif ( $action == 'woocommerce_cart_item_removed_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_removed_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_removed_server_event_name"];
                 } else {
@@ -1422,119 +1478,104 @@ class Segment_For_Wp_By_In8_Io
                 }
 
             }
+
             elseif ($action == 'woocommerce_order_status_pending') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_pending"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_pending"];
                 } else {
                     return 'Order Pending';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_pending_server') {
+            } elseif ($action == 'woocommerce_order_status_pending_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_pending_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_pending_server_event_name"];
                 } else {
                     return 'Order Pending';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_failed') {
+            } elseif ($action == 'woocommerce_order_status_failed') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_failed"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_failed"];
                 } else {
                     return 'Order Failed';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_failed_server') {
+            } elseif ($action == 'woocommerce_order_status_failed_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_failed_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_failed_server_event_name"];
                 } else {
                     return 'Order Failed';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_processing') {
+            } elseif ($action == 'woocommerce_order_status_processing') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_processing"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_processing"];
                 } else {
                     return 'Order Processing';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_processing_server') {
+            } elseif ($action == 'woocommerce_order_status_processing_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_processing_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_processing_server_event_name"];
                 } else {
                     return 'Order Processing';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_completed') {
+            } elseif ($action == 'woocommerce_order_status_completed') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_completed"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_completed"];
                 } else {
                     return 'Order Completed';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_completed_server') {
+            } elseif ($action == 'woocommerce_order_status_completed_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_completed_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_completed_server_event_name"];
                 } else {
                     return 'Order Completed';
                 }
-            }
-            elseif ($action == 'woocommerce_payment_complete') {
+            } elseif ($action == 'woocommerce_payment_complete') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_paid"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_paid"];
                 } else {
                     return 'Order Paid';
                 }
-            }
-            elseif ($action == 'woocommerce_payment_complete_server') {
+            } elseif ($action == 'woocommerce_payment_complete_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_paid_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_paid_server_event_name"];
                 } else {
                     return 'Order Paid';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_on_hold') {
+            } elseif ($action == 'woocommerce_order_status_on_hold') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_on_hold"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_on_hold"];
                 } else {
                     return 'Order On Hold';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_on_hold_server') {
+            } elseif ($action == 'woocommerce_order_status_on_hold_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_on_hold_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_on_hold_server_event_name"];
                 } else {
                     return 'Order On Hold';
                 }
-            }
-            elseif ($action == 'woocommerce_event_order_refunded') {
+            } elseif ($action == 'woocommerce_event_order_refunded') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_refunded"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_refunded"];
                 } else {
                     return 'Order Refunded';
                 }
-            }
-            elseif ($action == 'woocommerce_event_order_refunded_server') {
+            } elseif ($action == 'woocommerce_event_order_refunded_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_refunded"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_refunded"];
                 } else {
                     return 'Order Refunded';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_cancelled') {
+            } elseif ($action == 'woocommerce_order_status_cancelled') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_cancelled"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_cancelled"];
                 } else {
                     return 'Order Cancelled';
                 }
-            }
-            elseif ($action == 'woocommerce_order_status_cancelled_server') {
+            } elseif ($action == 'woocommerce_order_status_cancelled_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_cancelled_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_cancelled_server_event_name"];
                 } else {
                     return 'Order Cancelled';
                 }
-            }
-            elseif ($action == 'segment_4_wp_wc_cart_ajax_coupon_applied') {
+            } elseif ($action == 'segment_4_wp_wc_cart_ajax_coupon_applied') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_coupon_applied"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_coupon_applied"];
                 } else {
@@ -1542,6 +1583,7 @@ class Segment_For_Wp_By_In8_Io
                 }
             }
         }
+
     }
 
     /**
@@ -1576,152 +1618,195 @@ class Segment_For_Wp_By_In8_Io
             $properties["comment_author"] = $data["args"][1]["comment_author"];
             $properties["comment_author_email"] = $data["args"][1]["comment_author_email"];
             $properties["comment_author_url"] = $data["args"][1]["comment_author_url"];
-        }
-
-        elseif(self::woocommerce_active()){
-        if ($action == 'woocommerce_add_to_cart') {
-            if (isset($data['wp_user_id'])) {
-                $wp_user_id = $data["wp_user_id"];
-            }
-            if (array_key_exists('product_id', $data) && is_numeric($data["product_id"])) {
-                $properties = self::get_product_props_from_product_id($data["product_id"]);
-                $properties['variant'] = $data["variation"] ?? null;
-                $properties['variant_id'] = $data["variation_id"] ?? null;
-            }
-
-        }
-        elseif ($action == 'woocommerce_after_cart_item_quantity_update') {
-            if (isset($data['wp_user_id'])) {
-                $wp_user_id = $data["wp_user_id"];
-            }
-            if (array_key_exists('product_id', $data) && is_numeric($data["product_id"])) {
-                $properties = self::get_product_props_from_product_id($data["product_id"]);
-                $properties['quantity'] = $data["quantity"];
-            }
-        }
-        elseif ($action == 'woocommerce_add_to_cart_redirect') {
-            if (isset($data['wp_user_id'])) {
-                $wp_user_id = $data["wp_user_id"];
-            }
-            $properties = self::get_product_props_from_product_id($data["product_id"]);
-            $properties['variant'] = $data["variation"];
-            $properties['variant_id'] = $data["variation_id"];
-
-        }
-        elseif ($action == 'woocommerce_after_cart') {
-            if (isset($data['wp_user_id'])) {
-                $wp_user_id = $data["wp_user_id"];
-            }
-            $properties = self::get_product_props_from_product_id($data["product_id"]);
-            $properties['variant'] = $data["variation"]??null;
-            $properties['variant_id'] = $data["variation_id"]??null;
-
-        }
-        elseif ($action == 'woocommerce_add_to_cart_fragments') {
-            $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
-            $properties['variant'] = $data["args"]["variation"]??null;
-            $properties['variant_id'] = $data["args"]["variation_id"]??null;
-        }
-        elseif ($action == 'woocommerce_after_cart_item_quantity_update') {
-            $properties = self::get_product_props_from_product_id($data["product_id"]);
-        }
-        elseif ($action == 'woocommerce_cart_item_restored') {
-            $properties = self::get_product_props_from_product_id($data["product_id"]);
-        }
-        elseif ($action == 'woocommerce_remove_cart_item') {
-            $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
-            $properties['variant'] = $data["args"]["variation"]??null;
-            $properties['variant_id'] = $data["args"]["variation_id"]??null;
-        }
-        elseif ($action == 'segment_4_wp_wc_cart_ajax_item_removed') {
-            $properties = self::get_product_props_from_product_id($data["product_id"]);
-            $properties['variant'] = $data["variation"]??null;
-            $properties['variant_id'] = $data["variation_id"]??null;
-        }
-        elseif ($action == 'segment_4_wp_wc_cart_ajax_item_added') {
-            $properties = self::get_product_props_from_product_id($data["product_id"]);
-            $properties['variant'] = $data["variation"]??null;
-            $properties['variant_id'] = $data["variation_id"]??null;
-        }
-        //Orders
-        elseif ($action == 'woocommerce_order_status_pending') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-
-        }
-        elseif ($action == 'woocommerce_order_status_failed') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'woocommerce_order_status_processing') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'woocommerce_order_status_completed') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'woocommerce_payment_complete') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'woocommerce_order_status_on_hold') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'woocommerce_order_status_refunded') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'woocommerce_order_status_cancelled') {
-            if (is_numeric($data["order_id"])) {
-                $properties["order_id"] = $data["order_id"];
-                $properties = self::get_order_props_from_order_id($properties["order_id"]);
-            }
-        }
-        elseif ($action == 'segment_4_wp_wc_cart_ajax_coupon_applied') {
-            $coupon_code = $data;
-            $coupon_id = wc_get_coupon_id_by_code($coupon_code);
-            $coupon_type = wc_get_coupon_type($coupon_code);
-            $properties["coupon_code"] = $coupon_code;
-            $properties["coupon_id"] = $coupon_id;
-            $properties["coupon_type"] = $coupon_type;
-        }
-
-        if(!is_user_logged_in()) {
-            if (strpos($action, 'woocommerce_order') !== false || $action === 'woocommerce_payment_complete' ) {
-                if( array_key_exists("woocommerce_match_logged_out_users", $settings["track_woocommerce_fieldset"])) {
-                    if($settings["track_woocommerce_fieldset"]["woocommerce_match_logged_out_users"] === "yes") {
-                        if(array_key_exists('billing_email', $properties)) {
-                            $order_email=$properties["billing_email"];
-                            if(filter_var($order_email, FILTER_VALIDATE_EMAIL)){
-                                if(email_exists($order_email)){
-                                    $user = get_user_by( 'email', $order_email );
-                                    $user_id = self::get_user_id($user->ID);
-                                    $properties["wc_user_id"] = $user_id;
+        } elseif ($action == 'ninja_forms_after_submission') {
+            if (array_key_exists('ninja_form_event_properties', $settings["track_ninja_forms_fieldset"])) {
+                if (count($settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"]) > 0) {
+                    $ninja_form_event_properties = $settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"];
+                    foreach ($data["args"][0]["fields"] as $field) {
+                        if ($field["value"] != "") {
+                            foreach ($ninja_form_event_properties as $event_property) {
+                                if ($field["admin_label"] == $event_property["ninja_form_event_property_field_id"]) {
+                                    $properties[$event_property["ninja_form_event_property_label"]] = $field["value"];
                                 }
                             }
-                        }
 
+                        }
                     }
+
                 }
 
             }
         }
+        elseif ($action == 'gform_after_submission') {
+            if (array_key_exists('gravity_form_event_properties', $settings["track_gravity_forms_fieldset"])) {
+                $entry = $data["args"][0];
+                $form = $data["args"][1];
+                $gf_event_props = array();
+                foreach ($form['fields'] as $field) {
+
+                    if (array_key_exists('gravity_form_event_properties', $settings["track_gravity_forms_fieldset"]) && count($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"]) > 0) {
+                        foreach ($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"] as $property) {
+                            if ($property["gravity_form_event_property_field_id"] != '') {
+                                $gf_field_label_key = $property["gravity_form_event_property_field_id"];
+                                $gf_label_text = $property["gravity_form_event_property_label"];
+                                if ($field["adminLabel"] == $gf_field_label_key) {
+                                    $gf_field_id = $field["id"];
+
+                                    $value = $entry[$gf_field_id];
+
+                                    if ($value && $value != '') {
+                                        $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+                                    }
+
+                                }
+                            }
+
+
+                        }
+
+                    }
+
+                }
+                return array_filter($gf_event_props);
+
+            }
+        }
+
+        elseif (self::woocommerce_active()) {
+            if ($action == 'woocommerce_add_to_cart') {
+                if (isset($data['wp_user_id'])) {
+                    $wp_user_id = $data["wp_user_id"];
+                }
+                if (array_key_exists('product_id', $data) && is_numeric($data["product_id"])) {
+                    $properties = self::get_product_props_from_product_id($data["product_id"]);
+                    $properties['variant'] = $data["variation"] ?? null;
+                    $properties['variant_id'] = $data["variation_id"] ?? null;
+                }
+
+            } elseif ($action == 'woocommerce_after_cart_item_quantity_update') {
+                if (isset($data['wp_user_id'])) {
+                    $wp_user_id = $data["wp_user_id"];
+                }
+                if (array_key_exists('product_id', $data) && is_numeric($data["product_id"])) {
+                    $properties = self::get_product_props_from_product_id($data["product_id"]);
+                    $properties['quantity'] = $data["quantity"];
+                }
+            } elseif ($action == 'woocommerce_add_to_cart_redirect') {
+                if (isset($data['wp_user_id'])) {
+                    $wp_user_id = $data["wp_user_id"];
+                }
+                $properties = self::get_product_props_from_product_id($data["product_id"]);
+                $properties['variant'] = $data["variation"];
+                $properties['variant_id'] = $data["variation_id"];
+
+            } elseif ($action == 'woocommerce_after_cart') {
+                if (isset($data['wp_user_id'])) {
+                    $wp_user_id = $data["wp_user_id"];
+                }
+                $properties = self::get_product_props_from_product_id($data["product_id"]);
+                $properties['variant'] = $data["variation"] ?? null;
+                $properties['variant_id'] = $data["variation_id"] ?? null;
+
+            } elseif ($action == 'woocommerce_add_to_cart_fragments') {
+                $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
+                $properties['variant'] = $data["args"]["variation"] ?? null;
+                $properties['variant_id'] = $data["args"]["variation_id"] ?? null;
+            } elseif ($action == 'woocommerce_after_cart_item_quantity_update') {
+                $properties = self::get_product_props_from_product_id($data["product_id"]);
+            } elseif ($action == 'woocommerce_cart_item_restored') {
+                $properties = self::get_product_props_from_product_id($data["product_id"]);
+            }
+            elseif ($action == 'woocommerce_remove_cart_item') {
+                $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
+                $properties['variant'] =  $data["args"]["variation"] ?? null;
+                $properties['variant_id'] = $data["args"]["variation_id"] ?? null;
+            }
+            elseif ($action == 'woocommerce_cart_item_removed') {
+                $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
+                $properties['quantity'] = $data["args"]["quantity"] ?? null;
+                $properties['variant'] = $data["args"]["variation"] ?? null;
+                $properties['variant_id'] = $data["args"]["variation_id"] ?? null;
+            }
+            elseif ($action == 'segment_4_wp_wc_cart_ajax_item_removed') {
+                $properties = self::get_product_props_from_product_id($data["product_id"]);
+                $properties['variant'] = $data["variation"] ?? null;
+                $properties['variant_id'] = $data["variation_id"] ?? null;
+            }
+            elseif ($action == 'segment_4_wp_wc_cart_ajax_item_added') {
+                $properties = self::get_product_props_from_product_id($data["product_id"]);
+                $properties['variant'] = $data["variation"] ?? null;
+                $properties['variant_id'] = $data["variation_id"] ?? null;
+            } //Orders
+            elseif ($action == 'woocommerce_order_status_pending') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+
+            } elseif ($action == 'woocommerce_order_status_failed') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'woocommerce_order_status_processing') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'woocommerce_order_status_completed') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'woocommerce_payment_complete') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'woocommerce_order_status_on_hold') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'woocommerce_order_status_refunded') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'woocommerce_order_status_cancelled') {
+                if (is_numeric($data["order_id"])) {
+                    $properties["order_id"] = $data["order_id"];
+                    $properties = self::get_order_props_from_order_id($properties["order_id"]);
+                }
+            } elseif ($action == 'segment_4_wp_wc_cart_ajax_coupon_applied') {
+                $coupon_code = $data;
+                $coupon_id = wc_get_coupon_id_by_code($coupon_code);
+                $coupon_type = wc_get_coupon_type($coupon_code);
+                $properties["coupon_code"] = $coupon_code;
+                $properties["coupon_id"] = $coupon_id;
+                $properties["coupon_type"] = $coupon_type;
+            }
+
+            if (!is_user_logged_in()) {
+                if (strpos($action, 'woocommerce_order') !== false || $action === 'woocommerce_payment_complete') {
+                    if (array_key_exists("woocommerce_match_logged_out_users", $settings["track_woocommerce_fieldset"])) {
+                        if ($settings["track_woocommerce_fieldset"]["woocommerce_match_logged_out_users"] === "yes") {
+                            if (array_key_exists('billing_email', $properties)) {
+                                $order_email = $properties["billing_email"];
+                                if (filter_var($order_email, FILTER_VALIDATE_EMAIL)) {
+                                    if (email_exists($order_email)) {
+                                        $user = get_user_by('email', $order_email);
+                                        $user_id = self::get_user_id($user->ID);
+                                        $properties["wc_user_id"] = $user_id;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
         }
 
         if ($settings["include_user_ids"] == "yes") {
@@ -1740,51 +1825,28 @@ class Segment_For_Wp_By_In8_Io
                 }
             }
         }
-        if (array_key_exists("included_user_traits", $settings)) {
-            if (count($settings["included_user_traits"]) > 0) {
-                if (isset($wp_user_id) && $wp_user_id !== 0) {
-                    $user_data = get_userdata($wp_user_id);
-                    $user_data_keys = array(
-                        'ID' => 'ID',
-                        'user_login' => 'username',
-                        'user_nicename' => 'nicename',
-                        'user_email' => 'email',
-                        'user_url' => 'website',
-                        'user_registered' => 'createdAt',
-                        'display_name' => 'displayName'
-                    );
-                    $included_traits = $settings['included_user_traits'];
-                    foreach ($included_traits as $included_trait) {
-                        $trait_key = $included_trait;
-                        if ($trait_key != '') {
-                            if (array_key_exists($trait_key, $user_data_keys)) {
-                                $properties[$user_data_keys[$trait_key]] = $user_data->$trait_key;
-                            } else {
-                                $trait_value = get_user_meta($wp_user_id, $trait_key, true);
-                                $properties[$trait_key] = $trait_value;
-                            }
-
-
-                        }
-
-                    }
-                }
-            }
-        }
-        if (array_key_exists("custom_user_traits", $settings)) {
-            if (count($settings["custom_user_traits"]) > 0) {
-                if (isset($wp_user_id) && $wp_user_id !== 0 && $wp_user_id !== null) {
-                    $custom_traits = $settings["custom_user_traits"];
-                    foreach ($custom_traits as $custom_trait) {
-                        $trait_key = $custom_trait['custom_user_traits_key'];
-                        if ($trait_key != '') {
-                            $trait_value = get_user_meta($wp_user_id, $trait_key, true);
-                            $properties[$trait_key] = $trait_value;
-                        }
-                    }
-                }
-            }
-        }
+//        if (array_key_exists("included_user_traits", $settings)) {
+//            if (count($settings["included_user_traits"]) > 0) {
+//                if (isset($wp_user_id) && $wp_user_id !== 0) {
+//                    $traits = self::get_user_traits($wp_user_id);
+//                    $properties = array_merge($properties, $traits);
+//                }
+//            }
+//        }
+//        if (array_key_exists("custom_user_traits", $settings)) {
+//            if (count($settings["custom_user_traits"]) > 0) {
+//                if (isset($wp_user_id) && $wp_user_id !== 0) {
+//                    $custom_traits = $settings["custom_user_traits"];
+//                    foreach ($custom_traits as $custom_trait) {
+//                        $trait_key = $custom_trait['custom_user_traits_key'];
+//                        if ($trait_key != '') {
+//                            $trait_value = get_user_meta($wp_user_id, $trait_key, true);
+//                            $properties[$trait_key] = $trait_value;
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         return apply_filters('segment_for_wp_change_event_properties', array_filter($properties));
 
@@ -1804,73 +1866,73 @@ class Segment_For_Wp_By_In8_Io
         $product = wc_get_product($product_id);
         if ($product) {
             $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'single-post-thumbnail');
-            $product_meta = $product->get_meta_data()         ??null;
-            $properties['product_id'] = $product_id           ??null;
-            $properties['sku'] = $product->get_sku()          ??null;
-            $product_categories = $product->get_category_ids()??null;
+            $product_meta = $product->get_meta_data() ?? null;
+            $properties['product_id'] = $product_id ?? null;
+            $properties['sku'] = $product->get_sku() ?? null;
+            $product_categories = $product->get_category_ids() ?? null;
             if (is_array($product_categories)) {
                 foreach ($product_categories as $key => $value) {
                     if ($key == 0) {
-                        $properties['product_category'] = $value??null;
+                        $properties['product_category'] = $value ?? null;
                     } else {
-                        $properties['product_category_' . ($key + 1)] = $value??null;
+                        $properties['product_category_' . ($key + 1)] = $value ?? null;
                     }
                 }
             }
-            $properties['name'] = $product->get_name()                            ??null;
-            $properties['price'] = $product->get_price()                           ??null;
-            $properties['regular_price'] = $product->get_regular_price()           ??null;
-            $properties['sale_price'] = $product->get_sale_price()                 ??null;
-            $properties['on_sale_from'] = $product->get_date_on_sale_from()        ??null;
-            $properties['on_sale_to'] = $product->get_date_on_sale_to()            ??null;
+            $properties['name'] = $product->get_name() ?? null;
+            $properties['price'] = $product->get_price() ?? null;
+            $properties['regular_price'] = $product->get_regular_price() ?? null;
+            $properties['sale_price'] = $product->get_sale_price() ?? null;
+            $properties['on_sale_from'] = $product->get_date_on_sale_from() ?? null;
+            $properties['on_sale_to'] = $product->get_date_on_sale_to() ?? null;
             //$properties['total_sales']        = $product->get_total_sales(); //switching this on prob not a good idea
-            $properties['url'] = get_permalink($product_id)                                ??null;
-            $properties['image_url'] = $image_url[0]                                       ??null;
-            $properties['slug'] = $product->get_slug()                                     ??null;
-            $properties['date_created'] = $product->get_date_created()                     ??null;
-            $properties['date_modified'] = $product->get_date_modified()                   ??null;
-            $properties['status'] = $product->get_status()                                 ??null;
-            $properties['featured'] = $product->get_featured()                             ??null;
-            $properties['catalog_visibility'] = $product->get_catalog_visibility()         ??null;
+            $properties['url'] = get_permalink($product_id) ?? null;
+            $properties['image_url'] = $image_url[0] ?? null;
+            $properties['slug'] = $product->get_slug() ?? null;
+//            $properties['date_created'] = $product->get_date_created() ?? null;
+//            $properties['date_modified'] = $product->get_date_modified() ?? null;
+            $properties['status'] = $product->get_status() ?? null;
+            $properties['featured'] = $product->get_featured() ?? null;
+            $properties['catalog_visibility'] = $product->get_catalog_visibility() ?? null;
             //  $properties['description']        = $product->get_description(); can be quite long
             //  $properties['short_description']  = $product->get_short_description(); can be quite long
-            $properties['position'] = $product->get_menu_order()                       ??null;
-            $properties['tax_status'] = $product->get_tax_status()                     ??null;
-            $properties['tax_class'] = $product->get_tax_class()                       ??null;
-            $properties['manage_stock'] = $product->get_manage_stock()                 ??null;
-            $properties['stock_quantity'] = $product->get_stock_quantity()             ??null;
-            $properties['stock_status'] = $product->get_stock_status()                 ??null;
-            $properties['backorders'] = $product->get_backorders()                     ??null;
-            $properties['sold_individually'] = $product->get_sold_individually()       ??null;
+            $properties['position'] = $product->get_menu_order() ?? null;
+            $properties['tax_status'] = $product->get_tax_status() ?? null;
+            $properties['tax_class'] = $product->get_tax_class() ?? null;
+            $properties['manage_stock'] = $product->get_manage_stock() ?? null;
+            $properties['stock_quantity'] = $product->get_stock_quantity() ?? null;
+            $properties['stock_status'] = $product->get_stock_status() ?? null;
+            $properties['backorders'] = $product->get_backorders() ?? null;
+            $properties['sold_individually'] = $product->get_sold_individually() ?? null;
             //  $properties['purchase_note']      = $product->get_purchase_note();     ??null;
-            $properties['shipping_class'] = $product->get_shipping_class_id()          ??null;
-            $properties['weight'] = $product->get_weight()                             ??null;
-            $properties['length'] = $product->get_length()                             ??null;
-            $properties['width'] = $product->get_width()                               ??null;
-            $properties['height'] = $product->get_height()                             ??null;
+            $properties['shipping_class'] = $product->get_shipping_class_id() ?? null;
+            $properties['weight'] = $product->get_weight() ?? null;
+            $properties['length'] = $product->get_length() ?? null;
+            $properties['width'] = $product->get_width() ?? null;
+            $properties['height'] = $product->get_height() ?? null;
             //  $properties['dimensions']     = $product->get_dimensions();
             //  $properties['upsell_ids']        = json_encode($product->get_upsell_ids());
             //  $properties['cross_sell_ids']    = json_encode($product->get_cross_sell_ids());
-            $properties['parent_id'] = $product->get_parent_id()                   ??null;
-            $properties['variations'] = $product->get_attributes()                 ??null;
-            $properties['default_variation'] = $product->get_default_attributes()  ??null;
+            $properties['parent_id'] = $product->get_parent_id() ?? null;
+            $properties['variations'] = $product->get_attributes() ?? null;
+            $properties['default_variation'] = $product->get_default_attributes() ?? null;
             //  $properties['categories']         = $product->get_categories(); HTML
             //  $properties['category_ids']    = json_encode($product->get_category_ids()); //Array
             //  $properties['tag_ids']         = json_encode($product->get_tag_ids());
-            $properties['downloads'] = $product->get_downloads()                     ??null;
-            $properties['download_expiry'] = $product->get_download_expiry()         ??null;
-            $properties['downloadable'] = $product->get_downloadable()               ??null;
-            $properties['download_limit'] = $product->get_download_limit()           ??null;
-            $properties['image_id'] = $product->get_image_id()                       ??null;
+            $properties['downloads'] = $product->get_downloads() ?? null;
+            $properties['download_expiry'] = $product->get_download_expiry() ?? null;
+            $properties['downloadable'] = $product->get_downloadable() ?? null;
+            $properties['download_limit'] = $product->get_download_limit() ?? null;
+            $properties['image_id'] = $product->get_image_id() ?? null;
             //  $properties['image']              = $product->get_image(); HTML
             //	$properties['gallery_image_ids'] = json_encode($product->get_gallery_image_ids());
-            $properties['reviews_allowed'] = $product->get_reviews_allowed()      ??null;
-            $properties['rating_count'] = $product->get_rating_counts()           ??null;
-            $properties['average_rating'] = $product->get_average_rating()        ??null;
-            $properties['review_count'] = $product->get_review_count()            ??null;
+            $properties['reviews_allowed'] = $product->get_reviews_allowed() ?? null;
+            $properties['rating_count'] = $product->get_rating_counts() ?? null;
+            $properties['average_rating'] = $product->get_average_rating() ?? null;
+            $properties['review_count'] = $product->get_review_count() ?? null;
 
             if ($properties["sku"] == '') {
-                $properties["sku"] = $properties['product_id']??null;
+                $properties["sku"] = $properties['product_id'] ?? null;
             }
         }
 
@@ -1893,9 +1955,9 @@ class Segment_For_Wp_By_In8_Io
 
         $order = wc_get_order($order_id);
         if ($order) {
-            $total = (double)$order->get_total()??null;
-            $tax = (double)$order->get_total_tax()??null;
-            $shipping = (double)$order->get_shipping_total()??null;
+            $total = (double)$order->get_total() ?? null;
+            $tax = (double)$order->get_total_tax() ?? null;
+            $shipping = (double)$order->get_shipping_total() ?? null;
             //TODO explain this to users
             $revenue = $total - $shipping - $tax;
             $order_properties = array(
@@ -1965,7 +2027,7 @@ class Segment_For_Wp_By_In8_Io
                 'view_order_url' => $order->get_view_order_url(),
                 'edit_order_url' => $order->get_edit_order_url(),
             );
-            $order_properties['products'] = self::get_product_array_from_order_array($order)??null;
+            $order_properties['products'] = self::get_product_array_from_order_array($order) ?? null;
         } else {
             $order_properties = array();
         }
@@ -1987,65 +2049,65 @@ class Segment_For_Wp_By_In8_Io
         $properties = array();
         foreach ($order->get_items() as $item_id => $item) {
             // Get an instance of corresponding the WC_Product object
-            $product = $item->get_product()??null;
-            $quantity = $item->get_quantity()??null;
-            $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()??null), 'single-post-thumbnail');
+            $product = $item->get_product() ?? null;
+            $quantity = $item->get_quantity() ?? null;
+            $image_url = wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id() ?? null), 'single-post-thumbnail');
             $items_data[$item_id] = array(
                 'quantity' => $quantity,
-                'product_id' => $product->get_id()??null,
-                'sku' => $product->get_name()??null,
-                'category' => $product->get_category_ids()??null,
-                'name' => $product->get_name()??null,
-                'price' => $product->get_price()??null,
-                'regular_price' => $product->get_regular_price()??null,
-                'sale_price' => $product->get_sale_price()??null,
-                'on_sale_from' => $product->get_date_on_sale_from()??null,
-                'on_sale_to' => $product->get_date_on_sale_to()??null,
+                'product_id' => $product->get_id() ?? null,
+                'sku' => $product->get_name() ?? null,
+                'category' => $product->get_category_ids() ?? null,
+                'name' => $product->get_name() ?? null,
+                'price' => $product->get_price() ?? null,
+                'regular_price' => $product->get_regular_price() ?? null,
+                'sale_price' => $product->get_sale_price() ?? null,
+                'on_sale_from' => $product->get_date_on_sale_from() ?? null,
+                'on_sale_to' => $product->get_date_on_sale_to() ?? null,
                 //'total_sales'        => $product->get_total_sales(),
-                'url' => get_permalink($product->get_id())??null,
+                'url' => get_permalink($product->get_id()) ?? null,
                 'image_url' => $image_url,
-                'slug' => $product->get_slug()??null,
-                'date_created' => $product->get_date_created()??null,
-                'date_modified' => $product->get_date_modified()??null,
-                'status' => $product->get_status()??null,
-                'featured' => $product->get_featured()??null,
-                'catalog_visibility' => $product->get_catalog_visibility()??null,
+                'slug' => $product->get_slug() ?? null,
+                'date_created' => $product->get_date_created() ?? null,
+                'date_modified' => $product->get_date_modified() ?? null,
+                'status' => $product->get_status() ?? null,
+                'featured' => $product->get_featured() ?? null,
+                'catalog_visibility' => $product->get_catalog_visibility() ?? null,
                 //'description'        => $product->get_description(),
                 //'short_description'  => $product->get_short_description(),
-                'position' => $product->get_menu_order()??null,
-                'tax_status' => $product->get_tax_status()??null,
-                'tax_class' => $product->get_tax_class()??null,
-                'manage_stock' => $product->get_manage_stock()??null,
-                'stock_quantity' => $product->get_stock_quantity()??null,
-                'stock_status' => $product->get_stock_status()??null,
-                'backorders' => $product->get_backorders()??null,
-                'sold_individually' => $product->get_sold_individually()??null,
+                'position' => $product->get_menu_order() ?? null,
+                'tax_status' => $product->get_tax_status() ?? null,
+                'tax_class' => $product->get_tax_class() ?? null,
+                'manage_stock' => $product->get_manage_stock() ?? null,
+                'stock_quantity' => $product->get_stock_quantity() ?? null,
+                'stock_status' => $product->get_stock_status() ?? null,
+                'backorders' => $product->get_backorders() ?? null,
+                'sold_individually' => $product->get_sold_individually() ?? null,
                 //'purchase_note'      => $product->get_purchase_note(),
-                'shipping_class' => $product->get_shipping_class_id()??null,
-                'weight' => $product->get_weight()??null,
-                'length' => $product->get_length()??null,
-                'width' => $product->get_width()??null,
-                'height' => $product->get_height()??null,
+                'shipping_class' => $product->get_shipping_class_id() ?? null,
+                'weight' => $product->get_weight() ?? null,
+                'length' => $product->get_length() ?? null,
+                'width' => $product->get_width() ?? null,
+                'height' => $product->get_height() ?? null,
 //                'dimensions' => $product->get_dimensions()??null,
-                'upsell_ids' => $product->get_upsell_ids()??null,
-                'cross_sell_ids' => $product->get_cross_sell_ids()??null,
-                'parent_id' => $product->get_parent_id()??null,
-                'variations' => $product->get_attributes()??null,
-                'default_variation' => $product->get_default_attributes()??null,
+                'upsell_ids' => $product->get_upsell_ids() ?? null,
+                'cross_sell_ids' => $product->get_cross_sell_ids() ?? null,
+                'parent_id' => $product->get_parent_id() ?? null,
+                'variations' => $product->get_attributes() ?? null,
+                'default_variation' => $product->get_default_attributes() ?? null,
 //                'categories' => $product->get_categories()??null,
-                'category_ids' => $product->get_category_ids()??null,
-                'tag_ids' => $product->get_tag_ids()??null,
-                'downloads' => $product->get_downloads()??null,
-                'download_expiry' => $product->get_download_expiry()??null,
-                'downloadable' => $product->get_download_expiry()??null,
-                'download_limit' => $product->get_download_limit()??null,
-                'image_id' => $product->get_image_id()??null,
-                'image' => $product->get_image()??null,
-                'gallery_image_ids' => $product->get_gallery_image_ids()??null,
-                'reviews_allowed' => $product->get_reviews_allowed()??null,
-                'rating_count' => $product->get_rating_counts()??null,
-                'average_rating' => $product->get_average_rating()??null,
-                'review_count' => $product->get_review_count()??null
+                'category_ids' => $product->get_category_ids() ?? null,
+                'tag_ids' => $product->get_tag_ids() ?? null,
+                'downloads' => $product->get_downloads() ?? null,
+                'download_expiry' => $product->get_download_expiry() ?? null,
+                'downloadable' => $product->get_download_expiry() ?? null,
+                'download_limit' => $product->get_download_limit() ?? null,
+                'image_id' => $product->get_image_id() ?? null,
+                'image' => $product->get_image() ?? null,
+                'gallery_image_ids' => $product->get_gallery_image_ids() ?? null,
+                'reviews_allowed' => $product->get_reviews_allowed() ?? null,
+                'rating_count' => $product->get_rating_counts() ?? null,
+                'average_rating' => $product->get_average_rating() ?? null,
+                'review_count' => $product->get_review_count() ?? null
             );
             $items_data[$item_id] = array_filter($items_data[$item_id]);
         }
@@ -2247,8 +2309,7 @@ class Segment_For_Wp_By_In8_Io
 
             return ob_get_clean();
 
-        }
-        else {
+        } else {
             return null;
         }
 

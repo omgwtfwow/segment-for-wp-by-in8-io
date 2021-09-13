@@ -177,7 +177,6 @@ class Segment_For_Wp_By_In8_Io_Public
         );
         $args['wp_user_id'] = $args["args"][1]["ID"];
         $args['args'] = null;
-
         Segment_For_Wp_By_In8_Io_Cookie::set_cookie($action, $args);
         if (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
             Segment_For_Wp_By_In8_Io_Cookie::set_cookie('identify', $args);
@@ -207,8 +206,7 @@ class Segment_For_Wp_By_In8_Io_Public
     /**
      * @param ...$args 'int $id, WP_Comment $comment'
      */
-    public function wp_insert_comment(...$args)
-    {
+    public function wp_insert_comment(...$args){
         if (isset($args[1]->comment_author) && $args[1]->comment_author == 'WooCommerce') {
             //because Woo inserts a comment with order details
             return;
@@ -224,14 +222,13 @@ class Segment_For_Wp_By_In8_Io_Public
             $wp_user_id = Segment_For_Wp_By_In8_Io::get_wp_user_id($action, $args);
         }
         $args['wp_user_id'] = $wp_user_id;
-
         Segment_For_Wp_By_In8_Io_Cookie::set_cookie('wp_insert_comment', $args);
         if (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
             Segment_For_Wp_By_In8_Io_Cookie::set_cookie('identify', $args);
         }
     }
 
-    /**
+    /** TODO
      * @param ...$args '$form_data'
      */
     public function ninja_forms_after_submission(...$args)
@@ -244,6 +241,7 @@ class Segment_For_Wp_By_In8_Io_Public
         );
         $event_properties = array();
         //process fields
+
         foreach ($args["args"][0]["fields"] as $field) {
             if ($field["value"] != "") {
                 if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_event_name_field"]) {
@@ -261,7 +259,6 @@ class Segment_For_Wp_By_In8_Io_Public
                         $ninja_form_event_properties = $settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"];
                         foreach ($ninja_form_event_properties as $event_property) {
                             if ($field["admin_label"] == $event_property["ninja_form_event_property_field_id"]) {
-
                                 $event_properties[$event_property["ninja_form_event_property_label"]] = $field["value"];
                             }
                         }
@@ -369,9 +366,7 @@ class Segment_For_Wp_By_In8_Io_Public
         Segment_For_Wp_By_In8_Io_Cookie::set_cookie($action, $args);
 
         if ($settings["track_gravity_forms_fieldset"]["identify_gravity_forms"] == 'yes') {
-            if ($args['wp_user_id'] &&
-                $args['wp_user_id'] !== "" &&
-                $args['wp_user_id'] != 0) {
+            if (array_key_exists('wp_user_id', $args) && $args['wp_user_id'] != 0) {
                 $wp_user = get_user_by('ID', $args["wp_user_id"]);
                 if ($wp_user) {
                     $args["wp_user_id"] = $wp_user->ID;
@@ -401,7 +396,7 @@ class Segment_For_Wp_By_In8_Io_Public
         } else {
             $gf_identify = false;
         }
-        $gf_event_props = array();
+        $gf_event_props = Array();
         foreach ($form['fields'] as $field) {
             if ($gf_event_name_field != '') {
                 if ($field["adminLabel"] == $gf_event_name_field) {
@@ -444,43 +439,68 @@ class Segment_For_Wp_By_In8_Io_Public
             }
 
         }
-        if (!$gf_wp_user_id) {
+        if (!isset($gf_wp_user_id)) {
             if (is_user_logged_in()) {
                 $gf_wp_user_id = sanitize_text_field(get_current_user_id());
             }
         }
 
-        if ($gf_identify && $gf_wp_user_id && is_user_logged_in()) {
+        if ($gf_identify && isset($gf_wp_user_id) && is_user_logged_in()) {
             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($gf_wp_user_id);
-            $user_traits = json_encode(Segment_For_Wp_By_In8_Io::get_user_traits($gf_wp_user_id));
+            $user_traits = Segment_For_Wp_By_In8_Io::get_user_traits($gf_wp_user_id);
             $identify = true;
         }
-        $gf_event_props = json_encode($gf_event_props);
-
-        if (isset($confirmation['redirect'])) {
-
-            $url = esc_url_raw($confirmation['redirect']);
-            GFCommon::log_debug(__METHOD__ . '(): Redirect to URL: ' . $url);
-
-            return "<script type='text/javascript' src='$js_file'></script>" .
-                "<script>s4wp_run_gf_tracking('$form','$entry','$url','$ajax_url',
-						'$ajax_nonce', '$gf_event_name', '$gf_event_props', '$identify','$user_id','$user_traits'
-					)</script>";
-
-//			. "$entry" . "$url" .'$identify' . '$ajax_url' .
-//			  "$ajax_nonce" . "$gf_event_name" . "$gf_event_props" .
-//			  "$identify" . "$user_id" . "$user_traits" .
-//			  ".
-        } else {
-            $string = "<script type='text/javascript' src='$js_file'></script>" .
-                "<script>s4wp_run_gf_tracking('$form','$entry','false','$identify','$ajax_url',
-						'$ajax_nonce', '$gf_event_name', '$gf_event_props', '$identify','$user_id','$user_traits'
-					)</script>";
-//			          "<script>s4wp_run_gf_tracking('$form',' $entry ', false ,'echo $ajax_url','$ajax_nonce', '$gf_event_name', '$gf_event_props', '$identify','$user_id','$user_traits')</script>";
-            return $confirmation . $string;
-
+        else{
+            $user_id = null;
+            $identify = false;
         }
 
+        $form = json_encode($form);
+        $entry = json_encode($entry);
+        $gf_event_props = json_encode($gf_event_props);
+        $user_traits = isset($user_traits)?json_encode($user_traits):json_encode(array());
+
+        if(isset($gf_event_name)&&$gf_event_name!='') {
+            if (isset($confirmation['redirect'])) {
+
+                $url = esc_url_raw($confirmation['redirect']);
+                GFCommon::log_debug(__METHOD__ . '(): Redirect to URL: ' . $url);
+
+                return "<script type='text/javascript' src='$js_file'></script>" .
+                    "<script>s4wp_run_gf_tracking(
+                            '$form',
+                            '$entry',
+                            '$url',
+                            '$ajax_url',
+						    '$ajax_nonce',
+						    '$gf_event_name',
+						    '$gf_event_props',
+						    '$identify',
+						    '$user_id',
+						    '$user_traits'
+					)</script>";
+
+            }
+            else {
+
+                $string = "<script type='text/javascript' src='$js_file'></script>" .
+                    "<script>s4wp_run_gf_tracking(
+                            '$form',
+                            '$entry',
+                             null,
+                            '$ajax_url',
+                            '$ajax_nonce',
+                            '$gf_event_name',
+                            '$gf_event_props',
+                            '$identify',
+                            '$user_id',
+                            '$user_traits'
+					)</script>";
+                return $confirmation . $string;
+
+            }
+
+        }
 
     }
 
@@ -871,7 +891,6 @@ class Segment_For_Wp_By_In8_Io_Public
         if ($wp_user) {
             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
             $user_traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
-
             $user_identify = array();
             $user_identify['event'] = 'identify';
             $user_identify['user_id'] = $user_id;

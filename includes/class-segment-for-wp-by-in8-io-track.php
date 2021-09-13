@@ -77,6 +77,7 @@ class Segment_For_Wp_By_In8_Io_Track
                                     }
                                 }
                             }
+
                         }
                         ?>
                         <script type="text/javascript">

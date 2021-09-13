@@ -58,11 +58,14 @@ class Segment_For_Wp_By_In8_Io_Identify {
 							Segment_For_Wp_By_In8_Io_Cookie::delete_matching_cookies($cookie_name);
 							return;
 						}
+
 						$traits = Segment_For_Wp_By_In8_Io::get_user_traits( $wp_user_id );
+
 						?>
                         <script type="text/javascript">
+                            console.log(<?php echo sanitize_text_field( json_encode( $traits ) )?>)
                             analytics.identify("<?php echo sanitize_text_field( $user_id ) ?>",
-								<?php echo sanitize_text_field( json_encode( $traits ) )?>,
+								<?php echo json_encode( $traits ) ?>,
                                 {},
                                 function () {
                                     Cookies.remove("<?php echo sanitize_text_field( $cookie_name )?>");
@@ -72,7 +75,9 @@ class Segment_For_Wp_By_In8_Io_Identify {
 						<?php
 						Segment_For_Wp_By_In8_Io_Cookie::delete_matching_cookies($cookie_name);
 
-					} else {
+					}
+
+                    else {
 						$wp_user_id = $current_user->ID;
 						if ( $wp_user_id && $wp_user_id != 0 ) {
 							$user_id = Segment_For_Wp_By_In8_Io::get_user_id( $wp_user_id );

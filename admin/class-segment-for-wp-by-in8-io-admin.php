@@ -956,21 +956,6 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 								),
 
-//								array(
-//									'id'          => 'identify_ninja_forms_method',
-//									'type'        => 'radio',
-//									'title'       => 'Identify Base Method',
-//									'description' => 'Different methods available to determine the user id and get the user\'s traits. ',
-//									'options'     => array(
-//										'WP User ID' => 'Will use the WP user ID to fetch the user ID and traits from WP backend.',
-//										'Custom User ID'   => 'Will use a field you choose as a user id. At the moment these won\'t include any tr,
-//									),
-//									'default'     => 'socket',
-//									'dependency'  => array( 'php_api_key', '!=', '' ),
-//									'wrap_class'  => 'no-border-bottom',
-//								),
-//
-
 								array(
 									'id'          => 'ninja_forms_wp_user_id_field',
 									'type'        => 'text',
@@ -1003,7 +988,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 									'id'          => 'ninja_forms_event_name_field',
 									'type'        => 'text',
 									'title'       => 'Event Names',
-									'description' => 'The event names are pulled from a form field, you need to provide the \'Admin Label\' for the form field you want to use as the event name.</br>',
+									'description' => 'You can provide an \'Admin Label\' for a field you want to use as the event name. For example, add a hidden form field with the event name as the default value, set an Admin Label for that field and then enter it here.</br>',
 									'attributes'  => array(
 										'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
 									),
@@ -1072,7 +1057,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 							'type'        => 'fieldset',
 							'id'          => 'track_gravity_forms_fieldset',
 							'title'       => 'Track Gravity Forms',
-							'description' => 'Trigger events when people complete Gravity Forms.</br></br>',
+							'description' => 'Trigger events when people complete Gravity Forms.</br></br>You can find "Admin Field Labels" in the "Advanced" section of the field when creating forms.',
 							'options'     => array(
 								'cols' => 1,
 							),
@@ -1102,26 +1087,12 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 								),
 
-//								array(
-//									'id'          => 'identify_ninja_forms_method',
-//									'type'        => 'radio',
-//									'title'       => 'Identify Base Method',
-//									'description' => 'Different methods available to determine the user id and get the user\'s traits. ',
-//									'options'     => array(
-//										'WP User ID' => 'Will use the WP user ID to fetch the user ID and traits from WP backend.',
-//										'Custom User ID'   => 'Will use a field you choose as a user id. At the moment these won\'t include any tr,
-//									),
-//									'default'     => 'socket',
-//									'dependency'  => array( 'php_api_key', '!=', '' ),
-//									'wrap_class'  => 'no-border-bottom',
-//								),
-//
 
 								array(
 									'id'          => 'gravity_forms_wp_user_id_field',
 									'type'        => 'text',
 									'title'       => 'WP User ID Field',
-									'description' => 'The admin label of the fields that will contain a wordpress user id. If no field is specified, it will use the wp id for logged in users.',
+									'description' => 'The "Admin Field Label" of the fields that will contain a wordpress user id. If no field is specified, it will use the wp id for logged in users.',
 									'attributes'  => array(
 										'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
 
@@ -1149,7 +1120,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 									'id'          => 'gravity_forms_event_name_field',
 									'type'        => 'text',
 									'title'       => 'Event Names',
-									'description' => 'The event names are pulled from a form field, you need to provide the \'Admin Label\' for the form field you want to use as the event name.</br>',
+									'description' => 'Provide the "Admin Field Label" for the field you want to use as the event name. For example, create a hidden field with an event name as the default value, then enter the  "Admin Field Label" for that field here.</br>',
 									'attributes'  => array(
 										'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
 									),
@@ -1161,7 +1132,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 									'id'          => 'gravity_forms_properties_info',
 									'type'        => 'content',
 									'title'       => '</br>Event Properties',
-									'description' => 'Event properties can be created from form fields. Provide a name for the property, and an \'Admin Label\' for the form field you want to use as the value of that property.',
+									'description' => 'Event properties can be created from form fields. Provide a name for the property, and an \'Admin Field Label\' for the form field you want to use as the value of that property.',
 									'wrap_class'  => 'no-border-bottom',
 									'dependency'  => array( 'track_gravity_forms', '==', 'true' ),
 								),
@@ -1199,7 +1170,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 											'class'      => 'chosen',
 											'attributes' => array(
 												'data-title'  => 'title',
-												'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
+												'placeholder' => esc_html__( '\'Admin Field Label\'', 'plugin-name' ),
 
 											),
 										),
@@ -1211,123 +1182,6 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 							),
 						),
-//
-//						//GRAVITY FORM
-//						array(
-//							'type'        => 'fieldset',
-//							'id'          => 'track_gravity_forms_fieldset',
-//							'title'       => 'Track Gravity Forms',
-//							'description' => 'Trigger events when people complete Gravity Forms',
-//							'options'     => array(
-//								'cols' => 1,
-//							),
-////							'dependency' => array( $gravity_forms_active, '==', true ),
-//							'fields'      => array(
-//								array(
-//									'id'         => 'track_gravity_forms',
-//									'type'       => 'switcher',
-//									'wrap_class' => 'no-border-bottom',
-//								),
-//
-//								array(
-//									'id'          => 'gravity_forms_event_name_field',
-//									'type'        => 'text',
-//									'title'       => 'Gravity Forms Event Name',
-//									'description' => 'The admin label of the fields that will contain the event names',
-//									'attributes'  => array(
-//										'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
-//
-//									),
-//									'wrap_class'  => 'no-border-bottom',
-//									'dependency'  => array( 'track_gravity_forms', '==', 'true' ),
-//								),
-//								array(
-//									'type'       => 'group',
-//									'id'         => 'gravity_form_event_properties',
-//									'title'      => esc_html__( 'Gravity Forms event properties', 'plugin-name' ),
-//									'options'    => array(
-//										'repeater'     => true,
-//										'accordion'    => true,
-//										'button_title' => esc_html__( 'Add new', 'plugin-name' ),
-//										'group_title'  => esc_html__( 'Accordion Title', 'plugin-name' ),
-//										'limit'        => 50,
-//										'sortable'     => false,
-//										'mode'         => 'compact',
-//
-//									),
-//									'fields'     => array(
-//										array(
-//											'id'         => 'gravity_form_event_property_label',
-//											'type'       => 'text',
-//											'prepend'    => 'Event Property Label',
-//											'attributes' => array(
-//												'data-title'  => 'title',
-//												'placeholder' => esc_html__( 'Example', 'plugin-name' ),
-//											),
-//											'class'      => 'chosen',
-//										),
-//										array(
-//											'id'         => 'gravity_form_event_property_field_id',
-//											'type'       => 'text',
-//											'prepend'    => 'Event Property Value',
-//											'class'      => 'chosen',
-//											'attributes' => array(
-//												'data-title'  => 'title',
-//												'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
-//
-//											),
-//										),
-//									),
-////							'dependency' => array('track_gravity_forms|gravity_forms_active', '==|==', 'true|true' ),
-//									'dependency' => array( 'track_gravity_forms', '==', 'true' ),
-//									'wrap_class' => 'no-border-bottom',
-//
-//								),
-//								array(
-//									'id'         => 'identify_gravity_forms',
-//									'label'      => 'Fire identify calls for gravity Forms?',
-//									'type'       => 'switcher',
-//									'wrap_class' => 'no-border-bottom',
-////							'dependency'  => array( 'track_gravity_forms|gravity_forms_active', '==|==', 'true|true'  ),
-//									'dependency' => array( 'track_gravity_forms', '==', 'true' ),
-//
-//								),
-//								array(
-//									'id'          => 'gravity_forms_wp_user_id_field',
-//									'type'        => 'text',
-//									'title'       => 'WP User ID Field',
-//									'description' => 'The admin label of the fields that will contain a wordpress user id',
-//									'attributes'  => array(
-//										'placeholder' => esc_html__( 'Field \'Admin Label\'', 'plugin-name' ),
-//
-//									),
-//									'wrap_class'  => 'no-border-bottom',
-//									'dependency'  => array(
-//										'track_gravity_forms|identify_gravity_forms',
-//										'==|==',
-//										'true|true'
-//									),
-//								),
-//
-//								array(
-//									'id'         => 'track_gravity_forms_server',
-//									'type'       => 'checkbox',
-//									'label'      => 'Track server side',
-//									'dependency' => array( 'track_gravity_forms', '==', 'true' ),
-//								),
-//
-//								array(
-//									'type'        => 'content',
-//									'class'       => 'class-name', // for all fieds
-//									'content'     => '<hr>',
-//									'description' => 'Track Gravity Forms?',
-//									'wrap_class'  => 'no-border-bottom',
-////							'dependency'  => array( 'track_gravity_forms|gravity_forms_active', '==|==', 'true|true'  ),
-//									'dependency'  => array( 'track_gravity_forms', '==', 'true' ),
-//								),
-//							),
-//
-//						),
 					),
 			);
 
@@ -1441,7 +1295,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 													),
 													array(
-														'id'         => 'woocommerce_events_product_added_server',
+														'id'         => 'track_woocommerce_events_product_added_server',
 														'type'       => 'checkbox',
 														'label'      => 'Track server side',
 														'wrap_class' => 'no-border-bottom',
@@ -1460,7 +1314,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
                                                         'prepend'    => esc_html__( 'Product Added', 'plugin-name' ),
 														'class'      => 's4wp-woo-field',
 														'dependency' => array(
-															'woocommerce_events_product_added_server|track_woocommerce_events_product_added',
+															'track_woocommerce_events_product_added_server|track_woocommerce_events_product_added',
 															'==|==',
 															'true|true'
 														),
@@ -1510,7 +1364,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
 
 													),
 													array(
-														'id'         => 'woocommerce_events_product_removed_server',
+														'id'         => 'track_woocommerce_events_product_removed_server',
 														'type'       => 'checkbox',
 														'label'      => 'Track server side',
 														'wrap_class' => 'no-border-bottom',
@@ -1529,7 +1383,7 @@ class Segment_For_Wp_By_In8_Io_Admin {
                                                         'title'      => '<small>Event name</small>',
                                                         'prepend'    => 'Product Removed',
 														'dependency' => array(
-															'woocommerce_events_product_removed_server|track_woocommerce_events_product_removed',
+															'track_woocommerce_events_product_removed_server|track_woocommerce_events_product_removed',
 															'==|==',
 															'true|true'
 														),

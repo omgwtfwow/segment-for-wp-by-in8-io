@@ -74,6 +74,7 @@
         analytics.track(event_name, event_props, {}, function () {
             remove_cookie(cookie_name);
         })
+
     }
 
     function process_ninja_forms_cookies_on_load() {
