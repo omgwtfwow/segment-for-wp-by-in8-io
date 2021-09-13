@@ -5,7 +5,7 @@ Tags: segment, tracking, analytics
 Requires at least: 5.6
 Tested up to: 5.8.1
 Requires PHP: 7.0.0
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,9 +45,9 @@ The new version of the plugin is much much better, but you will need to set it u
 
 1. Supports client side (JS API) and server-side tracking (PHP API)
 2. Ability to filter out roles, custom post types and the admin area
-3. Rename your events, and easily include userID and email properties in each one
-4. Support for Ninja Forms and Gravity Forms
-5. Ability to include custom user traits in identify calls using meta keys
+3. Easily include userID and email properties
+4. Many other options for Identify calls
+5. Support for Ninja Forms and Gravity Forms
 6. Supports WooCommerce events, you can re-name them and track them server side, etc...
 
 == Frequently Asked Questions ==
