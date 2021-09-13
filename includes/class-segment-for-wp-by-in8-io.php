@@ -1762,7 +1762,8 @@ class Segment_For_Wp_By_In8_Io
                     $properties["order_id"] = $data["order_id"];
                     $properties = self::get_order_props_from_order_id($properties["order_id"]);
                 }
-            } elseif ($action == 'woocommerce_payment_complete') {
+            }
+            elseif ($action == 'woocommerce_payment_complete') {
                 if (is_numeric($data["order_id"])) {
                     $properties["order_id"] = $data["order_id"];
                     $properties = self::get_order_props_from_order_id($properties["order_id"]);
@@ -1800,8 +1801,7 @@ class Segment_For_Wp_By_In8_Io
                                 if (filter_var($order_email, FILTER_VALIDATE_EMAIL)) {
                                     if (email_exists($order_email)) {
                                         $user = get_user_by('email', $order_email);
-                                        $user_id = self::get_user_id($user->ID);
-                                        $properties["wc_user_id"] = $user_id;
+                                        $wp_user_id = self::get_user_id($user->ID);
                                     }
                                 }
                             }
@@ -1814,7 +1814,7 @@ class Segment_For_Wp_By_In8_Io
         }
 
         if ($settings["include_user_ids"] == "yes") {
-            if (isset($wp_user_id) && $wp_user_id !== 0 && $wp_user_id !== null) {
+            if (isset($wp_user_id) && $wp_user_id !== 0) {
                 $user_id = self::get_user_id($wp_user_id);
                 $properties["user_id"] = $user_id;
                 $user = get_userdata($wp_user_id);
