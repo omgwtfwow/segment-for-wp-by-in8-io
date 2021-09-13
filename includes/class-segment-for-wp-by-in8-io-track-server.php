@@ -31,8 +31,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->settings = $settings;
-        $this->async_request = new Segment_For_Wp_By_In8_Io_Async_Request($plugin_name, $version, $settings);
-        $this->background_task = new Segment_For_Wp_By_In8_Io_Background_Task($plugin_name, $version, $settings);
 
     }
 
@@ -58,10 +56,13 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                 "debug" => false,
                 "error_handler" => function ($code, $msg) {
                     error_log($msg);
+                    exit(1);
                 }
             ));
 
-        } else {
+        }
+
+        else {
             Segment::init($this->settings["php_api_key"], array(
                 "consumer" => "file",
                 "filename" => plugin_dir_path(dirname(__FILE__)) . 'tmp/analytics.log'
@@ -73,12 +74,19 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function file_consumer()
     {
         $settings = $this->settings;
+        $timeout = $this->settings["segment_php_consumer_timeout"];
+
+        if (!is_numeric($timeout)) {
+            $timeout = 1;
+        }
+
         $args = array(
             "secret" => $settings["php_api_key"],
             "file" => plugin_dir_path(dirname(__FILE__)) . 'tmp/analytics.log',
             "send_file" => plugin_dir_path(dirname(__FILE__)) . '/includes/segment_php/send.php',
+            "timeout" => $timeout
         );
-        if (isset($args["secret"]) && isset($args["file"])) {
+        if (isset($args["secret"]) && isset($args["file"]) && isset($args["timeout"])) {
             include(plugin_dir_path(dirname(__FILE__)) . '/includes/segment_php/send.php');
         }
     }
@@ -227,7 +235,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         as_enqueue_async_action( 'async_task', array($args), $this->plugin_name );
-
     }
 
     /**

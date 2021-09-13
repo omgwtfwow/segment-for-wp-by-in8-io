@@ -5,6 +5,7 @@
  */
 if (!isset($args["secret"])) die();
 if (!isset($args["file"])) die();
+if (!isset($args["timeout"])) die();
 $file = $args["file"];
 
 /**
@@ -32,7 +33,7 @@ $lines = explode("\n", $contents);
  */
 Segment::init($args["secret"], array(
 	"consumer"      => "socket",
-	"timeout"       => 0.5,
+	"timeout"       => $args["timeout"],
 	"error_handler" => function($code, $msg){
 		exit(1);
 	}

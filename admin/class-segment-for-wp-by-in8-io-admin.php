@@ -187,9 +187,15 @@ class Segment_For_Wp_By_In8_Io_Admin {
 					'attributes'  => array(
 						'placeholder' => 'paste your Segment PHP source API write key here',
 					),
-					'wrap_class'  => 'no-border-bottom',
 
 				),
+                array(
+                    'type'       => 'content',
+                    'class'      => 'class-name',
+                    'content'    => '<h3>Advanced Options</h3>',
+                    'wrap_class' => 'no-border-bottom',
+
+                ),
 				array(
 					'id'          => 'segment_php_consumer',
 					'type'        => 'radio',
@@ -203,10 +209,24 @@ class Segment_For_Wp_By_In8_Io_Admin {
 					'dependency'  => array( 'php_api_key', '!=', '' ),
 					'wrap_class'  => 'no-border-bottom',
 				),
+                array(
+                    'id'      => 'segment_php_consumer_file_cron_interval',
+                    'type'    => 'number',
+                    'title'   => 'File Consumer Cron Interval.',
+                    'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#file-consumer" target="_blank">Docs.</a> How often to upload events.',
+                    'dependency'  => array( 'php_api_key', '!=', '' ),
+                    'default' => '1',
+                    'after'   => ' <i class="text-muted">minutes</i>',
+                    'min'     => '1',
+                    'max'     => '5',
+                    'step'    => '1'
+
+                ),
 				array(
 					'id'         => 'segment_php_consumer_timeout',
 					'type'       => 'number',
 					'title'      => 'Socket Consumer Timeout',
+                    'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">Docs.</a> The number of seconds to wait for the socket request to time out, defaults to 1. </br></br> This setting affects both consumers.',
 					'dependency' => array( 'php_api_key', '!=', '' ),
 					'default'    => '1',
 					'after'      => ' <i class="text-muted">seconds</i>',
@@ -214,18 +234,6 @@ class Segment_For_Wp_By_In8_Io_Admin {
 					'max'        => '5',
 					'step'       => '0.5'
 				),
-
-//				array(
-//					'id'      => 'segment_php_consumer_file_cron_interval',
-//					'type'    => 'hidden',
-//					'title'   => 'File Consumer Cron Interval',
-//					'default' => '1',
-//					'after'   => ' <i class="text-muted">seconds</i>',
-//					'min'     => '0.5',
-//					'max'     => '5',
-//					'step'    => '0.5'
-//				),
-
 				array(
 					'id'         => 'nonce_string',
 					'type'       => 'hidden',
@@ -2161,11 +2169,6 @@ class Segment_For_Wp_By_In8_Io_Admin {
 		$settings["gravity_forms_active"] = $gravity_forms_active;
 		$settings["form_plugin_active"]   = $form_plugin_active;
 
-//		if ( $settings["track_signups_fieldset"]["track_signups"] == 'yes') {
-//			if ($settings["track_signups_fieldset"]["track_signups_client_event_name"] != '') {
-//				$fields[2]["fields"][9]["options"]['Signed up']=$settings["track_signups_fieldset"]["track_signups_client_event_name"];
-//			}
-//		}
         if(array_key_exists( 'track_logins_fieldset', $settings )) {
             if ($settings["track_logins_fieldset"]["track_logins"] == 'yes') {
                 if ($settings["track_logins_fieldset"]["track_logins_client_event_name"] != '') {
@@ -2205,24 +2208,20 @@ class Segment_For_Wp_By_In8_Io_Admin {
 		$log_file = $temp_dir . '/analytics.log';
 
         if(array_key_exists( 'segment_php_consumer', $settings )) {
+
             if ($settings["segment_php_consumer"] == 'file') {
                 $timestamp = time();
-                $recurrence = 'everyminute';
+                $recurrence = 's4wp_file_consumer';
                 $args = array();
                 if (!wp_next_scheduled('segment_4_wp_file_consumer')) {
                     wp_schedule_event($timestamp, $recurrence, 'segment_4_wp_file_consumer', $args);
                 }
-                $fields[0]["fields"][3]["type"] = 'hidden';
             }
-            if ($settings["segment_php_consumer"] == 'socket') {
+            elseif ($settings["segment_php_consumer"] == 'socket') {
                 wp_clear_scheduled_hook('segment_4_wp_file_consumer');
                 array_map('unlink', glob("$temp_dir/*.*"));
                 rmdir($temp_dir);
-            }
-            if ($settings["segment_php_consumer"] == 'socket') {
-                $fields[0]["fields"][3]["type"] = 'number';
-            } else {
-                $fields[0]["fields"][3]["type"] = 'hidden';
+                unset( $fields[0]["fields"][4]);
             }
         }
 		if ( ! file_exists( $temp_dir ) ) {
@@ -2236,12 +2235,22 @@ class Segment_For_Wp_By_In8_Io_Admin {
 	}
 
 	public function cron_schedules( $schedules ) {
-		if ( ! isset( $schedules["everyminute"] ) ) {
-			$schedules["everyminute"] = array(
-				'interval' => 60,
-				'display'  => __( 'Once every minute' )
+        $settings = $this->settings;
+
+		if ( ! isset( $schedules["s4wp_file_consumer"] ) ) {
+
+            $interval = $settings["segment_php_consumer_file_cron_interval"];
+
+            if(!is_numeric($interval)){
+                $interval = 1;
+            }
+
+			$schedules["s4wp_file_consumer"] = array(
+				'interval' => 60*$interval,
+				'display'  => __( 'Every ' .  $interval . ' minutes.' )
 			);
 		}
+
 
 		return $schedules;
 	}
