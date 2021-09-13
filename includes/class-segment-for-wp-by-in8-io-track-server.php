@@ -135,7 +135,7 @@ class Segment_For_Wp_By_In8_Io_Async_Request extends WP_Async_Request
 
 }
 
-class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
+class Segment_For_Wp_By_In8_Io_Background_Task extends WP_Background_Process
 {
 
     /**
@@ -160,13 +160,194 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     protected $settings;
 
+    /**
+     * @var string
+     */
+    protected $action = 'background_task';
+
+
+    /**
+     * Task
+     *
+     * Override this method to perform any actions required on each
+     * queue item. Return the modified item for further processing
+     * in the next pass through. Or, return false to remove the
+     * item from the queue.
+     *
+     * @param mixed $item Queue item to iterate over
+     *
+     * @return mixed
+     */
+    protected function task($item){
+
+        $settings = $this->settings;
+        $direct = $item['direct'] ?? false;
+        $action = $item['action_hook'];
+        $action_server = $action . '_server';
+        $wp_user_id = $item['wp_user_id'] ?? null;
+        $ajs_anon_id = $item['ajs_anon_id'] ?? null;
+        $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
+
+        if ($direct) {
+
+            $event_name = $_POST['event_name']??null;
+            $properties = $_POST['properties']??null;
+            if ($event_name && $event_name != '') {
+
+                if ($user_id) {
+
+                    if (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
+                        $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
+                        Analytics::identify(array(
+                            "userId" => $user_id,
+                            "traits" => $traits
+                        ));
+                    }
+
+                    Analytics::track(array(
+                        "userId" => $user_id,
+                        "event" => $event_name,
+                        "properties" => $properties
+                    ));
+
+
+                }
+
+                elseif ($ajs_anon_id) {
+                    Analytics::track(array(
+                        "anonymousId" => $ajs_anon_id,
+                        "event" => $event_name,
+                        "properties" => $properties
+                    ));
+                }
+
+            }
+
+        }
+        else {
+            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
+            $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server, $item);
+            $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $item);
+
+            if ($event_name) {
+
+                if ($user_id) {
+
+                    if ($action === 'user_register') {
+                        $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
+                        Analytics::identify(array(
+                            "userId" => $user_id,
+                            "traits" => $traits
+                        ));
+                    } elseif ($action === 'ninja_forms_after_submission') {
+                        if (array_key_exists('identify_ninja_forms', $settings["track_ninja_forms_fieldset"])) {
+                            if ($settings["track_ninja_forms_fieldset"]["identify_ninja_forms"] == 'yes') {
+                                $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
+                                Analytics::identify(array(
+                                    "userId" => $user_id,
+                                    "traits" => $traits
+                                ));
+                            }
+                        }
+
+
+                    } elseif ($action === 'gform_after_submission') {
+                        if (array_key_exists('identify_gravity_forms', $settings["track_gravity_forms_fieldset"])) {
+                            if ($settings["track_gravity_forms_fieldset"]["identify_gravity_forms"] == 'yes') {
+                                $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
+                                Analytics::identify(array(
+                                    "userId" => $user_id,
+                                    "traits" => $traits
+                                ));
+                            }
+                        }
+
+
+                    } elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
+                        $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
+                        Analytics::identify(array(
+                            "userId" => $user_id,
+                            "traits" => $traits
+                        ));
+                    }
+
+                    Analytics::track(array(
+                        "userId" => $user_id,
+                        "event" => $event_name,
+                        "properties" => $properties
+                    ));
+
+                }
+
+                elseif ($ajs_anon_id) {
+                    Analytics::track(array(
+                        "anonymousId" => $ajs_anon_id,
+                        "event" => $event_name,
+                        "properties" => $properties
+                    ));
+                }
+
+
+            }
+        }
+        Analytics::flush();
+        return false;
+    }
+
+    /**
+     * Complete
+     *
+     * Override if applicable, but ensure that the below actions are
+     * performed, or, call parent::complete().
+     */
+    protected function complete() {
+        parent::complete();
+
+        // Show notice to user or perform some other arbitrary task...
+    }
+
+}
+
+class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
+{
+
+    /**
+     * The ID of this plugin.
+     *
+     * @since    1.0.0
+     * @access   protected
+     * @var      string $plugin_name The ID of this plugin.
+     */
+    protected $plugin_name;
+
+    /**
+     * The version of this plugin.
+     *
+     * @since    1.0.0
+     * @access   protected
+     * @var      string $version The current version of this plugin.
+     */
+    protected $version;
+    /**
+     * @var
+     */
+    protected $settings;
+    /**
+     * @var Segment_For_Wp_By_In8_Io_Async_Request
+     */
+    private $async_request;
+    /**
+     * @var Segment_For_Wp_By_In8_Io_Background_Task
+     */
+    private $background_task;
+
     public function __construct($plugin_name, $version, $settings)
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->settings = $settings;
         $this->async_request = new Segment_For_Wp_By_In8_Io_Async_Request($plugin_name, $version, $settings);
-
+        $this->background_task = new Segment_For_Wp_By_In8_Io_Background_Task($plugin_name, $version, $settings);
     }
 
     /**
@@ -228,15 +409,17 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = $args["args"][0];
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
     }
 
     /**
      * @param ...$args 'two args, $user_login (username), $user (object)'
      */
     public function wp_login(...$args)
-    { //user
+    {
+
+        //user
 
         $args = array(
             'action_hook' => current_action(),
@@ -245,8 +428,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = $args["args"][1]["ID"];
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
+
     }
 
     /**
@@ -263,8 +447,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = $args["args"][0];
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
     }
 
@@ -289,8 +473,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         }
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
     }
 
@@ -306,8 +490,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
     }
 
     /**
@@ -322,9 +506,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
-
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
     }
 
     /**
@@ -349,8 +532,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['product_id'] = $args["args"][1];
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
     }
 
@@ -374,49 +557,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $quantity = $args["args"][1]["removed_cart_contents"][$item_key]["quantity"];
         $args['args']['product_id'] = $product_id;
         $args['args']['quantity'] = $quantity;
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
-
-
-//        $action = current_action();
-//        $action_server = $action . '_server';
-//        $args = array(
-//            'action_hook' => $action,
-//            'args' => json_decode(json_encode(func_get_args()), true)
-//        );
-//        $args['product_id'] = $args["args"][1];
-//        $args['quantity'] = $args["args"][2];
-//        if (is_user_logged_in()) {
-//            $wp_user_id = get_current_user_id();
-//            $args['wp_user_id'] = $wp_user_id;
-//            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
-//        } else {
-//            $user_id = null;
-//            $anon_id = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-//            $args['$anon_id'] = $anon_id;
-//        }
-//
-//        $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server);
-//        $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-//        $properties["quantity"] = $args["args"][2];
-//        $properties = array_filter($properties);
-//        if ($event_name && $event_name !== '') {
-//            if (isset($user_id) && $user_id) {
-//                Analytics::track(array(
-//                    "userId" => $user_id,
-//                    "event" => $event_name,
-//                    "properties" => $properties
-//                ));
-//            } elseif (isset($anon_id) && $anon_id) {
-//                Analytics::track(array(
-//                    "anonymousId" => $anon_id,
-//                    "event" => $event_name,
-//                    "properties" => $properties
-//                ));
-//            }
-//            Analytics::flush();
-//
-//        }
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
     }
 
@@ -479,8 +621,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
         if (isset($event_name) && $event_name !== '') {
 
-            $this->async_request->data($args);
-            $this->async_request->dispatch();
+            $this->background_task->push_to_queue($args);
+            $this->background_task->save()->dispatch();
 
         };
 
@@ -507,8 +649,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['product_id'] = $args['cart_contents'][$item_key]["product_id"];
         $args["quantity"] = $args['cart_contents'][$item_key]["quantity"];
 
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
     }
 
@@ -527,8 +669,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
 
     }
@@ -539,55 +681,18 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function woocommerce_order_status_failed(...$args)
     {
 
-        $action = current_action();
-        $action_server = $action . '_server';
         $args = array(
-            'action_hook' => $action,
+            'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
         );
-
+        $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
+        $args['wp_user_id'] = $wp_user_id;
+        $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
-        if (is_user_logged_in()) {
-            $wp_user_id = get_current_user_id();
-            $args['wp_user_id'] = $wp_user_id;
-            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
-        } else {
-            $user_id = null;
-            $anon_id = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-            $args['$anon_id'] = $anon_id;
-        }
-
-        $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server);
-        $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-        $properties = array_filter($properties);
-
-        if (!is_user_logged_in()) {
-            if (array_key_exists('wc_user_id', $properties)) {
-                $user_id = $properties['wc_user_id'];
-                unset($properties['wc_user_id']);
-            }
-
-        }
-
-        if ($event_name && $event_name !== '') {
-            if (isset($user_id) && $user_id) {
-                Analytics::track(array(
-                    "userId" => $user_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-            } elseif (isset($anon_id) && $anon_id) {
-                Analytics::track(array(
-                    "anonymousId" => $anon_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-
-            }
-            Analytics::flush();
-        }
 
     }
 
@@ -605,8 +710,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
     }
 
@@ -615,56 +720,18 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     public function woocommerce_order_status_completed(...$args)
     {
-
-        $action = current_action();
-        $action_server = $action . '_server';
         $args = array(
-            'action_hook' => $action,
+            'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
         );
-
+        $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
+        $args['wp_user_id'] = $wp_user_id;
+        $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
-        if (is_user_logged_in()) {
-            $wp_user_id = get_current_user_id();
-            $args['wp_user_id'] = $wp_user_id;
-            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
-        } else {
-            $user_id = null;
-            $anon_id = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-            $args['$anon_id'] = $anon_id;
-        }
-
-        $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server);
-        $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-        $properties = array_filter($properties);
-
-        if (!is_user_logged_in()) {
-            if (array_key_exists('wc_user_id', $properties)) {
-                $user_id = $properties['wc_user_id'];
-                unset($properties['wc_user_id']);
-            }
-
-        }
-
-        if ($event_name && $event_name !== '') {
-            if (isset($user_id) && $user_id) {
-                Analytics::track(array(
-                    "userId" => $user_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-            } elseif (isset($anon_id) && $anon_id) {
-                Analytics::track(array(
-                    "anonymousId" => $anon_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-
-            }
-            Analytics::flush();
-        }
 
     }
 
@@ -683,8 +750,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
-        $this->async_request->data($args);
-        $this->async_request->dispatch();
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
+
 
     }
 
@@ -693,56 +761,18 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     public function woocommerce_order_status_on_hold(...$args)
     {
-
-        $action = current_action();
-        $action_server = $action . '_server';
         $args = array(
-            'action_hook' => $action,
+            'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
         );
-
+        $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
+        $args['wp_user_id'] = $wp_user_id;
+        $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
-        if (is_user_logged_in()) {
-            $wp_user_id = get_current_user_id();
-            $args['wp_user_id'] = $wp_user_id;
-            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
-        } else {
-            $user_id = null;
-            $anon_id = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-            $args['$anon_id'] = $anon_id;
-        }
-
-        $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server);
-        $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-        $properties = array_filter($properties);
-
-        if (!is_user_logged_in()) {
-            if (array_key_exists('wc_user_id', $properties)) {
-                $user_id = $properties['wc_user_id'];
-                unset($properties['wc_user_id']);
-            }
-
-        }
-
-        if ($event_name && $event_name !== '') {
-            if (isset($user_id) && $user_id) {
-                Analytics::track(array(
-                    "userId" => $user_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-            } elseif (isset($anon_id) && $anon_id) {
-                Analytics::track(array(
-                    "anonymousId" => $anon_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-
-            }
-            Analytics::flush();
-        }
 
     }
 
@@ -752,55 +782,18 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function woocommerce_order_status_refunded(...$args)
     {
 
-        $action = current_action();
-        $action_server = $action . '_server';
         $args = array(
-            'action_hook' => $action,
+            'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
         );
-
+        $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
+        $args['wp_user_id'] = $wp_user_id;
+        $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
-        if (is_user_logged_in()) {
-            $wp_user_id = get_current_user_id();
-            $args['wp_user_id'] = $wp_user_id;
-            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
-        } else {
-            $user_id = null;
-            $anon_id = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-            $args['$anon_id'] = $anon_id;
-        }
-
-        $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server);
-        $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-        $properties = array_filter($properties);
-
-        if (!is_user_logged_in()) {
-            if (array_key_exists('wc_user_id', $properties)) {
-                $user_id = $properties['wc_user_id'];
-                unset($properties['wc_user_id']);
-            }
-
-        }
-
-        if ($event_name && $event_name !== '') {
-            if (isset($user_id) && $user_id) {
-                Analytics::track(array(
-                    "userId" => $user_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-            } elseif (isset($anon_id) && $anon_id) {
-                Analytics::track(array(
-                    "anonymousId" => $anon_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-
-            }
-            Analytics::flush();
-        }
 
     }
 
@@ -809,56 +802,18 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     public function woocommerce_order_status_cancelled(...$args)
     {
-
-        $action = current_action();
-        $action_server = $action . '_server';
         $args = array(
-            'action_hook' => $action,
+            'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
         );
-
+        $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
+        $args['wp_user_id'] = $wp_user_id;
+        $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
+        $this->background_task->push_to_queue($args);
+        $this->background_task->save()->dispatch();
 
-        if (is_user_logged_in()) {
-            $wp_user_id = get_current_user_id();
-            $args['wp_user_id'] = $wp_user_id;
-            $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
-        } else {
-            $user_id = null;
-            $anon_id = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-            $args['$anon_id'] = $anon_id;
-        }
-
-        $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server);
-        $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-        $properties = array_filter($properties);
-
-        if (!is_user_logged_in()) {
-            if (array_key_exists('wc_user_id', $properties)) {
-                $user_id = $properties['wc_user_id'];
-                unset($properties['wc_user_id']);
-            }
-
-        }
-
-        if ($event_name && $event_name !== '') {
-            if (isset($user_id) && $user_id) {
-                Analytics::track(array(
-                    "userId" => $user_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-            } elseif (isset($anon_id) && $anon_id) {
-                Analytics::track(array(
-                    "anonymousId" => $anon_id,
-                    "event" => $event_name,
-                    "properties" => $properties
-                ));
-
-            }
-            Analytics::flush();
-        }
 
     }
 
