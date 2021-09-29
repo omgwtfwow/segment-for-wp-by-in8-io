@@ -1,15 +1,15 @@
 <?php
 
 /**
- * @link              https://juangonzalez.com.au
+ * @link              https://github.com/omgwtfwow/segment-for-wp-by-in8-io
  * @since             1.0.0
  * @package           Segment_For_Wp_By_In8_Io
  *
  * @wordpress-plugin
  * Plugin Name:       Segment for WP by in8.io
- * Plugin URI:        https://in8.io
+ * Plugin URI:        https://github.com/omgwtfwow/segment-for-wp-by-in8-io
  * Description:       Segment Analytics for WordPress
- * Version:           2.0.1
+ * Version:           2.1.0
  * Author:            Juan
  * Author URI:        https://juangonzalez.com.au
  * License:           GPL-2.0+
@@ -26,7 +26,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Currently plugin version.
  */
-define( 'SEGMENT_FOR_WP_BY_IN8_IO_VERSION', '2.0.1' );
+define( 'SEGMENT_FOR_WP_BY_IN8_IO_VERSION', '2.1.0' );
 
 /**
  * The code that runs during plugin activation.

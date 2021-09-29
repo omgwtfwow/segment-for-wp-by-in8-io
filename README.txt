@@ -5,7 +5,7 @@ Tags: segment, tracking, analytics
 Requires at least: 5.6
 Tested up to: 5.8.1
 Requires PHP: 7.0.0
-Stable tag: 2.0.1
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,18 @@ There are annotations throughout the plugin to explain the different features.
 * Easily include userID and email properties in track calls
 * Ability to include custom user traits in identify calls using meta keys
 
+== Hooks ==
+
+You can use the following filters, please return the correct values.
+
+- "segment_for_wp_change_user_id" ($user_id): Return a user id.
+- "segment_for_wp_change_user_traits" ($traits, $wp_user_id): Return an associative array of traits.
+- "segment_for_wp_change_event_properties" ($properties, $action, $data): Return an associative array of properties.
+- "segment_for_wp_change_product_properties" ($properties): Return an associative array of product properties (for WooCommerce).
+- "segment_for_wp_change_order_properties" ($properties): Return an associative array of order properties (for WooCommerce).
+
+Happy to extend it, let me know.
+
 == Installation ==
 
 1. Upload the plugin zip file through the Plugins section of your site.
@@ -38,7 +50,8 @@ There are annotations throughout the plugin to explain the different features.
 
 == Upgrade Notice ==
 
-PLEASE READ!! You'll need to reconfigure the plugin again, so test it first and backup before upgrading.
+If you're upgrading between version 1.0 to 2.0: 
+You will need to reconfigure the plugin again, so test it first and backup before upgrading.
 The new version of the plugin is much much better, but you will need to set it up again.
 
 == Screenshots ==
@@ -57,6 +70,10 @@ The new version of the plugin is much much better, but you will need to set it u
 3. Will it slow my site down? Depends. The more destinations and the more events you use, the slower things can go. The same way as if you installed the scripts directly.
 
 == Changelog ==
+
+= 2.1.0 =
+* Adding filter hooks and hook documentation
+* Fixed User ID when default is selected.
 
 = 2.0.0 =
 * Re-wrote the whole plugin. Much better now.
