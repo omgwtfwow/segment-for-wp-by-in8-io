@@ -156,7 +156,7 @@ class Segment_Consumer_Socket extends Segment_QueueConsumer {
       $socket = $this->createSocket();
     }
 
-    return $success;
+    return true;
   }
 
   /**

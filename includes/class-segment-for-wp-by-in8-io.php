@@ -283,7 +283,7 @@ class Segment_For_Wp_By_In8_Io
         }
 
         //LOGINS
-        if (array_key_exists('track_ninja_forms_fieldset', $settings)) {
+        if (array_key_exists('track_logins_fieldset', $settings)) {
             if ($settings["track_logins_fieldset"]["track_logins"] == "yes") {
                 $this->loader->add_action('wp_login', $plugin_public, 'wp_login', 1, 2);
             }
@@ -762,11 +762,11 @@ class Segment_For_Wp_By_In8_Io
         if ($settings["userid_is_custom"] == "yes" && $settings["userid_custom_key"] != "") {
             $key = $settings["userid_custom_key"];
             $user_id = get_user_meta($wp_user_id, $key, true);
-        }
-
-        if ($settings["userid_is_email"] == "yes") {
+        } else if ($settings["userid_is_email"] == "yes") {
             $user_data = get_userdata($wp_user_id);
             $user_id = $user_data->user_email;
+        } else {
+            $user_id = $wp_user_id;
         }
 
         //you can use the hook 'change user id' to change the user id
@@ -777,7 +777,8 @@ class Segment_For_Wp_By_In8_Io
     /**
      * @param $wp_user_id
      *
-     * @return mixed|void
+     * @return Array
+     * @throws Exception
      */
     public static function get_user_traits($wp_user_id)
     {
@@ -861,8 +862,7 @@ class Segment_For_Wp_By_In8_Io
         // Clean out empty traits and apply filter before sending it back.
         $traits = array_filter($traits);
 
-        //Use the hook 'filter_user_traits' to modify user traits
-        //TODO: DOCS
+        //Use the hook 'segment_for_wp_change_user_traits' to modify user traits
         return apply_filters('segment_for_wp_change_user_traits', $traits, $wp_user_id);
 
     }
@@ -1832,30 +1832,10 @@ class Segment_For_Wp_By_In8_Io
                 }
             }
         }
-//        if (array_key_exists("included_user_traits", $settings)) {
-//            if (count($settings["included_user_traits"]) > 0) {
-//                if (isset($wp_user_id) && $wp_user_id !== 0) {
-//                    $traits = self::get_user_traits($wp_user_id);
-//                    $properties = array_merge($properties, $traits);
-//                }
-//            }
-//        }
-//        if (array_key_exists("custom_user_traits", $settings)) {
-//            if (count($settings["custom_user_traits"]) > 0) {
-//                if (isset($wp_user_id) && $wp_user_id !== 0) {
-//                    $custom_traits = $settings["custom_user_traits"];
-//                    foreach ($custom_traits as $custom_trait) {
-//                        $trait_key = $custom_trait['custom_user_traits_key'];
-//                        if ($trait_key != '') {
-//                            $trait_value = get_user_meta($wp_user_id, $trait_key, true);
-//                            $properties[$trait_key] = $trait_value;
-//                        }
-//                    }
-//                }
-//            }
-//        }
 
-        return apply_filters('segment_for_wp_change_event_properties', array_filter($properties));
+        $properties = array_filter($properties);
+
+        return apply_filters('segment_for_wp_change_event_properties', $properties, $action, $data);
 
     }
 
@@ -2320,8 +2300,8 @@ class Segment_For_Wp_By_In8_Io
                     }
                 }
             }
-
-            $properties = apply_filters('segment_for_wp_change_event_properties', array_filter($properties))
+            $properties = array_filter($properties);
+            $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, $data);
             ?>
             <script>
                 analytics.track('<?php echo sanitize_text_field($event_name); ?>',

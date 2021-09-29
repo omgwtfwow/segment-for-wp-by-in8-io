@@ -103,8 +103,10 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
         if ($direct) {
 
-            $event_name = $args['event_name']??null;
-            $properties = $args['properties']??null;
+            $event_name = $args['event_name'] ?? null;
+            $properties = $args['properties'] ?? null;
+            $properties = array_filter($properties);
+            $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, []);
             if ($event_name && $event_name != '') {
 
                 if ($user_id) {
@@ -147,7 +149,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
             $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server, $args);
             $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
-
+            $properties = array_filter($properties);
+            $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, []);
             if ($event_name) {
 
                 if (!$user_id && Segment_For_Wp_By_In8_Io::is_ecommerce_order_hook($action)) {
@@ -667,6 +670,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
     public function custom_events(...$args)
     {
+        //TODO
 
     }
 

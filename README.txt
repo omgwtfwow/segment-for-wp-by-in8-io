@@ -5,7 +5,7 @@ Tags: segment, tracking, analytics
 Requires at least: 5.6
 Tested up to: 5.8.1
 Requires PHP: 7.0.0
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,9 @@ The new version of the plugin is much much better, but you will need to set it u
 3. Will it slow my site down? Depends. The more destinations and the more events you use, the slower things can go. The same way as if you installed the scripts directly.
 
 == Changelog ==
+
+= 2.1.1 =
+* Fixes for Logged In event and fallback identify call
 
 = 2.1.0 =
 * Adding filter hooks and hook documentation
