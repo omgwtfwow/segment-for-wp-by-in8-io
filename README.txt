@@ -5,7 +5,7 @@ Tags: segment, tracking, analytics
 Requires at least: 5.6
 Tested up to: 5.8.1
 Requires PHP: 7.0.0
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,7 +72,7 @@ The new version of the plugin is much much better, but you will need to set it u
 == Changelog ==
 
 = 2.2.1 =
-* Fix bug initialising plugin without write permissions are available
+* Fix bug initialising plugin without write permissions for plugin folder
 * Handle critical error when Server side payload is greater than 8000 characters
 * Fix a bug with client side events for Gravity Forms
 
