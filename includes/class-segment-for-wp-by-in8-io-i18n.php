@@ -24,24 +24,25 @@
  * @subpackage Segment_For_Wp_By_In8_Io/includes
  * @author     Juan <hello@juangonzalez.com.au>
  */
-class Segment_For_Wp_By_In8_Io_i18n {
+class Segment_For_Wp_By_In8_Io_i18n
+{
 
 
-	/**
-	 * Load the plugin text domain for translation.
-	 *
-	 * @since    1.0.0
-	 */
-	public function load_plugin_textdomain() {
+    /**
+     * Load the plugin text domain for translation.
+     *
+     * @since    1.0.0
+     */
+    public function load_plugin_textdomain()
+    {
 
-		load_plugin_textdomain(
-			'segment-for-wp-by-in8-io',
-			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
-		);
+        load_plugin_textdomain(
+            'segment-for-wp-by-in8-io',
+            false,
+            dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
+        );
 
-	}
-
+    }
 
 
 }

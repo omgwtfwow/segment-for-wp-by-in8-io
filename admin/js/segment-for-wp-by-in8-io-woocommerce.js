@@ -122,7 +122,7 @@
                 }
                 if (wp_ajax.wc_settings.coupon === 'yes') {
 
-                    $( document.body ).on( 'applied_coupon', function ( event, coupon_code  ) {
+                    $(document.body).on('applied_coupon', function (event, coupon_code) {
                         console.log(coupon_code)
                         $.ajax({
                             cache: false,
@@ -139,19 +139,19 @@
                                     if ('update' in response.data && 'changed' in response.data) {
                                         if (response.data.changed === true) {
                                             let event_data = JSON.parse(response.data.tracks);
-                                                if (event_data != null) {
-                                                    let event_name = event_data.event_name;
-                                                    let event_props = event_data.properties;
-                                                    if (event_name && event_name !== '') {
-                                                        analytics.track(
-                                                            event_name,
-                                                            event_props,
-                                                            {},
-                                                            function () {
-                                                                // console.log('');
-                                                            })
-                                                    }
+                                            if (event_data != null) {
+                                                let event_name = event_data.event_name;
+                                                let event_props = event_data.properties;
+                                                if (event_name && event_name !== '') {
+                                                    analytics.track(
+                                                        event_name,
+                                                        event_props,
+                                                        {},
+                                                        function () {
+                                                            // console.log('');
+                                                        })
                                                 }
+                                            }
                                         }
                                     }
                                 }
@@ -162,7 +162,7 @@
                             }
                         });
 
-                    } );
+                    });
 
                 }
 

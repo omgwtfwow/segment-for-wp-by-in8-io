@@ -206,7 +206,8 @@ class Segment_For_Wp_By_In8_Io_Public
     /**
      * @param ...$args 'int $id, WP_Comment $comment'
      */
-    public function wp_insert_comment(...$args){
+    public function wp_insert_comment(...$args)
+    {
         if (isset($args[1]->comment_author) && $args[1]->comment_author == 'WooCommerce') {
             //because Woo inserts a comment with order details
             return;
@@ -386,6 +387,14 @@ class Segment_For_Wp_By_In8_Io_Public
      */
     public function gform_confirmation($confirmation, $form, $entry, $ajax)
     {
+        global $wp_scripts;
+        if (isset($wp_scripts->registered['jquery']->ver)) {
+            $ver = $wp_scripts->registered['jquery']->ver;
+            $jquery_ver = str_replace("-wp", "", $ver);
+        } else {
+            $jquery_ver = '1.12.4';
+        }
+
         $settings = $this->settings;
         $js_file = plugin_dir_url(__FILE__) . 'js/segment-for-wp-by-in8-io-gravity-forms.js';
         $ajax_url = esc_url_raw(admin_url('admin-ajax.php'));
@@ -393,13 +402,14 @@ class Segment_For_Wp_By_In8_Io_Public
         $gf_event_name_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_event_name_field"]);
         $gf_wp_user_id_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"]);
         $gf_identify = $settings["track_gravity_forms_fieldset"]["identify_gravity_forms"];
+
         if ($gf_identify === 'yes') {
             $gf_identify = true;
 
         } else {
             $gf_identify = false;
         }
-        $gf_event_props = Array();
+        $gf_event_props = array();
         foreach ($form['fields'] as $field) {
             if ($gf_event_name_field != '') {
                 if ($field["adminLabel"] == $gf_event_name_field) {
@@ -432,9 +442,7 @@ class Segment_For_Wp_By_In8_Io_Public
                             }
                         }
 
-
                     }
-
 
                 }
             } else {
@@ -452,8 +460,7 @@ class Segment_For_Wp_By_In8_Io_Public
             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($gf_wp_user_id);
             $user_traits = Segment_For_Wp_By_In8_Io::get_user_traits($gf_wp_user_id);
             $identify = true;
-        }
-        else{
+        } else {
             $user_id = null;
             $identify = false;
         }
@@ -461,9 +468,9 @@ class Segment_For_Wp_By_In8_Io_Public
         $form = json_encode($form);
         $entry = json_encode($entry);
         $gf_event_props = json_encode($gf_event_props);
-        $user_traits = isset($user_traits)?json_encode($user_traits):json_encode(array());
+        $user_traits = isset($user_traits) ? json_encode($user_traits) : json_encode(array());
 
-        if(isset($gf_event_name)&&$gf_event_name!='') {
+        if (isset($gf_event_name) && $gf_event_name != '') {
             if (isset($confirmation['redirect'])) {
 
                 $url = esc_url_raw($confirmation['redirect']);
@@ -480,11 +487,11 @@ class Segment_For_Wp_By_In8_Io_Public
 						    '$gf_event_props',
 						    '$identify',
 						    '$user_id',
-						    '$user_traits'
+						    '$user_traits',
+						    '$jquery_ver'
 					)</script>";
 
-            }
-            else {
+            } else {
 
                 $string = "<script type='text/javascript' src='$js_file'></script>" .
                     "<script>s4wp_run_gf_tracking(
@@ -497,7 +504,8 @@ class Segment_For_Wp_By_In8_Io_Public
                             '$gf_event_props',
                             '$identify',
                             '$user_id',
-                            '$user_traits'
+                            '$user_traits',
+                            '$jquery_ver'
 					)</script>";
                 return $confirmation . $string;
 
@@ -604,14 +612,15 @@ class Segment_For_Wp_By_In8_Io_Public
             return;
         }
         $product = wc_get_product($product_id);
-        if ($product instanceof \WC_Product) {
+        if ($product instanceof WC_Product) {
             WC()->session->set('segment_4_wp_last_product_added_to_cart', $product->get_id());
         }
 
     }
 
-    public function woocommerce_after_cart(){
-        if(!is_cart()) {
+    public function woocommerce_after_cart()
+    {
+        if (!is_cart()) {
             return;
         }
         $last_product_id = WC()->session->get('segment_4_wp_last_product_added_to_cart', 0);
@@ -952,8 +961,7 @@ class Segment_For_Wp_By_In8_Io_Public
                                         }
                                     }
                                 }
-                            }
-                            elseif (isset($_COOKIE["ajs_anonymous_id"])) {
+                            } elseif (isset($_COOKIE["ajs_anonymous_id"])) {
                                 Analytics::track(array(
                                     "anonymousId" => $_COOKIE["ajs_anonymous_id"],
                                     "event" => $event,
@@ -1057,8 +1065,7 @@ class Segment_For_Wp_By_In8_Io_Public
                             'update' => true,
                             'changed' => $changed
                         ), 200);
-                    }
-                    else {
+                    } else {
                         $changed = true;
                         $events = array();
                         $i = 0;
@@ -1086,7 +1093,7 @@ class Segment_For_Wp_By_In8_Io_Public
                                     $events[$i]["event_name"] = $event_name;
                                     $events[$i]["properties"] = Segment_For_Wp_By_In8_Io::get_event_properties('segment_4_wp_wc_cart_ajax_item_removed', $initial_item);
                                     $events[$i]["properties"]["quantity"] = $initial_item['quantity'] - $new_item["quantity"];
-                                    $events[$i]["properties"] =  apply_filters('segment_for_wp_change_event_properties', array_filter($events[$i]["properties"]), 'segment_4_wp_wc_cart_ajax_item_removed', []);
+                                    $events[$i]["properties"] = apply_filters('segment_for_wp_change_event_properties', array_filter($events[$i]["properties"]), 'segment_4_wp_wc_cart_ajax_item_removed', []);
                                     $i++;
                                 }
                                 //Additions - if new quantity is higher than previously
@@ -1095,7 +1102,7 @@ class Segment_For_Wp_By_In8_Io_Public
                                     $events[$i]["event_name"] = $event_name;
                                     $events[$i]["properties"] = Segment_For_Wp_By_In8_Io::get_event_properties('segment_4_wp_wc_cart_ajax_item_added', $initial_item);
                                     $events[$i]["properties"]["quantity"] = $new_item["quantity"] - $initial_item['quantity'];
-                                    $events[$i]["properties"] =  apply_filters('segment_for_wp_change_event_properties', array_filter($events[$i]["properties"]), 'segment_4_wp_wc_cart_ajax_item_added', []);
+                                    $events[$i]["properties"] = apply_filters('segment_for_wp_change_event_properties', array_filter($events[$i]["properties"]), 'segment_4_wp_wc_cart_ajax_item_added', []);
                                     $i++;
                                 }
 
@@ -1113,7 +1120,7 @@ class Segment_For_Wp_By_In8_Io_Public
                                 $events[$i]["event_name"] = $event_name;
                                 if (!array_key_exists($new_item_key, $initial_items)) {
                                     $events[$i]["properties"] = Segment_For_Wp_By_In8_Io::get_event_properties('segment_4_wp_wc_cart_ajax_item_added', $new_item);
-                                    $events[$i]["properties"] =  apply_filters('segment_for_wp_change_event_properties', array_filter($events[$i]["properties"]), 'segment_4_wp_wc_cart_ajax_item_added', $new_item);
+                                    $events[$i]["properties"] = apply_filters('segment_for_wp_change_event_properties', array_filter($events[$i]["properties"]), 'segment_4_wp_wc_cart_ajax_item_added', $new_item);
 
                                 }
                             }
@@ -1137,7 +1144,7 @@ class Segment_For_Wp_By_In8_Io_Public
                     $event_name = Segment_For_Wp_By_In8_Io::get_event_name('segment_4_wp_wc_cart_ajax_coupon_applied');
                     $event["event_name"] = $event_name;
                     $event["properties"] = Segment_For_Wp_By_In8_Io::get_event_properties('segment_4_wp_wc_cart_ajax_coupon_applied', $coupon_code);
-                    $event["properties"]=  apply_filters('segment_for_wp_change_event_properties', array_filter($event["properties"]), 'segment_4_wp_wc_cart_ajax_coupon_applied', $coupon_code);
+                    $event["properties"] = apply_filters('segment_for_wp_change_event_properties', array_filter($event["properties"]), 'segment_4_wp_wc_cart_ajax_coupon_applied', $coupon_code);
                     wp_send_json_success(array(
                         'update' => true,
                         'changed' => true,
