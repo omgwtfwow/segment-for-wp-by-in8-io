@@ -3,25 +3,27 @@
  * ActionScheduler_Mocker
  */
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 /**
  * ActionScheduler_Mocker class.
  */
-class ActionScheduler_Mocker {
+class ActionScheduler_Mocker
+{
 
 	/**
 	 * Do not run queues via async requests.
 	 *
 	 * @param ActionScheduler_Store $store
 	 */
-	public static function get_queue_runner( ActionScheduler_Store $store = null ) {
+	public static function get_queue_runner(ActionScheduler_Store $store = null)
+	{
 
-		if ( ! $store ) {
+		if (!$store) {
 			$store = ActionScheduler_Store::instance();
 		}
 
-		return new ActionScheduler_QueueRunner( $store, null, null, self::get_async_request_queue_runner( $store ) );
+		return new ActionScheduler_QueueRunner($store, null, null, self::get_async_request_queue_runner($store));
 	}
 
 	/**
@@ -29,7 +31,8 @@ class ActionScheduler_Mocker {
 	 *
 	 * @param ActionScheduler_Store $store
 	 */
-	protected static function get_async_request_queue_runner( ActionScheduler_Store $store ) {
-		return new ActionScheduler_Mock_AsyncRequest_QueueRunner( $store );
+	protected static function get_async_request_queue_runner(ActionScheduler_Store $store)
+	{
+		return new ActionScheduler_Mock_AsyncRequest_QueueRunner($store);
 	}
 }

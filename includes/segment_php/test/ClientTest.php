@@ -10,7 +10,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
         $client = new Segment_Client('foobar', []);
         $this->assertInstanceOf(Segment_Consumer_LibCurl::class, $client->getConsumer());
     }
-    
+
     /** @test */
     public function can_provide_the_consumer_configuration_as_string()
     {
@@ -19,7 +19,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertInstanceOf(Segment_Consumer_ForkCurl::class, $client->getConsumer());
     }
-    
+
     /** @test */
     public function can_provide_a_class_namespace_as_consumer_configuration()
     {

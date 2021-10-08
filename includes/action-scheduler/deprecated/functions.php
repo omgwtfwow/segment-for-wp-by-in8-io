@@ -18,9 +18,10 @@
  *
  * @return string The job ID
  */
-function wc_schedule_single_action( $timestamp, $hook, $args = array(), $group = '' ) {
-	_deprecated_function( __FUNCTION__, '2.1.0', 'as_schedule_single_action()' );
-	return as_schedule_single_action( $timestamp, $hook, $args, $group );
+function wc_schedule_single_action($timestamp, $hook, $args = array(), $group = '')
+{
+	_deprecated_function(__FUNCTION__, '2.1.0', 'as_schedule_single_action()');
+	return as_schedule_single_action($timestamp, $hook, $args, $group);
 }
 
 /**
@@ -32,13 +33,14 @@ function wc_schedule_single_action( $timestamp, $hook, $args = array(), $group =
  * @param array $args Arguments to pass when the hook triggers
  * @param string $group The group to assign this job to
  *
+ * @return string The job ID
  * @deprecated 2.1.0
  *
- * @return string The job ID
  */
-function wc_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args = array(), $group = '' ) {
-	_deprecated_function( __FUNCTION__, '2.1.0', 'as_schedule_recurring_action()' );
-	return as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args, $group );
+function wc_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args = array(), $group = '')
+{
+	_deprecated_function(__FUNCTION__, '2.1.0', 'as_schedule_recurring_action()');
+	return as_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args, $group);
 }
 
 /**
@@ -46,6 +48,13 @@ function wc_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, 
  *
  * @param int $timestamp The schedule will start on or after this time
  * @param string $schedule A cron-link schedule string
+ * @param string $hook The hook to trigger
+ * @param array $args Arguments to pass when the hook triggers
+ * @param string $group The group to assign this job to
+ *
+ * @return string The job ID
+ * @deprecated 2.1.0
+ *
  * @see http://en.wikipedia.org/wiki/Cron
  *   *    *    *    *    *    *
  *   ┬    ┬    ┬    ┬    ┬    ┬
@@ -56,17 +65,11 @@ function wc_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, 
  *   |    |    +--------------- day of month (1 - 31)
  *   |    +-------------------- hour (0 - 23)
  *   +------------------------- min (0 - 59)
- * @param string $hook The hook to trigger
- * @param array $args Arguments to pass when the hook triggers
- * @param string $group The group to assign this job to
- *
- * @deprecated 2.1.0
- *
- * @return string The job ID
  */
-function wc_schedule_cron_action( $timestamp, $schedule, $hook, $args = array(), $group = '' ) {
-	_deprecated_function( __FUNCTION__, '2.1.0', 'as_schedule_cron_action()' );
-	return as_schedule_cron_action( $timestamp, $schedule, $hook, $args, $group );
+function wc_schedule_cron_action($timestamp, $schedule, $hook, $args = array(), $group = '')
+{
+	_deprecated_function(__FUNCTION__, '2.1.0', 'as_schedule_cron_action()');
+	return as_schedule_cron_action($timestamp, $schedule, $hook, $args, $group);
 }
 
 /**
@@ -78,9 +81,10 @@ function wc_schedule_cron_action( $timestamp, $schedule, $hook, $args = array(),
  *
  * @deprecated 2.1.0
  */
-function wc_unschedule_action( $hook, $args = array(), $group = '' ) {
-	_deprecated_function( __FUNCTION__, '2.1.0', 'as_unschedule_action()' );
-	as_unschedule_action( $hook, $args, $group );
+function wc_unschedule_action($hook, $args = array(), $group = '')
+{
+	_deprecated_function(__FUNCTION__, '2.1.0', 'as_unschedule_action()');
+	as_unschedule_action($hook, $args, $group);
 }
 
 /**
@@ -88,13 +92,14 @@ function wc_unschedule_action( $hook, $args = array(), $group = '' ) {
  * @param array $args
  * @param string $group
  *
+ * @return int|bool The timestamp for the next occurrence, or false if nothing was found
  * @deprecated 2.1.0
  *
- * @return int|bool The timestamp for the next occurrence, or false if nothing was found
  */
-function wc_next_scheduled_action( $hook, $args = NULL, $group = '' ) {
-	_deprecated_function( __FUNCTION__, '2.1.0', 'as_next_scheduled_action()' );
-	return as_next_scheduled_action( $hook, $args, $group );
+function wc_next_scheduled_action($hook, $args = NULL, $group = '')
+{
+	_deprecated_function(__FUNCTION__, '2.1.0', 'as_next_scheduled_action()');
+	return as_next_scheduled_action($hook, $args, $group);
 }
 
 /**
@@ -116,11 +121,12 @@ function wc_next_scheduled_action( $hook, $args = NULL, $group = '' ) {
  *        'order' => 'ASC'
  * @param string $return_format OBJECT, ARRAY_A, or ids
  *
+ * @return array
  * @deprecated 2.1.0
  *
- * @return array
  */
-function wc_get_scheduled_actions( $args = array(), $return_format = OBJECT ) {
-	_deprecated_function( __FUNCTION__, '2.1.0', 'as_get_scheduled_actions()' );
-	return as_get_scheduled_actions( $args, $return_format );
+function wc_get_scheduled_actions($args = array(), $return_format = OBJECT)
+{
+	_deprecated_function(__FUNCTION__, '2.1.0', 'as_get_scheduled_actions()');
+	return as_get_scheduled_actions($args, $return_format);
 }

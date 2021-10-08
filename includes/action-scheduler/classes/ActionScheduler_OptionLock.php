@@ -7,7 +7,8 @@
  * Class ActionScheduler_OptionLock
  * @since 3.0.0
  */
-class ActionScheduler_OptionLock extends ActionScheduler_Lock {
+class ActionScheduler_OptionLock extends ActionScheduler_Lock
+{
 
 	/**
 	 * Set a lock using options for a given amount of time (60 seconds by default).
@@ -23,8 +24,9 @@ class ActionScheduler_OptionLock extends ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @bool True if lock value has changed, false if not or if set failed.
 	 */
-	public function set( $lock_type ) {
-		return update_option( $this->get_key( $lock_type ), time() + $this->get_duration( $lock_type ) );
+	public function set($lock_type)
+	{
+		return update_option($this->get_key($lock_type), time() + $this->get_duration($lock_type));
 	}
 
 	/**
@@ -33,8 +35,9 @@ class ActionScheduler_OptionLock extends ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @return bool|int False if no lock is set, otherwise the timestamp for when the lock is set to expire.
 	 */
-	public function get_expiration( $lock_type ) {
-		return get_option( $this->get_key( $lock_type ) );
+	public function get_expiration($lock_type)
+	{
+		return get_option($this->get_key($lock_type));
 	}
 
 	/**
@@ -43,7 +46,8 @@ class ActionScheduler_OptionLock extends ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @return string
 	 */
-	protected function get_key( $lock_type ) {
-		return sprintf( 'action_scheduler_lock_%s', $lock_type );
+	protected function get_key($lock_type)
+	{
+		return sprintf('action_scheduler_lock_%s', $lock_type);
 	}
 }

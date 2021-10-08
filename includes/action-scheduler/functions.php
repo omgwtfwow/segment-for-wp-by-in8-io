@@ -8,15 +8,16 @@
  * Enqueue an action to run one time, as soon as possible
  *
  * @param string $hook The hook to trigger.
- * @param array  $args Arguments to pass when the hook triggers.
+ * @param array $args Arguments to pass when the hook triggers.
  * @param string $group The group to assign this job to.
  * @return int The action ID.
  */
-function as_enqueue_async_action( $hook, $args = array(), $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_enqueue_async_action($hook, $args = array(), $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return 0;
 	}
-	return ActionScheduler::factory()->async( $hook, $args, $group );
+	return ActionScheduler::factory()->async($hook, $args, $group);
 }
 
 /**
@@ -29,11 +30,12 @@ function as_enqueue_async_action( $hook, $args = array(), $group = '' ) {
  *
  * @return int The action ID.
  */
-function as_schedule_single_action( $timestamp, $hook, $args = array(), $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_schedule_single_action($timestamp, $hook, $args = array(), $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return 0;
 	}
-	return ActionScheduler::factory()->single( $hook, $args, $timestamp, $group );
+	return ActionScheduler::factory()->single($hook, $args, $timestamp, $group);
 }
 
 /**
@@ -47,11 +49,12 @@ function as_schedule_single_action( $timestamp, $hook, $args = array(), $group =
  *
  * @return int The action ID.
  */
-function as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args = array(), $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_schedule_recurring_action($timestamp, $interval_in_seconds, $hook, $args = array(), $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return 0;
 	}
-	return ActionScheduler::factory()->recurring( $hook, $args, $timestamp, $interval_in_seconds, $group );
+	return ActionScheduler::factory()->recurring($hook, $args, $timestamp, $interval_in_seconds, $group);
 }
 
 /**
@@ -61,6 +64,11 @@ function as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, 
  *        to run at a time calculated after this timestamp matching the cron
  *        expression. This can be used to delay the first instance of the action.
  * @param string $schedule A cron-link schedule string
+ * @param string $hook The hook to trigger.
+ * @param array $args Arguments to pass when the hook triggers.
+ * @param string $group The group to assign this job to.
+ *
+ * @return int The action ID.
  * @see http://en.wikipedia.org/wiki/Cron
  *   *    *    *    *    *    *
  *   ┬    ┬    ┬    ┬    ┬    ┬
@@ -71,17 +79,13 @@ function as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, 
  *   |    |    +--------------- day of month (1 - 31)
  *   |    +-------------------- hour (0 - 23)
  *   +------------------------- min (0 - 59)
- * @param string $hook The hook to trigger.
- * @param array $args Arguments to pass when the hook triggers.
- * @param string $group The group to assign this job to.
- *
- * @return int The action ID.
  */
-function as_schedule_cron_action( $timestamp, $schedule, $hook, $args = array(), $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_schedule_cron_action($timestamp, $schedule, $hook, $args = array(), $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return 0;
 	}
-	return ActionScheduler::factory()->cron( $hook, $args, $timestamp, $schedule, $group );
+	return ActionScheduler::factory()->cron($hook, $args, $timestamp, $schedule, $group);
 }
 
 /**
@@ -100,24 +104,25 @@ function as_schedule_cron_action( $timestamp, $schedule, $hook, $args = array(),
  *
  * @return string|null The scheduled action ID if a scheduled action was found, or null if no matching action found.
  */
-function as_unschedule_action( $hook, $args = array(), $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_unschedule_action($hook, $args = array(), $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return 0;
 	}
 	$params = array(
-		'hook'    => $hook,
-		'status'  => ActionScheduler_Store::STATUS_PENDING,
+		'hook' => $hook,
+		'status' => ActionScheduler_Store::STATUS_PENDING,
 		'orderby' => 'date',
-		'order'   => 'ASC',
-		'group'   => $group,
+		'order' => 'ASC',
+		'group' => $group,
 	);
-	if ( is_array( $args ) ) {
+	if (is_array($args)) {
 		$params['args'] = $args;
 	}
 
-	$action_id = ActionScheduler::store()->query_action( $params );
-	if ( $action_id ) {
-		ActionScheduler::store()->cancel_action( $action_id );
+	$action_id = ActionScheduler::store()->query_action($params);
+	if ($action_id) {
+		ActionScheduler::store()->cancel_action($action_id);
 	}
 
 	return $action_id;
@@ -130,23 +135,24 @@ function as_unschedule_action( $hook, $args = array(), $group = '' ) {
  * @param array $args Args that would have been passed to the job.
  * @param string $group The group the job is assigned to.
  */
-function as_unschedule_all_actions( $hook, $args = array(), $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_unschedule_all_actions($hook, $args = array(), $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return;
 	}
-	if ( empty( $args ) ) {
-		if ( ! empty( $hook ) && empty( $group ) ) {
-			ActionScheduler_Store::instance()->cancel_actions_by_hook( $hook );
+	if (empty($args)) {
+		if (!empty($hook) && empty($group)) {
+			ActionScheduler_Store::instance()->cancel_actions_by_hook($hook);
 			return;
 		}
-		if ( ! empty( $group ) && empty( $hook ) ) {
-			ActionScheduler_Store::instance()->cancel_actions_by_group( $group );
+		if (!empty($group) && empty($hook)) {
+			ActionScheduler_Store::instance()->cancel_actions_by_group($group);
 			return;
 		}
 	}
 	do {
-		$unscheduled_action = as_unschedule_action( $hook, $args, $group );
-	} while ( ! empty( $unscheduled_action ) );
+		$unscheduled_action = as_unschedule_action($hook, $args, $group);
+	} while (!empty($unscheduled_action));
 }
 
 /**
@@ -164,39 +170,40 @@ function as_unschedule_all_actions( $hook, $args = array(), $group = '' ) {
  *
  * @return int|bool The timestamp for the next occurrence of a pending scheduled action, true for an async or in-progress action or false if there is no matching action.
  */
-function as_next_scheduled_action( $hook, $args = null, $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_next_scheduled_action($hook, $args = null, $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return false;
 	}
 
 	$params = array(
-		'hook'    => $hook,
+		'hook' => $hook,
 		'orderby' => 'date',
-		'order'   => 'ASC',
-		'group'   => $group,
+		'order' => 'ASC',
+		'group' => $group,
 	);
 
-	if ( is_array( $args ) ) {
+	if (is_array($args)) {
 		$params['args'] = $args;
 	}
 
 	$params['status'] = ActionScheduler_Store::STATUS_RUNNING;
-	$action_id        = ActionScheduler::store()->query_action( $params );
-	if ( $action_id ) {
+	$action_id = ActionScheduler::store()->query_action($params);
+	if ($action_id) {
 		return true;
 	}
 
 	$params['status'] = ActionScheduler_Store::STATUS_PENDING;
-	$action_id        = ActionScheduler::store()->query_action( $params );
-	if ( null === $action_id ) {
+	$action_id = ActionScheduler::store()->query_action($params);
+	if (null === $action_id) {
 		return false;
 	}
 
-	$action         = ActionScheduler::store()->fetch_action( $action_id );
+	$action = ActionScheduler::store()->fetch_action($action_id);
 	$scheduled_date = $action->get_schedule()->get_date();
-	if ( $scheduled_date ) {
-		return (int) $scheduled_date->format( 'U' );
-	} elseif ( null === $scheduled_date ) { // pending async action with NullSchedule
+	if ($scheduled_date) {
+		return (int)$scheduled_date->format('U');
+	} elseif (null === $scheduled_date) { // pending async action with NullSchedule
 		return true;
 	}
 
@@ -209,31 +216,32 @@ function as_next_scheduled_action( $hook, $args = null, $group = '' ) {
  * It's recommended to use this function when you need to know whether a specific action is currently scheduled
  * (pending or in-progress).
  *
- * @since x.x.x
- *
- * @param string $hook  The hook of the action.
- * @param array  $args  Args that have been passed to the action. Null will matches any args.
+ * @param string $hook The hook of the action.
+ * @param array $args Args that have been passed to the action. Null will matches any args.
  * @param string $group The group the job is assigned to.
  *
  * @return bool True if a matching action is pending or in-progress, false otherwise.
+ * @since x.x.x
+ *
  */
-function as_has_scheduled_action( $hook, $args = null, $group = '' ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_has_scheduled_action($hook, $args = null, $group = '')
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return false;
 	}
 
 	$query_args = array(
-		'hook'     => $hook,
-		'status'   => array( ActionScheduler_Store::STATUS_RUNNING, ActionScheduler_Store::STATUS_PENDING ),
-		'group'    => $group,
-		'orderby'  => 'none',
+		'hook' => $hook,
+		'status' => array(ActionScheduler_Store::STATUS_RUNNING, ActionScheduler_Store::STATUS_PENDING),
+		'group' => $group,
+		'orderby' => 'none',
 	);
 
-	if ( null !== $args ) {
+	if (null !== $args) {
 		$query_args['args'] = $args;
 	}
 
-	$action_id = ActionScheduler::store()->query_action( $query_args );
+	$action_id = ActionScheduler::store()->query_action($query_args);
 
 	return $action_id !== null;
 }
@@ -260,29 +268,30 @@ function as_has_scheduled_action( $hook, $args = null, $group = '' ) {
  *
  * @return array
  */
-function as_get_scheduled_actions( $args = array(), $return_format = OBJECT ) {
-	if ( ! ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+function as_get_scheduled_actions($args = array(), $return_format = OBJECT)
+{
+	if (!ActionScheduler::is_initialized(__FUNCTION__)) {
 		return array();
 	}
 	$store = ActionScheduler::store();
-	foreach ( array('date', 'modified') as $key ) {
-		if ( isset($args[$key]) ) {
+	foreach (array('date', 'modified') as $key) {
+		if (isset($args[$key])) {
 			$args[$key] = as_get_datetime_object($args[$key]);
 		}
 	}
-	$ids = $store->query_actions( $args );
+	$ids = $store->query_actions($args);
 
-	if ( $return_format == 'ids' || $return_format == 'int' ) {
+	if ($return_format == 'ids' || $return_format == 'int') {
 		return $ids;
 	}
 
 	$actions = array();
-	foreach ( $ids as $action_id ) {
-		$actions[$action_id] = $store->fetch_action( $action_id );
+	foreach ($ids as $action_id) {
+		$actions[$action_id] = $store->fetch_action($action_id);
 	}
 
-	if ( $return_format == ARRAY_A ) {
-		foreach ( $actions as $action_id => $action_object ) {
+	if ($return_format == ARRAY_A) {
+		foreach ($actions as $action_id => $action_object) {
 			$actions[$action_id] = get_object_vars($action_object);
 		}
 	}
@@ -307,13 +316,14 @@ function as_get_scheduled_actions( $args = array(), $return_format = OBJECT ) {
  *
  * @return ActionScheduler_DateTime
  */
-function as_get_datetime_object( $date_string = null, $timezone = 'UTC' ) {
-	if ( is_object( $date_string ) && $date_string instanceof DateTime ) {
-		$date = new ActionScheduler_DateTime( $date_string->format( 'Y-m-d H:i:s' ), new DateTimeZone( $timezone ) );
-	} elseif ( is_numeric( $date_string ) ) {
-		$date = new ActionScheduler_DateTime( '@' . $date_string, new DateTimeZone( $timezone ) );
+function as_get_datetime_object($date_string = null, $timezone = 'UTC')
+{
+	if (is_object($date_string) && $date_string instanceof DateTime) {
+		$date = new ActionScheduler_DateTime($date_string->format('Y-m-d H:i:s'), new DateTimeZone($timezone));
+	} elseif (is_numeric($date_string)) {
+		$date = new ActionScheduler_DateTime('@' . $date_string, new DateTimeZone($timezone));
 	} else {
-		$date = new ActionScheduler_DateTime( $date_string, new DateTimeZone( $timezone ) );
+		$date = new ActionScheduler_DateTime($date_string, new DateTimeZone($timezone));
 	}
 	return $date;
 }

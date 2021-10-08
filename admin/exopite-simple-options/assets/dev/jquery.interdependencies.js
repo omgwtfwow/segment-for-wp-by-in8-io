@@ -8,7 +8,7 @@
 
 /*global console, window*/
 
-(function($) {
+(function ($) {
 
     "use strict";
 
@@ -18,7 +18,7 @@
      * @ignore
      */
     function log(msg) {
-        if(window.console && window.console.log) {
+        if (window.console && window.console.log) {
             console.log(msg);
         }
     }
@@ -41,11 +41,11 @@
      */
     function safeFind(context, selector) {
 
-        if(selector[0] == "#") {
+        if (selector[0] == "#") {
 
             // Pseudo-check that this is a simple id selector
             // and not a complex jQuery selector
-            if(selector.indexOf(" ") < 0) {
+            if (selector.indexOf(" ") < 0) {
                 return $(selector);
             }
         }
@@ -64,19 +64,19 @@
          * @cfg show Callback function show(elem) for showing elements
          * @type {Function}
          */
-        show : null,
+        show: null,
 
         /**
          * @cfg hide Callback function hide(elem) for hiding elements
          * @type {Function}
          */
-        hide : null,
+        hide: null,
 
         /**
          * @cfg log Write console.log() output of rule applying
          * @type {Boolean}
          */
-        log : false,
+        log: false,
 
 
         /**
@@ -86,7 +86,7 @@
          *
          * @type {Boolean}
          */
-        checkTargets : true
+        checkTargets: true
 
     };
 
@@ -129,7 +129,7 @@
          * @param value Matching value of **controller** when widgets become visible
          *
          */
-        init : function(controller, condition, value) {
+        init: function (controller, condition, value) {
             this.controller = controller;
 
             this.condition = condition;
@@ -151,38 +151,38 @@
          * @param  {Object} val2      Something we got out of input
          * @return {Boolean}          true or false
          */
-        evalCondition : function(context, control, condition, val1, val2) {
+        evalCondition: function (context, control, condition, val1, val2) {
 
-          /**
-           *
-           * Codestar Framework
-           * Added new condition for Codestar Framework
-           *
-           * @since 1.0.0
-           * @version 1.0.0
-           *
-           */
-          if(condition == "==" || condition == "OR") {
-            return this.checkBoolean(val1) == this.checkBoolean(val2);
-          } else if(condition == "!=") {
-            return this.checkBoolean(val1) != this.checkBoolean(val2);
-          } else if(condition == ">=") {
-            return Number(val2) >= Number(val1);
-          } else if(condition == "<=") {
-            return Number(val2) <= Number(val1);
-          } else if(condition == ">") {
-            return Number(val2) > Number(val1);
-          } else if(condition == "<") {
-            return Number(val2) < Number(val1);
-          } else if(condition == "()") {
-            return window[val1](context, control, val2); // FIXED: function method
-          } else if(condition == "any") {
-            return $.inArray(val2, val1.split(',')) > -1;
-          } else if(condition == "not-any") {
-            return $.inArray(val2, val1.split(',')) == -1;
-          } else {
-            throw new Error("Unknown condition:" + condition);
-          }
+            /**
+             *
+             * Codestar Framework
+             * Added new condition for Codestar Framework
+             *
+             * @since 1.0.0
+             * @version 1.0.0
+             *
+             */
+            if (condition == "==" || condition == "OR") {
+                return this.checkBoolean(val1) == this.checkBoolean(val2);
+            } else if (condition == "!=") {
+                return this.checkBoolean(val1) != this.checkBoolean(val2);
+            } else if (condition == ">=") {
+                return Number(val2) >= Number(val1);
+            } else if (condition == "<=") {
+                return Number(val2) <= Number(val1);
+            } else if (condition == ">") {
+                return Number(val2) > Number(val1);
+            } else if (condition == "<") {
+                return Number(val2) < Number(val1);
+            } else if (condition == "()") {
+                return window[val1](context, control, val2); // FIXED: function method
+            } else if (condition == "any") {
+                return $.inArray(val2, val1.split(',')) > -1;
+            } else if (condition == "not-any") {
+                return $.inArray(val2, val1.split(',')) == -1;
+            } else {
+                throw new Error("Unknown condition:" + condition);
+            }
 
         },
 
@@ -195,31 +195,31 @@
          * @version 1.0.0
          *
          */
-        checkBoolean: function(value) {
+        checkBoolean: function (value) {
 
-          switch(value) {
+            switch (value) {
 
-            case true:
-            case 'true':
-            case 1:
-            case '1':
-            //case 'on':
-            //case 'yes':
-              value = true;
-            break;
+                case true:
+                case 'true':
+                case 1:
+                case '1':
+                    //case 'on':
+                    //case 'yes':
+                    value = true;
+                    break;
 
-            case false:
-            case 'false':
-            case 0:
-            case '0':
-            //case 'off':
-            //case 'no':
-              value = false;
-            break;
+                case false:
+                case 'false':
+                case 0:
+                case '0':
+                    //case 'off':
+                    //case 'no':
+                    value = false;
+                    break;
 
-          }
+            }
 
-          return value;
+            return value;
         },
 
         /**
@@ -230,24 +230,24 @@
          * @param {jQuery} context The jQuery selection in which this rule is evaluated.
          *
          */
-        checkCondition : function(context, cfg) {
+        checkCondition: function (context, cfg) {
 
             // We do not have condition set, we are always true
-            if(!this.condition) {
+            if (!this.condition) {
                 return true;
             }
 
             var control = context.find(this.controller);
-            if(control.size() === 0 && cfg.log) {
+            if (control.size() === 0 && cfg.log) {
                 log("Evaling condition: Could not find controller input " + this.controller);
             }
 
             var val = this.getControlValue(context, control);
-            if(cfg.log && val === undefined) {
+            if (cfg.log && val === undefined) {
                 log("Evaling condition: Could not exctract value from input " + this.controller);
             }
 
-            if(val === undefined) {
+            if (val === undefined) {
                 return false;
             }
 
@@ -260,9 +260,9 @@
          * Make sure that what we read from input field is comparable against Javascript primitives
          *
          */
-        normalizeValue : function(control, baseValue, val) {
+        normalizeValue: function (control, baseValue, val) {
 
-            if(typeof baseValue == "number") {
+            if (typeof baseValue == "number") {
                 // Make sure we compare numbers against numbers
                 return parseFloat(val);
             }
@@ -276,27 +276,27 @@
          * Handle, text, checkbox, radio, select.
          *
          */
-        getControlValue : function(context, control) {
+        getControlValue: function (context, control) {
 
-          /**
-           *
-           * Codestar Framework
-           * Added multiple checkbox value control
-           *
-           * @since 1.0.0
-           * @version 1.0.0
-           *
-           */
-          if( ( control.attr("type") == "radio" || control.attr("type") == "checkbox" ) && control.size() > 1 ) {
-            return control.filter(":checked").val();
-          }
+            /**
+             *
+             * Codestar Framework
+             * Added multiple checkbox value control
+             *
+             * @since 1.0.0
+             * @version 1.0.0
+             *
+             */
+            if ((control.attr("type") == "radio" || control.attr("type") == "checkbox") && control.size() > 1) {
+                return control.filter(":checked").val();
+            }
 
-          // Handle individual checkboxes & radio
-          if ( control.attr("type") == "checkbox" || control.attr("type") == "radio" ) {
-            return control.is(":checked");
-          }
+            // Handle individual checkboxes & radio
+            if (control.attr("type") == "checkbox" || control.attr("type") == "radio") {
+                return control.is(":checked");
+            }
 
-          return control.val();
+            return control.val();
 
         },
 
@@ -310,7 +310,7 @@
          *
          * @return Rule instance
          */
-        createRule : function(controller, condition, value) {
+        createRule: function (controller, condition, value) {
             var rule = new Rule(controller, condition, value);
             this.rules.push(rule);
             return rule;
@@ -321,9 +321,9 @@
          *
          * @param  {String} input     jQuery expression to match the input within ruleset context
          */
-        include : function(input) {
+        include: function (input) {
 
-            if(!input) {
+            if (!input) {
                 throw new Error("Must give an input selector");
             }
 
@@ -338,52 +338,52 @@
          * @param  {Object} enforced Recursive rule enforcer: undefined to evaluate condition, true show always, false hide always
          *
          */
-        applyRule : function(context, cfg, enforced) {
+        applyRule: function (context, cfg, enforced) {
 
             var result;
 
-            if(enforced === undefined) {
+            if (enforced === undefined) {
                 result = this.checkCondition(context, cfg);
             } else {
                 result = enforced;
             }
 
-            if(cfg.log) {
+            if (cfg.log) {
                 log("Applying rule on " + this.controller + "==" + this.value + " enforced:" + enforced + " result:" + result);
             }
 
-            if(cfg.log && !this.controls.length) {
+            if (cfg.log && !this.controls.length) {
                 log("Zero length controls slipped through");
             }
 
             // Get show/hide callback functions
 
-            var show = cfg.show || function(control) {
+            var show = cfg.show || function (control) {
                 control.show();
             };
 
-            var hide = cfg.hide || function(control) {
+            var hide = cfg.hide || function (control) {
                 control.hide();
             };
 
 
             // Resolve controls from ids to jQuery selections
             // we are controlling in this context
-            var controls = $.map(this.controls, function(elem, idx) {
+            var controls = $.map(this.controls, function (elem, idx) {
                 var control = context.find(elem);
-                if(cfg.log && control.size() === 0) {
+                if (cfg.log && control.size() === 0) {
                     log("Could not find element:" + elem);
                 }
                 return control;
             });
 
-            if(result) {
+            if (result) {
 
-                $(controls).each(function() {
+                $(controls).each(function () {
 
 
                     // Some friendly debug info
-                    if(cfg.log && $(this).size() === 0) {
+                    if (cfg.log && $(this).size() === 0) {
                         log("Control selection is empty when showing");
                         log(this);
                     }
@@ -392,18 +392,18 @@
                 });
 
                 // Evaluate all child rules
-                $(this.rules).each(function() {
-                  if(this.condition !== "OR"){
-                    this.applyRule(context, cfg);
-                  }
+                $(this.rules).each(function () {
+                    if (this.condition !== "OR") {
+                        this.applyRule(context, cfg);
+                    }
                 });
 
             } else {
 
-                $(controls).each(function() {
+                $(controls).each(function () {
 
                     // Some friendly debug info
-                    if(cfg.log && $(this).size() === 0) {
+                    if (cfg.log && $(this).size() === 0) {
                         log("Control selection is empty when hiding:");
                         log(this);
                     }
@@ -412,12 +412,12 @@
                 });
 
                 // Supress all child rules
-                $(this.rules).each(function() {
-                  if(this.condition !== "OR"){
-                    this.applyRule(context, cfg, false);
-                  } else {
-                    this.applyRule(context, cfg);
-                  }
+                $(this.rules).each(function () {
+                    if (this.condition !== "OR") {
+                        this.applyRule(context, cfg, false);
+                    } else {
+                        this.applyRule(context, cfg);
+                    }
                 });
             }
         }
@@ -440,7 +440,7 @@
          * See  {@link Rule} about the contstruction parameters.
          * @return {Rule}
          */
-        createRule : function(controller, condition, value) {
+        createRule: function (controller, condition, value) {
             var rule = new Rule(controller, condition, value);
             this.rules.push(rule);
             return rule;
@@ -453,16 +453,16 @@
          *
          * @param cfg {@link Configuration} object or undefined.
          */
-        applyRules: function(context, cfg) {
+        applyRules: function (context, cfg) {
             var i;
 
             cfg = cfg || {};
 
-            if(cfg.log) {
+            if (cfg.log) {
                 log("Starting evaluation ruleset of " + this.rules.length + " rules");
             }
 
-            for(i=0; i<this.rules.length; i++) {
+            for (i = 0; i < this.rules.length; i++) {
                 this.rules[i].applyRule(context, cfg);
             }
         },
@@ -473,7 +473,7 @@
          *
          * @return {Array} Rules as depth-first searched
          */
-        walk : function() {
+        walk: function () {
 
             var rules = [];
 
@@ -481,12 +481,12 @@
 
                 rules.push(rule);
 
-                $(rule.children).each(function() {
+                $(rule.children).each(function () {
                     descent(this);
                 });
             }
 
-            $(this.rules).each(function() {
+            $(this.rules).each(function () {
                 descent(this);
             });
 
@@ -503,24 +503,24 @@
          *
          * @param  {Configuration} cfg
          */
-        checkTargets : function(context, cfg) {
+        checkTargets: function (context, cfg) {
 
             var controls = 0;
             var rules = this.walk();
 
-            $(rules).each(function() {
+            $(rules).each(function () {
 
-                if(context.find(this.controller).size() === 0) {
+                if (context.find(this.controller).size() === 0) {
                     throw new Error("Rule's controller does not exist:" + this.controller);
                 }
 
-                if(this.controls.length === 0) {
+                if (this.controls.length === 0) {
                     throw new Error("Rule has no controls:" + this);
                 }
 
-                $(this.controls).each(function() {
+                $(this.controls).each(function () {
 
-                    if(safeFind(context, this) === 0) {
+                    if (safeFind(context, this) === 0) {
                         throw new Error("Rule's target control " + this + " does not exist in context " + context.get(0));
                     }
 
@@ -529,7 +529,7 @@
 
             });
 
-            if(cfg.log) {
+            if (cfg.log) {
                 log("Controller check ok, rules count " + rules.length + " controls count " + controls);
             }
 
@@ -544,7 +544,7 @@
          * @param  {Configuration} cfg {@link Configuration} object or undefined
          *
          */
-        install : function(cfg) {
+        install: function (cfg) {
             $.deps.enable($(document.body), this, cfg);
         }
 
@@ -570,7 +570,7 @@
          *
          * @return {Ruleset}
          */
-        createRuleset : function() {
+        createRuleset: function () {
             return new Ruleset();
         },
 
@@ -587,23 +587,25 @@
          * @param  {Ruleset} ruleset
          * @param  {Configuration} cfg
          */
-        enable : function(selection, ruleset, cfg) {
+        enable: function (selection, ruleset, cfg) {
 
             cfg = cfg || {};
 
-            if(cfg.checkTargets || cfg.checkTargets === undefined) {
+            if (cfg.checkTargets || cfg.checkTargets === undefined) {
                 ruleset.checkTargets(selection, cfg);
             }
 
             var self = this;
 
-            if(cfg.log) {
+            if (cfg.log) {
                 log("Enabling dependency change monitoring on " + selection.get(0));
             }
 
             // Namespace our handler to avoid conflicts
             //
-            var handler = function() { ruleset.applyRules(selection, cfg); };
+            var handler = function () {
+                ruleset.applyRules(selection, cfg);
+            };
             var val = selection.on ? selection.on("change.deps", null, null, handler) : selection.live("change.deps", handler);
 
             ruleset.applyRules(selection, cfg);

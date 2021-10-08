@@ -1,4 +1,4 @@
-;(function ( $, window, document, undefined ) {
+;(function ($, window, document, undefined) {
 
     /*
      * A jQuery Plugin Boilerplate
@@ -10,18 +10,18 @@
     var pluginName = "exopiteFineUploader";
 
     // The actual plugin constructor
-    function Plugin( element, options ) {
+    function Plugin(element, options) {
 
         this.element = element;
         this._name = pluginName;
-        this.$element = $( element );
+        this.$element = $(element);
         this.init();
 
     }
 
     Plugin.prototype = {
 
-        init: function() {
+        init: function () {
 
             // console.log( 'maxsize: ' + this.$element.data('maxsize') );
             // console.log( 'allowedExtensions: ' + this.$element.data('mimetypes') );
@@ -51,13 +51,13 @@
                     params: {
                         action: 'exopite-sof-file_uploader',
                     },
-                    enabled             : this.$element.data('delete-enabled'),
-                    forceConfirm        : this.$element.data('delete-force-confirm')
+                    enabled: this.$element.data('delete-enabled'),
+                    forceConfirm: this.$element.data('delete-force-confirm')
                 },
                 retry: {
-                    enableAuto          : this.$element.data('retry-enable-auto'),
-                    maxAutoAttempts     : this.$element.data('retry-max-auto-attempts'),
-                    autoAttemptDelay    : this.$element.data('retry-auto-attempt-delay'),
+                    enableAuto: this.$element.data('retry-enable-auto'),
+                    maxAutoAttempts: this.$element.data('retry-max-auto-attempts'),
+                    autoAttemptDelay: this.$element.data('retry-auto-attempt-delay'),
                 },
                 validation: {
                     allowedExtensions: this.$element.data('mimetypes').split(','),
@@ -72,11 +72,11 @@
 
         },
 
-       // Bind events that trigger methods
-        bindEvents: function() {
+        // Bind events that trigger methods
+        bindEvents: function () {
             var plugin = this;
 
-            plugin.$element.find( '.trigger-upload' ).on( 'click'+'.'+plugin._name, function() {
+            plugin.$element.find('.trigger-upload').on('click' + '.' + plugin._name, function () {
 
                 plugin.$element.fineUploader('uploadStoredFiles');
 
@@ -86,19 +86,19 @@
 
     };
 
-    $.fn[pluginName] = function ( options ) {
+    $.fn[pluginName] = function (options) {
         return this.each(function () {
             if (!$.data(this, "plugin_" + pluginName)) {
                 $.data(this, "plugin_" + pluginName,
-                new Plugin( this, options ));
+                    new Plugin(this, options));
             }
         });
     };
 
-    $( document ).ready(function() {
+    $(document).ready(function () {
 
         $('.qq-template').exopiteFineUploader();
 
     });
 
-})( jQuery, window, document );
+})(jQuery, window, document);

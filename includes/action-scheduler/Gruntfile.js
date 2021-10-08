@@ -1,10 +1,10 @@
-module.exports = function( grunt ) {
+module.exports = function (grunt) {
 	'use strict';
 
 	grunt.initConfig({
 		// Check textdomain errors.
 		checktextdomain: {
-			options:{
+			options: {
 				text_domain: 'action-scheduler',
 				keywords: [
 					'__:1,2d',
@@ -24,7 +24,7 @@ module.exports = function( grunt ) {
 				]
 			},
 			files: {
-				src:  [
+				src: [
 					'**/*.php',
 					'!node_modules/**',
 					'!tests/**',
@@ -41,7 +41,7 @@ module.exports = function( grunt ) {
 				bin: 'vendor/bin/phpcs'
 			},
 			dist: {
-				src:  [
+				src: [
 					'**/*.php', // Include all php files.
 					'!deprecated/**',
 					'!node_modules/**',
@@ -52,6 +52,6 @@ module.exports = function( grunt ) {
 	});
 
 	// Load NPM tasks to be used here.
-	grunt.loadNpmTasks( 'grunt-phpcs' );
-	grunt.loadNpmTasks( 'grunt-checktextdomain' );
+	grunt.loadNpmTasks('grunt-phpcs');
+	grunt.loadNpmTasks('grunt-checktextdomain');
 };

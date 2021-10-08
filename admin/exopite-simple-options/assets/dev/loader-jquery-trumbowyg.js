@@ -1,8 +1,7 @@
-
 /**
  * Exopite Simple Options Framework Trumbowyg
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSOFTrumbowyg";
 
@@ -22,7 +21,7 @@
 
             var plugin = this;
 
-            plugin.trumbowygOptions = new Object();
+            plugin.trumbowygOptions = {};
             plugin.trumbowygOptions.svgPath = plugin.$element.find('.trumbowyg-js').data('icon-path');
 
             plugin.trumbowygOptions.btnsDef = {
@@ -74,7 +73,7 @@
 
 })(jQuery, window, document);
 
-; (function ($) {
+;(function ($) {
     "use strict";
 
     $(document).ready(function () {

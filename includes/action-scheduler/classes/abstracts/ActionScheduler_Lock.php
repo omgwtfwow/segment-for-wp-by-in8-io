@@ -5,7 +5,8 @@
  *
  * Class ActionScheduler_Lock
  */
-abstract class ActionScheduler_Lock {
+abstract class ActionScheduler_Lock
+{
 
 	/** @var ActionScheduler_Lock */
 	private static $locker = NULL;
@@ -19,8 +20,9 @@ abstract class ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @return bool
 	 */
-	public function is_locked( $lock_type ) {
-		return ( $this->get_expiration( $lock_type ) >= time() );
+	public function is_locked($lock_type)
+	{
+		return ($this->get_expiration($lock_type) >= time());
 	}
 
 	/**
@@ -29,7 +31,7 @@ abstract class ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @return bool
 	 */
-	abstract public function set( $lock_type );
+	abstract public function set($lock_type);
 
 	/**
 	 * If a lock is set, return the timestamp it was set to expiry.
@@ -37,7 +39,7 @@ abstract class ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @return bool|int False if no lock is set, otherwise the timestamp for when the lock is set to expire.
 	 */
-	abstract public function get_expiration( $lock_type );
+	abstract public function get_expiration($lock_type);
 
 	/**
 	 * Get the amount of time to set for a given lock. 60 seconds by default.
@@ -45,16 +47,18 @@ abstract class ActionScheduler_Lock {
 	 * @param string $lock_type A string to identify different lock types.
 	 * @return int
 	 */
-	protected function get_duration( $lock_type ) {
-		return apply_filters( 'action_scheduler_lock_duration', self::$lock_duration, $lock_type );
+	protected function get_duration($lock_type)
+	{
+		return apply_filters('action_scheduler_lock_duration', self::$lock_duration, $lock_type);
 	}
 
 	/**
 	 * @return ActionScheduler_Lock
 	 */
-	public static function instance() {
-		if ( empty( self::$locker ) ) {
-			$class = apply_filters( 'action_scheduler_lock_class', 'ActionScheduler_OptionLock' );
+	public static function instance()
+	{
+		if (empty(self::$locker)) {
+			$class = apply_filters('action_scheduler_lock_class', 'ActionScheduler_OptionLock');
 			self::$locker = new $class();
 		}
 		return self::$locker;

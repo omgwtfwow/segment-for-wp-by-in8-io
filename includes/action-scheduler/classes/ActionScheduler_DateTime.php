@@ -5,7 +5,8 @@
  *
  * This is a custom extension to DateTime that
  */
-class ActionScheduler_DateTime extends DateTime {
+class ActionScheduler_DateTime extends DateTime
+{
 
 	/**
 	 * UTC offset.
@@ -24,8 +25,9 @@ class ActionScheduler_DateTime extends DateTime {
 	 *
 	 * @return int
 	 */
-	public function getTimestamp() {
-		return method_exists( 'DateTime', 'getTimestamp' ) ? parent::getTimestamp() : $this->format( 'U' );
+	public function getTimestamp()
+	{
+		return method_exists('DateTime', 'getTimestamp') ? parent::getTimestamp() : $this->format('U');
 	}
 
 	/**
@@ -35,8 +37,9 @@ class ActionScheduler_DateTime extends DateTime {
 	 *
 	 * @param $offset
 	 */
-	public function setUtcOffset( $offset ) {
-		$this->utcOffset = intval( $offset );
+	public function setUtcOffset($offset)
+	{
+		$this->utcOffset = intval($offset);
 	}
 
 	/**
@@ -45,7 +48,8 @@ class ActionScheduler_DateTime extends DateTime {
 	 * @return int
 	 * @link http://php.net/manual/en/datetime.getoffset.php
 	 */
-	public function getOffset() {
+	public function getOffset()
+	{
 		return $this->utcOffset ? $this->utcOffset : parent::getOffset();
 	}
 
@@ -57,9 +61,10 @@ class ActionScheduler_DateTime extends DateTime {
 	 * @return static
 	 * @link http://php.net/manual/en/datetime.settimezone.php
 	 */
-	public function setTimezone( $timezone ) {
+	public function setTimezone($timezone)
+	{
 		$this->utcOffset = 0;
-		parent::setTimezone( $timezone );
+		parent::setTimezone($timezone);
 
 		return $this;
 	}
@@ -67,10 +72,11 @@ class ActionScheduler_DateTime extends DateTime {
 	/**
 	 * Get the timestamp with the WordPress timezone offset added or subtracted.
 	 *
-	 * @since  3.0.0
 	 * @return int
+	 * @since  3.0.0
 	 */
-	public function getOffsetTimestamp() {
+	public function getOffsetTimestamp()
+	{
 		return $this->getTimestamp() + $this->getOffset();
 	}
 }

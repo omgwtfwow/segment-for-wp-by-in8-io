@@ -1,6 +1,7 @@
 ---
 description: Learn how to use the Action Scheduler background processing job queue for WordPress in your WordPress plugin.
 ---
+
 # Usage
 
 Using Action Scheduler requires:
@@ -29,7 +30,9 @@ To install it as a plugin:
 
 Or clone the Git repository into your site's `wp-content/plugins` folder.
 
-Using Action Scheduler as a plugin can be handy for developing against newer versions, rather than having to update the subtree in your codebase. **When installed as a plugin, Action Scheduler does not provide any user interfaces for scheduling actions**. The only way to interact with Action Scheduler is via code.
+Using Action Scheduler as a plugin can be handy for developing against newer versions, rather than having to update the
+subtree in your codebase. **When installed as a plugin, Action Scheduler does not provide any user interfaces for
+scheduling actions**. The only way to interact with Action Scheduler is via code.
 
 ### Usage as a Library
 
@@ -38,7 +41,9 @@ To use Action Scheduler as a library:
 1. include the Action Scheduler codebase
 1. load the library by including the `action-scheduler.php` file
 
-Using a [subtree in your plugin, theme or site's Git repository](https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree) to include Action Scheduler is the recommended method. Composer can also be used.
+Using
+a [subtree in your plugin, theme or site's Git repository](https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree)
+to include Action Scheduler is the recommended method. Composer can also be used.
 
 To include Action Scheduler as a git subtree:
 
@@ -48,7 +53,8 @@ To include Action Scheduler as a git subtree:
 git remote add -f subtree-action-scheduler https://github.com/woocommerce/action-scheduler.git
 ```
 
-Adding the subtree as a remote allows us to refer to it in short from via the name `subtree-action-scheduler`, instead of the full GitHub URL.
+Adding the subtree as a remote allows us to refer to it in short from via the name `subtree-action-scheduler`, instead
+of the full GitHub URL.
 
 #### Step 2. Add the Repo as a Subtree
 
@@ -58,7 +64,8 @@ git subtree add --prefix libraries/action-scheduler subtree-action-scheduler mas
 
 This will add the `master` branch of Action Scheduler to your repository in the folder `libraries/action-scheduler`.
 
-You can change the `--prefix` to change where the code is included. Or change the `master` branch to a tag, like `2.1.0` to include only a stable version.
+You can change the `--prefix` to change where the code is included. Or change the `master` branch to a tag, like `2.1.0`
+to include only a stable version.
 
 #### Step 3. Update the Subtree
 
@@ -71,7 +78,8 @@ git subtree pull --prefix libraries/action-scheduler subtree-action-scheduler ma
 
 ### Loading Action Scheduler
 
-Regardless of how it is installed, to load Action Scheduler, you only need to include the `action-scheduler.php` file, e.g.
+Regardless of how it is installed, to load Action Scheduler, you only need to include the `action-scheduler.php` file,
+e.g.
 
 ```php
 <?php
@@ -80,19 +88,26 @@ require_once( plugin_dir_path( __FILE__ ) . '/libraries/action-scheduler/action-
 
 There is no need to call any functions or do else to initialize Action Scheduler.
 
-When the `action-scheduler.php` file is included, Action Scheduler will register the version in that file and then load the most recent version of itself on the site. It will also load the most recent version of [all API functions](https://actionscheduler.org/api/).
+When the `action-scheduler.php` file is included, Action Scheduler will register the version in that file and then load
+the most recent version of itself on the site. It will also load the most recent version
+of [all API functions](https://actionscheduler.org/api/).
 
 ### Load Order
 
-Action Scheduler will register its version on `'plugins_loaded'` with priority `0` - after all other plugin codebases has been loaded. Therefore **the `action-scheduler.php` file must be included before `'plugins_loaded'` priority `0`**.
+Action Scheduler will register its version on `'plugins_loaded'` with priority `0` - after all other plugin codebases
+has been loaded. Therefore **the `action-scheduler.php` file must be included before `'plugins_loaded'` priority `0`**.
 
-It is recommended to load it _when the file including it is included_. However, if you need to load it on a hook, then the hook must occur before `'plugins_loaded'`, or you can use `'plugins_loaded'` with negative priority, like `-10`.
+It is recommended to load it _when the file including it is included_. However, if you need to load it on a hook, then
+the hook must occur before `'plugins_loaded'`, or you can use `'plugins_loaded'` with negative priority, like `-10`.
 
-Action Scheduler will later initialize itself on `'init'` with priority `1`.  Action Scheduler APIs should not be used until after `'init'` with priority `1`.
+Action Scheduler will later initialize itself on `'init'` with priority `1`. Action Scheduler APIs should not be used
+until after `'init'` with priority `1`.
 
 ### Usage in Themes
 
-When using Action Scheduler in themes, it's important to note that if Action Scheduler has been registered by a plugin, then the latest version registered by a plugin will be used, rather than the version included in the theme. This is because of the version dependency handling code using `'plugins_loaded'` since version 1.0.
+When using Action Scheduler in themes, it's important to note that if Action Scheduler has been registered by a plugin,
+then the latest version registered by a plugin will be used, rather than the version included in the theme. This is
+because of the version dependency handling code using `'plugins_loaded'` since version 1.0.
 
 ## Scheduling an Action
 

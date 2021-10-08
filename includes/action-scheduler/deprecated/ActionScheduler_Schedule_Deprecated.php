@@ -3,7 +3,8 @@
 /**
  * Class ActionScheduler_Abstract_Schedule
  */
-abstract class ActionScheduler_Schedule_Deprecated implements ActionScheduler_Schedule {
+abstract class ActionScheduler_Schedule_Deprecated implements ActionScheduler_Schedule
+{
 
 	/**
 	 * Get the date & time this schedule was created to run, or calculate when it should be run
@@ -13,16 +14,17 @@ abstract class ActionScheduler_Schedule_Deprecated implements ActionScheduler_Sc
 	 *
 	 * @return DateTime|null
 	 */
-	public function next( DateTime $after = NULL ) {
-		if ( empty( $after ) ) {
-			$return_value       = $this->get_date();
+	public function next(DateTime $after = NULL)
+	{
+		if (empty($after)) {
+			$return_value = $this->get_date();
 			$replacement_method = 'get_date()';
 		} else {
-			$return_value       = $this->get_next( $after );
+			$return_value = $this->get_next($after);
 			$replacement_method = 'get_next( $after )';
 		}
 
-		_deprecated_function( __METHOD__, '3.0.0', __CLASS__ . '::' . $replacement_method );
+		_deprecated_function(__METHOD__, '3.0.0', __CLASS__ . '::' . $replacement_method);
 
 		return $return_value;
 	}

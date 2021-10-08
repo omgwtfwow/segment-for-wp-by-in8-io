@@ -1,8 +1,7 @@
-
 /**
  * Exopite Simple Options Framework Trumbowyg
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSOFColorpicker";
 
@@ -66,7 +65,7 @@
             var color = ui.color.toString();
             if ($this.hasClass('font-color-js')) {
                 console.log('has font-color');
-                $this.parents('.exopite-sof-font-field').find('.exopite-sof-font-preview').css({ 'color': color });
+                $this.parents('.exopite-sof-font-field').find('.exopite-sof-font-preview').css({'color': color});
             }
         },
 
@@ -83,7 +82,7 @@
 
 })(jQuery, window, document);
 
-; (function ($) {
+;(function ($) {
     "use strict";
 
     $(document).ready(function () {

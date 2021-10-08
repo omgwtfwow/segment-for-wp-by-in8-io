@@ -3,7 +3,8 @@
 /**
  * Class ActionScheduler_Versions
  */
-class ActionScheduler_Versions {
+class ActionScheduler_Versions
+{
 	/**
 	 * @var ActionScheduler_Versions
 	 */
@@ -11,30 +12,34 @@ class ActionScheduler_Versions {
 
 	private $versions = array();
 
-	public function register( $version_string, $initialization_callback ) {
-		if ( isset($this->versions[$version_string]) ) {
+	public function register($version_string, $initialization_callback)
+	{
+		if (isset($this->versions[$version_string])) {
 			return FALSE;
 		}
 		$this->versions[$version_string] = $initialization_callback;
 		return TRUE;
 	}
 
-	public function get_versions() {
+	public function get_versions()
+	{
 		return $this->versions;
 	}
 
-	public function latest_version() {
+	public function latest_version()
+	{
 		$keys = array_keys($this->versions);
-		if ( empty($keys) ) {
+		if (empty($keys)) {
 			return false;
 		}
-		uasort( $keys, 'version_compare' );
+		uasort($keys, 'version_compare');
 		return end($keys);
 	}
 
-	public function latest_version_callback() {
+	public function latest_version_callback()
+	{
 		$latest = $this->latest_version();
-		if ( empty($latest) || !isset($this->versions[$latest]) ) {
+		if (empty($latest) || !isset($this->versions[$latest])) {
 			return '__return_null';
 		}
 		return $this->versions[$latest];
@@ -44,8 +49,9 @@ class ActionScheduler_Versions {
 	 * @return ActionScheduler_Versions
 	 * @codeCoverageIgnore
 	 */
-	public static function instance() {
-		if ( empty(self::$instance) ) {
+	public static function instance()
+	{
+		if (empty(self::$instance)) {
 			self::$instance = new self();
 		}
 		return self::$instance;
@@ -54,9 +60,9 @@ class ActionScheduler_Versions {
 	/**
 	 * @codeCoverageIgnore
 	 */
-	public static function initialize_latest_version() {
+	public static function initialize_latest_version()
+	{
 		$self = self::instance();
 		call_user_func($self->latest_version_callback());
 	}
 }
- 

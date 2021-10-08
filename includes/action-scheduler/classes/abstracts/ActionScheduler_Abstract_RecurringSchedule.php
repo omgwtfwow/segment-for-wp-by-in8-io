@@ -3,7 +3,8 @@
 /**
  * Class ActionScheduler_Abstract_RecurringSchedule
  */
-abstract class ActionScheduler_Abstract_RecurringSchedule extends ActionScheduler_Abstract_Schedule {
+abstract class ActionScheduler_Abstract_RecurringSchedule extends ActionScheduler_Abstract_Schedule
+{
 
 	/**
 	 * The date & time the first instance of this schedule was setup to run (which may not be this instance).
@@ -39,16 +40,18 @@ abstract class ActionScheduler_Abstract_RecurringSchedule extends ActionSchedule
 	 * @param mixed $recurrence The data used to determine the schedule's recurrance.
 	 * @param DateTime|null $first (Optional) The date & time the first instance of this interval schedule ran. Default null, meaning this is the first instance.
 	 */
-	public function __construct( DateTime $date, $recurrence, DateTime $first = null ) {
-		parent::__construct( $date );
-		$this->first_date = empty( $first ) ? $date : $first;
+	public function __construct(DateTime $date, $recurrence, DateTime $first = null)
+	{
+		parent::__construct($date);
+		$this->first_date = empty($first) ? $date : $first;
 		$this->recurrence = $recurrence;
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function is_recurring() {
+	public function is_recurring()
+	{
 		return true;
 	}
 
@@ -57,14 +60,16 @@ abstract class ActionScheduler_Abstract_RecurringSchedule extends ActionSchedule
 	 *
 	 * @return DateTime|null
 	 */
-	public function get_first_date() {
+	public function get_first_date()
+	{
 		return clone $this->first_date;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function get_recurrence() {
+	public function get_recurrence()
+	{
 		return $this->recurrence;
 	}
 
@@ -72,13 +77,14 @@ abstract class ActionScheduler_Abstract_RecurringSchedule extends ActionSchedule
 	 * For PHP 5.2 compat, since DateTime objects can't be serialized
 	 * @return array
 	 */
-	public function __sleep() {
+	public function __sleep()
+	{
 		$sleep_params = parent::__sleep();
 		$this->first_timestamp = $this->first_date->getTimestamp();
-		return array_merge( $sleep_params, array(
+		return array_merge($sleep_params, array(
 			'first_timestamp',
 			'recurrence'
-		) );
+		));
 	}
 
 	/**
@@ -91,10 +97,11 @@ abstract class ActionScheduler_Abstract_RecurringSchedule extends ActionSchedule
 	 * inheritance. To maintain backward compatibility with scheduled serialized and stored
 	 * prior to 3.0, we need to correctly map the old property names.
 	 */
-	public function __wakeup() {
+	public function __wakeup()
+	{
 		parent::__wakeup();
-		if ( $this->first_timestamp > 0 ) {
-			$this->first_date = as_get_datetime_object( $this->first_timestamp );
+		if ($this->first_timestamp > 0) {
+			$this->first_date = as_get_datetime_object($this->first_timestamp);
 		} else {
 			$this->first_date = $this->get_date();
 		}

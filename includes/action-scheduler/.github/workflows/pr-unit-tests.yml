@@ -1,5 +1,5 @@
 name: Run unit tests on PR
-on: 
+on:
   pull_request
 jobs:
   test:

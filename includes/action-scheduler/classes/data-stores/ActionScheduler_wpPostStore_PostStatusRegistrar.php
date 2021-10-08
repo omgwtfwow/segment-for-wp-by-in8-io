@@ -4,10 +4,12 @@
  * Class ActionScheduler_wpPostStore_PostStatusRegistrar
  * @codeCoverageIgnore
  */
-class ActionScheduler_wpPostStore_PostStatusRegistrar {
-	public function register() {
-		register_post_status( ActionScheduler_Store::STATUS_RUNNING, array_merge( $this->post_status_args(), $this->post_status_running_labels() ) );
-		register_post_status( ActionScheduler_Store::STATUS_FAILED, array_merge( $this->post_status_args(), $this->post_status_failed_labels() ) );
+class ActionScheduler_wpPostStore_PostStatusRegistrar
+{
+	public function register()
+	{
+		register_post_status(ActionScheduler_Store::STATUS_RUNNING, array_merge($this->post_status_args(), $this->post_status_running_labels()));
+		register_post_status(ActionScheduler_Store::STATUS_FAILED, array_merge($this->post_status_args(), $this->post_status_failed_labels()));
 	}
 
 	/**
@@ -15,15 +17,16 @@ class ActionScheduler_wpPostStore_PostStatusRegistrar {
 	 *
 	 * @return array
 	 */
-	protected function post_status_args() {
+	protected function post_status_args()
+	{
 		$args = array(
-			'public'                    => false,
-			'exclude_from_search'       => false,
-			'show_in_admin_all_list'    => true,
+			'public' => false,
+			'exclude_from_search' => false,
+			'show_in_admin_all_list' => true,
 			'show_in_admin_status_list' => true,
 		);
 
-		return apply_filters( 'action_scheduler_post_status_args', $args );
+		return apply_filters('action_scheduler_post_status_args', $args);
 	}
 
 	/**
@@ -31,14 +34,15 @@ class ActionScheduler_wpPostStore_PostStatusRegistrar {
 	 *
 	 * @return array
 	 */
-	protected function post_status_failed_labels() {
+	protected function post_status_failed_labels()
+	{
 		$labels = array(
-			'label'       => _x( 'Failed', 'post', 'action-scheduler' ),
+			'label' => _x('Failed', 'post', 'action-scheduler'),
 			/* translators: %s: count */
-			'label_count' => _n_noop( 'Failed <span class="count">(%s)</span>', 'Failed <span class="count">(%s)</span>', 'action-scheduler' ),
+			'label_count' => _n_noop('Failed <span class="count">(%s)</span>', 'Failed <span class="count">(%s)</span>', 'action-scheduler'),
 		);
 
-		return apply_filters( 'action_scheduler_post_status_failed_labels', $labels );
+		return apply_filters('action_scheduler_post_status_failed_labels', $labels);
 	}
 
 	/**
@@ -46,13 +50,14 @@ class ActionScheduler_wpPostStore_PostStatusRegistrar {
 	 *
 	 * @return array
 	 */
-	protected function post_status_running_labels() {
+	protected function post_status_running_labels()
+	{
 		$labels = array(
-			'label'       => _x( 'In-Progress', 'post', 'action-scheduler' ),
+			'label' => _x('In-Progress', 'post', 'action-scheduler'),
 			/* translators: %s: count */
-			'label_count' => _n_noop( 'In-Progress <span class="count">(%s)</span>', 'In-Progress <span class="count">(%s)</span>', 'action-scheduler' ),
+			'label_count' => _n_noop('In-Progress <span class="count">(%s)</span>', 'In-Progress <span class="count">(%s)</span>', 'action-scheduler'),
 		);
 
-		return apply_filters( 'action_scheduler_post_status_running_labels', $labels );
+		return apply_filters('action_scheduler_post_status_running_labels', $labels);
 	}
 }

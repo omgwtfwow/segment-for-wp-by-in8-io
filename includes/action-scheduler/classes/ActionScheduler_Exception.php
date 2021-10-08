@@ -8,4 +8,6 @@
  * @package ActionScheduler
  * @since %VERSION%
  */
-interface ActionScheduler_Exception {}
+interface ActionScheduler_Exception
+{
+}

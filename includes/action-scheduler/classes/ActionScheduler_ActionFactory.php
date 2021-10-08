@@ -3,7 +3,8 @@
 /**
  * Class ActionScheduler_ActionFactory
  */
-class ActionScheduler_ActionFactory {
+class ActionScheduler_ActionFactory
+{
 
 	/**
 	 * @param string $status The action's status in the data store
@@ -14,16 +15,17 @@ class ActionScheduler_ActionFactory {
 	 *
 	 * @return ActionScheduler_Action An instance of the stored action
 	 */
-	public function get_stored_action( $status, $hook, array $args = array(), ActionScheduler_Schedule $schedule = null, $group = '' ) {
+	public function get_stored_action($status, $hook, array $args = array(), ActionScheduler_Schedule $schedule = null, $group = '')
+	{
 
-		switch ( $status ) {
+		switch ($status) {
 			case ActionScheduler_Store::STATUS_PENDING :
 				$action_class = 'ActionScheduler_Action';
 				break;
 			case ActionScheduler_Store::STATUS_CANCELED :
 				$action_class = 'ActionScheduler_CanceledAction';
-				if ( ! is_null( $schedule ) && ! is_a( $schedule, 'ActionScheduler_CanceledSchedule' ) && ! is_a( $schedule, 'ActionScheduler_NullSchedule' ) ) {
-					$schedule = new ActionScheduler_CanceledSchedule( $schedule->get_date() );
+				if (!is_null($schedule) && !is_a($schedule, 'ActionScheduler_CanceledSchedule') && !is_a($schedule, 'ActionScheduler_NullSchedule')) {
+					$schedule = new ActionScheduler_CanceledSchedule($schedule->get_date());
 				}
 				break;
 			default :
@@ -31,9 +33,9 @@ class ActionScheduler_ActionFactory {
 				break;
 		}
 
-		$action_class = apply_filters( 'action_scheduler_stored_action_class', $action_class, $status, $hook, $args, $schedule, $group );
+		$action_class = apply_filters('action_scheduler_stored_action_class', $action_class, $status, $hook, $args, $schedule, $group);
 
-		$action = new $action_class( $hook, $args, $schedule, $group );
+		$action = new $action_class($hook, $args, $schedule, $group);
 
 		/**
 		 * Allow 3rd party code to change the instantiated action for a given hook, args, schedule and group.
@@ -44,7 +46,7 @@ class ActionScheduler_ActionFactory {
 		 * @param ActionScheduler_Schedule $schedule The instantiated action's schedule.
 		 * @param string $group The instantiated action's group.
 		 */
-		return apply_filters( 'action_scheduler_stored_action_instance', $action, $hook, $args, $schedule, $group );
+		return apply_filters('action_scheduler_stored_action_instance', $action, $hook, $args, $schedule, $group);
 	}
 
 	/**
@@ -63,10 +65,11 @@ class ActionScheduler_ActionFactory {
 	 *
 	 * @return int The ID of the stored action
 	 */
-	public function async( $hook, $args = array(), $group = '' ) {
+	public function async($hook, $args = array(), $group = '')
+	{
 		$schedule = new ActionScheduler_NullSchedule();
-		$action = new ActionScheduler_Action( $hook, $args, $schedule, $group );
-		return $this->store( $action );
+		$action = new ActionScheduler_Action($hook, $args, $schedule, $group);
+		return $this->store($action);
 	}
 
 	/**
@@ -77,11 +80,12 @@ class ActionScheduler_ActionFactory {
 	 *
 	 * @return int The ID of the stored action
 	 */
-	public function single( $hook, $args = array(), $when = null, $group = '' ) {
-		$date = as_get_datetime_object( $when );
-		$schedule = new ActionScheduler_SimpleSchedule( $date );
-		$action = new ActionScheduler_Action( $hook, $args, $schedule, $group );
-		return $this->store( $action );
+	public function single($hook, $args = array(), $when = null, $group = '')
+	{
+		$date = as_get_datetime_object($when);
+		$schedule = new ActionScheduler_SimpleSchedule($date);
+		$action = new ActionScheduler_Action($hook, $args, $schedule, $group);
+		return $this->store($action);
 	}
 
 	/**
@@ -95,14 +99,15 @@ class ActionScheduler_ActionFactory {
 	 *
 	 * @return int The ID of the stored action
 	 */
-	public function recurring( $hook, $args = array(), $first = null, $interval = null, $group = '' ) {
-		if ( empty($interval) ) {
-			return $this->single( $hook, $args, $first, $group );
+	public function recurring($hook, $args = array(), $first = null, $interval = null, $group = '')
+	{
+		if (empty($interval)) {
+			return $this->single($hook, $args, $first, $group);
 		}
-		$date = as_get_datetime_object( $first );
-		$schedule = new ActionScheduler_IntervalSchedule( $date, $interval );
-		$action = new ActionScheduler_Action( $hook, $args, $schedule, $group );
-		return $this->store( $action );
+		$date = as_get_datetime_object($first);
+		$schedule = new ActionScheduler_IntervalSchedule($date, $interval);
+		$action = new ActionScheduler_Action($hook, $args, $schedule, $group);
+		return $this->store($action);
 	}
 
 	/**
@@ -118,15 +123,16 @@ class ActionScheduler_ActionFactory {
 	 *
 	 * @return int The ID of the stored action
 	 */
-	public function cron( $hook, $args = array(), $base_timestamp = null, $schedule = null, $group = '' ) {
-		if ( empty($schedule) ) {
-			return $this->single( $hook, $args, $base_timestamp, $group );
+	public function cron($hook, $args = array(), $base_timestamp = null, $schedule = null, $group = '')
+	{
+		if (empty($schedule)) {
+			return $this->single($hook, $args, $base_timestamp, $group);
 		}
-		$date = as_get_datetime_object( $base_timestamp );
-		$cron = CronExpression::factory( $schedule );
-		$schedule = new ActionScheduler_CronSchedule( $date, $cron );
-		$action = new ActionScheduler_Action( $hook, $args, $schedule, $group );
-		return $this->store( $action );
+		$date = as_get_datetime_object($base_timestamp);
+		$cron = CronExpression::factory($schedule);
+		$schedule = new ActionScheduler_CronSchedule($date, $cron);
+		$action = new ActionScheduler_Action($hook, $args, $schedule, $group);
+		return $this->store($action);
 	}
 
 	/**
@@ -153,18 +159,19 @@ class ActionScheduler_ActionFactory {
 	 * @return string The ID of the stored action
 	 * @throws InvalidArgumentException If $action is not a recurring action.
 	 */
-	public function repeat( $action ) {
+	public function repeat($action)
+	{
 		$schedule = $action->get_schedule();
-		$next     = $schedule->get_next( as_get_datetime_object() );
+		$next = $schedule->get_next(as_get_datetime_object());
 
-		if ( is_null( $next ) || ! $schedule->is_recurring() ) {
-			throw new InvalidArgumentException( __( 'Invalid action - must be a recurring action.', 'action-scheduler' ) );
+		if (is_null($next) || !$schedule->is_recurring()) {
+			throw new InvalidArgumentException(__('Invalid action - must be a recurring action.', 'action-scheduler'));
 		}
 
-		$schedule_class = get_class( $schedule );
-		$new_schedule = new $schedule( $next, $schedule->get_recurrence(), $schedule->get_first_date() );
-		$new_action = new ActionScheduler_Action( $action->get_hook(), $action->get_args(), $new_schedule, $action->get_group() );
-		return $this->store( $new_action );
+		$schedule_class = get_class($schedule);
+		$new_schedule = new $schedule($next, $schedule->get_recurrence(), $schedule->get_first_date());
+		$new_action = new ActionScheduler_Action($action->get_hook(), $action->get_args(), $new_schedule, $action->get_group());
+		return $this->store($new_action);
 	}
 
 	/**
@@ -172,8 +179,9 @@ class ActionScheduler_ActionFactory {
 	 *
 	 * @return int The ID of the stored action
 	 */
-	protected function store( ActionScheduler_Action $action ) {
+	protected function store(ActionScheduler_Action $action)
+	{
 		$store = ActionScheduler_Store::instance();
-		return $store->save_action( $action );
+		return $store->save_action($action);
 	}
 }

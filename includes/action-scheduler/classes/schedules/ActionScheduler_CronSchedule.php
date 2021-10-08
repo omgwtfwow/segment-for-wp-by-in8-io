@@ -3,7 +3,8 @@
 /**
  * Class ActionScheduler_CronSchedule
  */
-class ActionScheduler_CronSchedule extends ActionScheduler_Abstract_RecurringSchedule implements ActionScheduler_Schedule {
+class ActionScheduler_CronSchedule extends ActionScheduler_Abstract_RecurringSchedule implements ActionScheduler_Schedule
+{
 
 	/**
 	 * Deprecated property @see $this->__wakeup() for details.
@@ -23,18 +24,19 @@ class ActionScheduler_CronSchedule extends ActionScheduler_Abstract_RecurringSch
 	 * @param CronExpression|string $recurrence The CronExpression used to calculate the schedule's next instance.
 	 * @param DateTime|null $first (Optional) The date & time the first instance of this interval schedule ran. Default null, meaning this is the first instance.
 	 */
-	public function __construct( DateTime $start, $recurrence, DateTime $first = null ) {
-		if ( ! is_a( $recurrence, 'CronExpression' ) ) {
-			$recurrence = CronExpression::factory( $recurrence );
+	public function __construct(DateTime $start, $recurrence, DateTime $first = null)
+	{
+		if (!is_a($recurrence, 'CronExpression')) {
+			$recurrence = CronExpression::factory($recurrence);
 		}
 
 		// For backward compatibility, we need to make sure the date is set to the first matching cron date, not whatever date is passed in. Importantly, by passing true as the 3rd param, if $start matches the cron expression, then it will be used. This was previously handled in the now deprecated next() method.
-		$date = $recurrence->getNextRunDate( $start, 0, true );
+		$date = $recurrence->getNextRunDate($start, 0, true);
 
 		// parent::__construct() will set this to $date by default, but that may be different to $start now.
-		$first = empty( $first ) ? $start : $first;
+		$first = empty($first) ? $start : $first;
 
-		parent::__construct( $date, $recurrence, $first );
+		parent::__construct($date, $recurrence, $first);
 	}
 
 	/**
@@ -44,15 +46,17 @@ class ActionScheduler_CronSchedule extends ActionScheduler_Abstract_RecurringSch
 	 * @param DateTime $after
 	 * @return DateTime
 	 */
-	protected function calculate_next( DateTime $after ) {
-		return $this->recurrence->getNextRunDate( $after, 0, false );
+	protected function calculate_next(DateTime $after)
+	{
+		return $this->recurrence->getNextRunDate($after, 0, false);
 	}
 
 	/**
 	 * @return string
 	 */
-	public function get_recurrence() {
-		return strval( $this->recurrence );
+	public function get_recurrence()
+	{
+		return strval($this->recurrence);
 	}
 
 	/**
@@ -68,17 +72,18 @@ class ActionScheduler_CronSchedule extends ActionScheduler_Abstract_RecurringSch
 	 *
 	 * @return array
 	 */
-	public function __sleep() {
+	public function __sleep()
+	{
 
 		$sleep_params = parent::__sleep();
 
 		$this->start_timestamp = $this->scheduled_timestamp;
-		$this->cron            = $this->recurrence;
+		$this->cron = $this->recurrence;
 
-		return array_merge( $sleep_params, array(
+		return array_merge($sleep_params, array(
 			'start_timestamp',
 			'cron'
-		) );
+		));
 	}
 
 	/**
@@ -86,15 +91,16 @@ class ActionScheduler_CronSchedule extends ActionScheduler_Abstract_RecurringSch
 	 *
 	 * For more background, @see ActionScheduler_Abstract_RecurringSchedule::__wakeup().
 	 */
-	public function __wakeup() {
-		if ( is_null( $this->scheduled_timestamp ) && ! is_null( $this->start_timestamp ) ) {
+	public function __wakeup()
+	{
+		if (is_null($this->scheduled_timestamp) && !is_null($this->start_timestamp)) {
 			$this->scheduled_timestamp = $this->start_timestamp;
-			unset( $this->start_timestamp );
+			unset($this->start_timestamp);
 		}
 
-		if ( is_null( $this->recurrence ) && ! is_null( $this->cron ) ) {
+		if (is_null($this->recurrence) && !is_null($this->cron)) {
 			$this->recurrence = $this->cron;
-			unset( $this->cron );
+			unset($this->cron);
 		}
 		parent::__wakeup();
 	}

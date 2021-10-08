@@ -15,6 +15,6 @@ To run unit tests:
 You may need to quote strings with backslashes to prevent them from being processed by the shell or other programs.
 
 Then, to run the tests:
-    ```
-    $ composer run test
-    ```
+```
+$ composer run test
+```

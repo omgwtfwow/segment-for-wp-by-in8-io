@@ -3,21 +3,20 @@ PHP Cron Expression Parser
 
 [![Latest Stable Version](https://poser.pugx.org/mtdowling/cron-expression/v/stable.png)](https://packagist.org/packages/mtdowling/cron-expression) [![Total Downloads](https://poser.pugx.org/mtdowling/cron-expression/downloads.png)](https://packagist.org/packages/mtdowling/cron-expression) [![Build Status](https://secure.travis-ci.org/mtdowling/cron-expression.png)](http://travis-ci.org/mtdowling/cron-expression)
 
-The PHP cron expression parser can parse a CRON expression, determine if it is
-due to run, calculate the next run date of the expression, and calculate the previous
-run date of the expression.  You can calculate dates far into the future or past by
-skipping n number of matching dates.
+The PHP cron expression parser can parse a CRON expression, determine if it is due to run, calculate the next run date
+of the expression, and calculate the previous run date of the expression. You can calculate dates far into the future or
+past by skipping n number of matching dates.
 
-The parser can handle increments of ranges (e.g. */12, 2-59/3), intervals (e.g. 0-9),
-lists (e.g. 1,2,3), W to find the nearest weekday for a given day of the month, L to
-find the last day of the month, L to find the last given weekday of a month, and hash
+The parser can handle increments of ranges (e.g. */12, 2-59/3), intervals (e.g. 0-9), lists (e.g. 1,2,3), W to find the
+nearest weekday for a given day of the month, L to find the last day of the month, L to find the last given weekday of a
+month, and hash
 (#) to find the nth weekday of a given month.
 
 Credits
 ==========
 
-Created by Micheal Dowling. Ported to PHP 5.2 by Flightless, Inc.
-Based on version 1.0.3: https://github.com/mtdowling/cron-expression/tree/v1.0.3
+Created by Micheal Dowling. Ported to PHP 5.2 by Flightless, Inc. Based on version
+1.0.3: https://github.com/mtdowling/cron-expression/tree/v1.0.3
 
 Installing
 ==========
@@ -34,6 +33,7 @@ Add the following to your project's composer.json:
 
 Usage
 =====
+
 ```php
 <?php
 
@@ -61,7 +61,8 @@ echo $cron->getNextRunDate('2010-01-12 00:00:00')->format('Y-m-d H:i:s');
 CRON Expressions
 ================
 
-A CRON expression is a string representing the schedule for a particular command to execute.  The parts of a CRON schedule are as follows:
+A CRON expression is a string representing the schedule for a particular command to execute. The parts of a CRON
+schedule are as follows:
 
     *    *    *    *    *    *
     -    -    -    -    -    -

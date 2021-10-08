@@ -2,6 +2,10 @@
 
 namespace Action_Scheduler\WP_CLI;
 
+use cli\progress\Bar;
+use Exception;
+use function WP_CLI\Utils\make_progress_bar;
+
 /**
  * WP_CLI progress bar for Action Scheduler.
  */
@@ -15,7 +19,8 @@ namespace Action_Scheduler\WP_CLI;
  *
  * @codeCoverageIgnore
  */
-class ProgressBar {
+class ProgressBar
+{
 
 	/** @var integer */
 	protected $total_ticks;
@@ -29,42 +34,44 @@ class ProgressBar {
 	/** @var string */
 	protected $message;
 
-	/** @var \cli\progress\Bar */
+	/** @var Bar */
 	protected $progress_bar;
 
 	/**
 	 * ProgressBar constructor.
 	 *
-	 * @param string  $message    Text to display before the progress bar.
-	 * @param integer $count      Total number of ticks to be performed.
-	 * @param integer $interval   Optional. The interval in milliseconds between updates. Default 100.
- 	 *
+	 * @param string $message Text to display before the progress bar.
+	 * @param integer $count Total number of ticks to be performed.
+	 * @param integer $interval Optional. The interval in milliseconds between updates. Default 100.
+	 *
 	 * @throws Exception When this is not run within WP CLI
 	 */
-	public function __construct( $message, $count, $interval = 100 ) {
-		if ( ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+	public function __construct($message, $count, $interval = 100)
+	{
+		if (!(defined('WP_CLI') && WP_CLI)) {
 			/* translators: %s php class name */
-			throw new \Exception( sprintf( __( 'The %s class can only be run within WP CLI.', 'action-scheduler' ), __CLASS__ ) );
+			throw new Exception(sprintf(__('The %s class can only be run within WP CLI.', 'action-scheduler'), __CLASS__));
 		}
 
 		$this->total_ticks = 0;
-		$this->message     = $message;
-		$this->count       = $count;
-		$this->interval    = $interval;
+		$this->message = $message;
+		$this->count = $count;
+		$this->interval = $interval;
 	}
 
 	/**
 	 * Increment the progress bar ticks.
 	 */
-	public function tick() {
-		if ( null === $this->progress_bar ) {
+	public function tick()
+	{
+		if (null === $this->progress_bar) {
 			$this->setup_progress_bar();
 		}
 
 		$this->progress_bar->tick();
 		$this->total_ticks++;
 
-		do_action( 'action_scheduler/progress_tick', $this->total_ticks );
+		do_action('action_scheduler/progress_tick', $this->total_ticks);
 	}
 
 	/**
@@ -72,15 +79,17 @@ class ProgressBar {
 	 *
 	 * @return int
 	 */
-	public function current() {
+	public function current()
+	{
 		return $this->progress_bar ? $this->progress_bar->current() : 0;
 	}
 
 	/**
 	 * Finish the current progress bar.
 	 */
-	public function finish() {
-		if ( null !== $this->progress_bar ) {
+	public function finish()
+	{
+		if (null !== $this->progress_bar) {
 			$this->progress_bar->finish();
 		}
 
@@ -92,7 +101,8 @@ class ProgressBar {
 	 *
 	 * @param string $message The message to be used when the next progress bar is created.
 	 */
-	public function set_message( $message ) {
+	public function set_message($message)
+	{
 		$this->message = $message;
 	}
 
@@ -101,7 +111,8 @@ class ProgressBar {
 	 *
 	 * @param integer $count The total number of ticks expected to complete.
 	 */
-	public function set_count( $count ) {
+	public function set_count($count)
+	{
 		$this->count = $count;
 		$this->finish();
 	}
@@ -109,8 +120,9 @@ class ProgressBar {
 	/**
 	 * Set up the progress bar.
 	 */
-	protected function setup_progress_bar() {
-		$this->progress_bar = \WP_CLI\Utils\make_progress_bar(
+	protected function setup_progress_bar()
+	{
+		$this->progress_bar = make_progress_bar(
 			$this->message,
 			$this->count,
 			$this->interval

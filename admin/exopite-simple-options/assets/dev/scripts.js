@@ -40,13 +40,12 @@ jQuery.fn.findExclude = function (selector, mask, result) {
  * Get url parameter in jQuery
  * @link https://stackoverflow.com/questions/19491336/get-url-parameter-jquery-or-how-to-get-query-string-values-in-js/25359264#25359264
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
     $.urlParam = function (name) {
         var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
         if (results == null) {
             return null;
-        }
-        else {
+        } else {
             return decodeURI(results[1]) || 0;
         }
     };
@@ -62,7 +61,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
  *
  * @link https://github.com/Codestar/codestar-framework/
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
     'use strict';
     /**
      * Dependency System
@@ -137,7 +136,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Save Options with AJAX
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSaveOptionsAJAX";
 
@@ -247,10 +246,10 @@ jQuery.fn.findExclude = function (selector, mask, result) {
              */
             var $that = $(this);
             $(this).ajaxSubmit({
-                beforeSubmit: function(arr, $form, options) {
+                beforeSubmit: function (arr, $form, options) {
                     // The array of form data takes the following form:
                     // [ { name: 'username', value: 'jresig' }, { name: 'password', value: 'secret' } ]
-                     // https://jsonformatter.curiousconcept.com/
+                    // https://jsonformatter.curiousconcept.com/
 
                     $that.find('[name]').not(':disabled').each(function (index, el) {
                         if ($(el).prop('nodeName') == 'INPUT' && $(el).attr('type') == 'checkbox' && !$(el).is(":checked") && !$(el).attr('name').endsWith('[]')) {
@@ -313,7 +312,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Media Uploader
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteMediaUploader";
 
@@ -390,10 +389,10 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                     }
                     if (!isVideo && plugin.options.preview !== undefined) {
                         parent.find(plugin.options.preview).removeClass('hidden');
-                        parent.find('img').attr({ 'src': attachment.url });
+                        parent.find('img').attr({'src': attachment.url});
                     }
                     if (isVideo) {
-                        parent.find('video').attr({ 'src': attachment.url });
+                        parent.find('video').attr({'src': attachment.url});
                     }
                     // $(button).removeClass('button').html('<img class="true_pre_image" src="' + attachment.url + '" style="max-width:95%;display:block;" />').next().val(attachment.id).next().show();
                     /* if you sen multiple to true, here is some code for getting the image IDs
@@ -422,7 +421,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                 previewImg.css('display') !== 'none'
             ) {
                 previewWrapper.addClass('hidden');
-                previewImg.attr({ 'src': '' });
+                previewImg.attr({'src': ''});
             }
 
             parent.find(plugin.options.input).val('');
@@ -444,7 +443,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Options Navigation
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     /**
      * A jQuery Plugin Boilerplate
@@ -560,7 +559,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Handle TinyMCE
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSOFTinyMCE";
 
@@ -661,7 +660,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Font Field Preview
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteFontPreview";
 
@@ -723,17 +722,17 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             this.$element.off('.' + this._name);
         },
         // Remove plugin instance completely
-        destroy: function() {
+        destroy: function () {
             this.unbindEvents();
             this.$element.removeData('plugin_' + this._name);
             // this.element.removeData();
             this.element = null;
             this.$element = null;
         },
-        setColorOnStart: function() {
+        setColorOnStart: function () {
             var plugin = this;
             var color = plugin.fontColor.val();
-            plugin.preview.css({ 'color': color });
+            plugin.preview.css({'color': color});
         },
         updatePreview: function () {
             var plugin = this;
@@ -827,7 +826,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                     break;
             }
 
-            return { fontWeightValue, fontStyleValue };
+            return {fontWeightValue, fontStyleValue};
         },
 
 
@@ -847,7 +846,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Repeater
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     /**
      * A jQuery Plugin Boilerplate
@@ -890,7 +889,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 
         },
 
-        sortableInit: function() {
+        sortableInit: function () {
 
             if (this.isSortable) {
 
@@ -970,7 +969,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             this.$element.off('.' + this._name);
         },
 
-        updateName: function( $element ) {
+        updateName: function ($element) {
             var plugin = this;
 
             var text = $element.closest('.exopite-sof-group').children('.exopite-sof-cloneable--add').text();
@@ -981,12 +980,12 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             var baseNameRegex = plugin.escapeRegExp(baseName);
             var regexGroupName = new RegExp(baseNameRegex + "\\[(.*?)\\]", "i");
 
-            $wrapper.findExclude('.exopite-sof-cloneable__item', '.exopite-sof-group').each(function(index, el){
+            $wrapper.findExclude('.exopite-sof-cloneable__item', '.exopite-sof-group').each(function (index, el) {
 
                 /**
                  * Update data-name for muster element (set parent indexes for cloning)
                  */
-                $(el).find('[data-name^="' + baseName + '"]').each(function(indexName, elDataName){
+                $(el).find('[data-name^="' + baseName + '"]').each(function (indexName, elDataName) {
                     var elementName = $(elDataName).attr('data-name');
 
                     var relpacedName = elementName.replace(regexGroupName, function ($0, $1) {
@@ -1002,7 +1001,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                 /**
                  * Update element names (only this parent index) from current level to the last level
                  */
-                $(el).find('[name^="' + baseName + '"]').each(function(indexName, elName){
+                $(el).find('[name^="' + baseName + '"]').each(function (indexName, elName) {
 
                     var elementName = $(elName).attr('name');
                     var relpacedName = elementName.replace(regexGroupName, function ($0, $1) {
@@ -1092,12 +1091,12 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             return stringToGoIntoTheRegex.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
 
-        removeIfNested: function(index) {
+        removeIfNested: function (index) {
             // this is the corrent DOM element
             var $this = $(this),
                 return_value = false;
 
-            $.each($this.attr('class').split(/\s+/), function(index) {
+            $.each($this.attr('class').split(/\s+/), function (index) {
                 if ($this.parents("." + this).length > 0) {
                     return_value = default_value || true;
                 }
@@ -1136,7 +1135,8 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             $cloned.removeClass('exopite-sof-cloneable__muster');
             $cloned.removeClass('exopite-sof-cloneable__muster--hidden');
             $cloned.removeClass('exopite-sof-accordion--hidden');
-            $cloned.findExclude('[disabled]', '.exopite-sof-cloneable__muster').attr('disabled', false).removeClass('disabled');;
+            $cloned.findExclude('[disabled]', '.exopite-sof-cloneable__muster').attr('disabled', false).removeClass('disabled');
+
 
             plugin.$element.trigger('exopite-sof-field-group-item-added-before', [$cloned, $group]);
 
@@ -1157,19 +1157,19 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             }
 
             var numItem = plugin.checkAmount($wrapper);
-            if (! numItem) {
+            if (!numItem) {
                 return;
             }
 
             plugin.setMusterDisabled();
             plugin.updateName($wrapper);
 
-            if ($.fn.chosen) $group.find("select.chosen").chosen({ width: "375px" });
+            if ($.fn.chosen) $group.find("select.chosen").chosen({width: "375px"});
 
             // If has date picker, initilize it.
             $cloned.find('.datepicker').each(function (index, el) {
                 var dateFormat = $(el).data('format');
-                $(el).removeClass('hasDatepicker').datepicker({ 'dateFormat': dateFormat });
+                $(el).removeClass('hasDatepicker').datepicker({'dateFormat': dateFormat});
             });
 
             plugin.sortableInit();
@@ -1178,7 +1178,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             $cloned.exopiteSofManageDependencies('sub');
             $cloned.find('.exopite-sof-cloneable__content').removeAttr("style").show();
 
-            $cloned.find('.exopite-sof-font-field').each(function(index,el){
+            $cloned.find('.exopite-sof-font-field').each(function (index, el) {
 
                 if (!$(el).children('label').children('select').is(":disabled")) {
                     $(el).exopiteFontPreview();
@@ -1215,7 +1215,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Accordion
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSOFAccordion";
 
@@ -1323,7 +1323,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Search In Options
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSofSearch";
 
@@ -1392,9 +1392,10 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                 plugin.$element.find('.exopite-sof-section-header').hide();
                 var $activeElement = plugin.$element.find('.exopite-sof-nav li[data-section="' + activeElement + '"]');
                 $activeElement.addClass('active');
-                if ( $activeElement.parents('.exopite-sof-nav-list-parent-item').length > 0  &&
-                    ! $activeElement.parents('.exopite-sof-nav-list-parent-item').hasClass('active') ) {
-                    $activeElement.parents('.exopite-sof-nav-list-parent-item').addClass('active').find('ul').slideToggle(200);;
+                if ($activeElement.parents('.exopite-sof-nav-list-parent-item').length > 0 &&
+                    !$activeElement.parents('.exopite-sof-nav-list-parent-item').hasClass('active')) {
+                    $activeElement.parents('.exopite-sof-nav-list-parent-item').addClass('active').find('ul').slideToggle(200);
+
                 }
                 plugin.$element.find('.exopite-sof-nav').removeClass('search');
             }
@@ -1452,7 +1453,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Import/Export Options with AJAX
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteImportExportAJAX";
 
@@ -1636,7 +1637,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 /**
  * Exopite SOF Tab Navigation
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteTabs";
 
@@ -1722,7 +1723,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 
 })(jQuery, window, document);
 
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     "use strict";
 
@@ -1794,14 +1795,14 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             plugin.$element.on('click' + '.' + plugin._name, '> .exopite-sof-gallery-add', function (e) {
                 e.preventDefault();
 
-                plugin.manageMediaFrame.call( plugin, $(this) );
+                plugin.manageMediaFrame.call(plugin, $(this));
 
             });
 
             plugin.$element.on('click' + '.' + plugin._name, '.exopite-sof-image-delete', function (e) {
                 e.preventDefault();
 
-                plugin.deleteImage.call( plugin, $(this) );
+                plugin.deleteImage.call(plugin, $(this));
 
             });
 
@@ -1809,18 +1810,18 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 
                 // console.log('gallery sortstop 2');
 
-                plugin.updateIDs( $(this) );
+                plugin.updateIDs($(this));
 
             });
 
         },
-        updateIDs: function ( $element ) {
+        updateIDs: function ($element) {
 
             let imageIDs = [];
-            $element.children('span').each(function( index, el ){
-                imageIDs.push( $(el).children('img').attr('id') );
+            $element.children('span').each(function (index, el) {
+                imageIDs.push($(el).children('img').attr('id'));
             });
-            $element.closest('.exopite-sof-gallery').prev().val( imageIDs.join(',') );
+            $element.closest('.exopite-sof-gallery').prev().val(imageIDs.join(','));
 
         },
         deleteImage: function ($button) {
@@ -1830,14 +1831,14 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                 let $imageIDs = $button.closest('.exopite-sof-gallery').prev();
                 var removedImage = $button.next().attr('id');
                 var galleryIds = $imageIDs.val().split(",");
-                galleryIds = $( galleryIds ).not([removedImage]).get();
-                $imageIDs.val( galleryIds );
+                galleryIds = $(galleryIds).not([removedImage]).get();
+                $imageIDs.val(galleryIds);
                 $button.parent().remove();
                 plugin.sortableInit();
 
             }
         },
-        manageMediaFrame: function ( $button ) {
+        manageMediaFrame: function ($button) {
             var plugin = this;
 
             let $imageIDs = $button.prev().prev();
@@ -1906,8 +1907,8 @@ jQuery.fn.findExclude = function (selector, mask, result) {
                 });
                 metadataString = imageIDArray.join(",");
                 if (metadataString) {
-                    $imageIDs.val( metadataString );
-                    $galleryWrapper.html( imageHTML );
+                    $imageIDs.val(metadataString);
+                    $galleryWrapper.html(imageHTML);
                     plugin.sortableInit();
                 }
             });
@@ -1950,7 +1951,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
  * This is only relevant for metabox, because in the options the POST can be
  * check and add them before being sent.
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopitePrepareForm";
 
@@ -2027,7 +2028,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
             this.$element.off('.' + this._name);
         },
 
-        addHidden: function ( name, $element ) {
+        addHidden: function (name, $element) {
 
             $('<input>').attr({
                 'type': 'hidden',
@@ -2037,7 +2038,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
 
         },
 
-        removeHidden: function ( $element ) {
+        removeHidden: function ($element) {
 
             $element.prev('input[type="hidden"]').remove();
 
@@ -2068,7 +2069,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
  *      https://www.jquery-az.com/a-bootstrap-jquery-color-picker-with-7-demos/
  *   )?
  */
-; (function ($) {
+;(function ($) {
     "use strict";
 
     $(document).ready(function () {
@@ -2086,7 +2087,7 @@ jQuery.fn.findExclude = function (selector, mask, result) {
         });
 
         $('.exopite-sof-content-js').exopiteOptionsNavigation();
-        $('.exopite-sof-wrapper').find('.exopite-sof-font-field').each(function(index,el){
+        $('.exopite-sof-wrapper').find('.exopite-sof-font-field').each(function (index, el) {
 
             if (!$(el).children('label').children('select').is(":disabled")) {
                 $(el).exopiteFontPreview();

@@ -1,30 +1,42 @@
 ---
 description: Reference guide for background processing functions provided by the Action Scheduler job queue for WordPress.
 ---
+
 # API Reference
 
-Action Scheduler provides a range of functions for scheduling hooks to run at some time in the future on one or more occassions.
+Action Scheduler provides a range of functions for scheduling hooks to run at some time in the future on one or more
+occassions.
 
-To understand the scheduling functions, it can help to think of them as extensions to WordPress' `do_action()` function that add the ability to delay and repeat when the hook will be triggered.
+To understand the scheduling functions, it can help to think of them as extensions to WordPress' `do_action()` function
+that add the ability to delay and repeat when the hook will be triggered.
 
 ## WP-Cron APIs vs. Action Scheduler APIs
 
-The Action Scheduler API functions are designed to mirror the WordPress [WP-Cron API functions](http://codex.wordpress.org/Category:WP-Cron_Functions).
+The Action Scheduler API functions are designed to mirror the
+WordPress [WP-Cron API functions](http://codex.wordpress.org/Category:WP-Cron_Functions).
 
 Functions return similar values and accept similar arguments to their WP-Cron counterparts. The notable differences are:
 
-* `as_schedule_single_action()` & `as_schedule_recurring_action()` will return the ID of the scheduled action rather than boolean indicating whether the event was scheduled
-* `as_schedule_recurring_action()` takes an interval in seconds as the recurring interval rather than an arbitrary string
-* `as_schedule_single_action()` & `as_schedule_recurring_action()` can accept a `$group` parameter to group different actions for the one plugin together.
+* `as_schedule_single_action()` & `as_schedule_recurring_action()` will return the ID of the scheduled action rather
+  than boolean indicating whether the event was scheduled
+* `as_schedule_recurring_action()` takes an interval in seconds as the recurring interval rather than an arbitrary
+  string
+* `as_schedule_single_action()` & `as_schedule_recurring_action()` can accept a `$group` parameter to group different
+  actions for the one plugin together.
 * the `wp_` prefix is substituted with `as_` and the term `event` is replaced with `action`
 
 ## API Function Availability
 
-As mentioned in the [Usage - Load Order](usage.md#load-order) section, Action Scheduler will initialize itself on the `'init'` hook with priority `1`. While API functions are loaded prior to this and can be called, they should not be called until after `'init'` with priority `1`, because each component, like the data store, has not yet been initialized.
+As mentioned in the [Usage - Load Order](usage.md#load-order) section, Action Scheduler will initialize itself on
+the `'init'` hook with priority `1`. While API functions are loaded prior to this and can be called, they should not be
+called until after `'init'` with priority `1`, because each component, like the data store, has not yet been
+initialized.
 
-Do not use Action Scheduler API functions prior to `'init'` hook with priority `1`. Doing so could lead to unexpected results, like data being stored in the incorrect location.
+Do not use Action Scheduler API functions prior to `'init'` hook with priority `1`. Doing so could lead to unexpected
+results, like data being stored in the incorrect location.
 
-Action Scheduler provides `Action_Scheduler::is_initialized()` for use in hooks to confirm that the data stores have been initialized.
+Action Scheduler provides `Action_Scheduler::is_initialized()` for use in hooks to confirm that the data stores have
+been initialized.
 
 ## Function Reference / `as_enqueue_async_action()`
 
@@ -48,7 +60,6 @@ as_enqueue_async_action( $hook, $args, $group );
 
 (integer) the action's ID.
 
-
 ## Function Reference / `as_schedule_single_action()`
 
 ### Description
@@ -71,7 +82,6 @@ as_schedule_single_action( $timestamp, $hook, $args, $group );
 ### Return value
 
 (integer) the action's ID.
-
 
 ## Function Reference / `as_schedule_recurring_action()`
 
@@ -97,7 +107,6 @@ as_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args, $g
 
 (integer) the action's ID.
 
-
 ## Function Reference / `as_schedule_cron_action()`
 
 ### Description
@@ -121,7 +130,6 @@ as_schedule_cron_action( $timestamp, $schedule, $hook, $args, $group );
 ### Return value
 
 (integer) the action's ID.
-
 
 ## Function Reference / `as_unschedule_action()`
 
@@ -167,7 +175,6 @@ as_unschedule_all_actions( $hook, $args, $group )
 
 (string|null) The scheduled action ID if a scheduled action was found, or null if no matching action found.
 
-
 ## Function Reference / `as_next_scheduled_action()`
 
 ### Description
@@ -190,7 +197,6 @@ as_next_scheduled_action( $hook, $args, $group );
 
 (integer|boolean) The timestamp for the next occurrence, or false if nothing was found.
 
-
 ## Function Reference / `as_get_scheduled_actions()`
 
 ### Description
@@ -206,20 +212,24 @@ as_get_scheduled_actions( $args, $return_format );
 ### Parameters
 
 - **$args** (array) Arguments to search and filter results by. Possible arguments, with their default values:
-    * `'hook' => ''` - the name of the action that will be triggered
-    * `'args' => NULL` - the args array that will be passed with the action
-    * `'date' => NULL` - the scheduled date of the action. Expects a DateTime object, a unix timestamp, or a string that can parsed with strtotime().
-    * `'date_compare' => '<=`' - operator for testing "date". accepted values are '!=', '>', '>=', '<', '<=', '='
-    * `'modified' => NULL` - the date the action was last updated. Expects a DateTime object, a unix timestamp, or a string that can parsed with strtotime().
-    * `'modified_compare' => '<='` - operator for testing "modified". accepted values are '!=', '>', '>=', '<', '<=', '='
-    * `'group' => ''` - the group the action belongs to
-    * `'status' => ''` - ActionScheduler_Store::STATUS_COMPLETE or ActionScheduler_Store::STATUS_PENDING
-    * `'claimed' => NULL` - TRUE to find claimed actions, FALSE to find unclaimed actions, a string to find a specific claim ID
-    * `'per_page' => 5` - Number of results to return
-    * `'offset' => 0`
-    * `'orderby' => 'date'` - accepted values are 'hook', 'group', 'modified', or 'date'
-    * `'order' => 'ASC'`
-- **$return_format** (string) The format in which to return the scheduled actions: 'OBJECT', 'ARRAY_A', or 'ids'. Default: _'OBJECT'_.
+  * `'hook' => ''` - the name of the action that will be triggered
+  * `'args' => NULL` - the args array that will be passed with the action
+  * `'date' => NULL` - the scheduled date of the action. Expects a DateTime object, a unix timestamp, or a string that
+    can parsed with strtotime().
+  * `'date_compare' => '<=`' - operator for testing "date". accepted values are '!=', '>', '>=', '<', '<=', '='
+  * `'modified' => NULL` - the date the action was last updated. Expects a DateTime object, a unix timestamp, or a
+    string that can parsed with strtotime().
+  * `'modified_compare' => '<='` - operator for testing "modified". accepted values are '!=', '>', '>=', '<', '<=', '='
+  * `'group' => ''` - the group the action belongs to
+  * `'status' => ''` - ActionScheduler_Store::STATUS_COMPLETE or ActionScheduler_Store::STATUS_PENDING
+  * `'claimed' => NULL` - TRUE to find claimed actions, FALSE to find unclaimed actions, a string to find a specific
+    claim ID
+  * `'per_page' => 5` - Number of results to return
+  * `'offset' => 0`
+  * `'orderby' => 'date'` - accepted values are 'hook', 'group', 'modified', or 'date'
+  * `'order' => 'ASC'`
+- **$return_format** (string) The format in which to return the scheduled actions: 'OBJECT', 'ARRAY_A', or 'ids'.
+  Default: _'OBJECT'_.
 
 ### Return value
 

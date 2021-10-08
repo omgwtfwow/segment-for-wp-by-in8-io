@@ -1,8 +1,7 @@
-
 /**
  * Exopite Simple Options Framework Trumbowyg
  */
-; (function ($, window, document, undefined) {
+;(function ($, window, document, undefined) {
 
     var pluginName = "exopiteSOFDatepicker";
 
@@ -26,7 +25,7 @@
                 if ($(el).parents('.exopite-sof-cloneable__muster').length) return;
                 if ($(el).hasClass('.disabled')) return;
                 var dateFormat = $(el).data('format');
-                $(el).datepicker({ 'dateFormat': dateFormat });
+                $(el).datepicker({'dateFormat': dateFormat});
             });
 
             plugin.$element.closest('.exopite-sof-wrapper').on('exopite-sof-field-group-item-added-after', function (event, $cloned) {
@@ -46,7 +45,7 @@
                     }
 
                     var dateFormat = $(el).data('format');
-                    $(el).datepicker({ 'dateFormat': dateFormat });
+                    $(el).datepicker({'dateFormat': dateFormat});
 
 
                 });
@@ -68,7 +67,7 @@
 
 })(jQuery, window, document);
 
-; (function ($) {
+;(function ($) {
     "use strict";
 
     $(document).ready(function () {

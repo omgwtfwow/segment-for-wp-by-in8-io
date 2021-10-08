@@ -1,9 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestResult;
+
 /**
  * Class ActionScheduler_UnitTestCase
  */
-class ActionScheduler_UnitTestCase extends WP_UnitTestCase {
+class ActionScheduler_UnitTestCase extends WP_UnitTestCase
+{
 
 	protected $existing_timezone;
 
@@ -12,7 +15,8 @@ class ActionScheduler_UnitTestCase extends WP_UnitTestCase {
 	 *
 	 * @return int
 	 */
-	public function count(): int {
+	public function count(): int
+	{
 		return 'UTC' == date_default_timezone_get() ? 2 : 3;
 	}
 
@@ -20,24 +24,25 @@ class ActionScheduler_UnitTestCase extends WP_UnitTestCase {
 	 * We want to run every test multiple times using a different timezone to make sure
 	 * that they are unaffected by changes to PHP's timezone.
 	 */
-	public function run( PHPUnit\Framework\TestResult $result = NULL ): \PHPUnit\Framework\TestResult {
+	public function run(PHPUnit\Framework\TestResult $result = NULL): TestResult
+	{
 
 		if ($result === NULL) {
 			$result = $this->createResult();
 		}
 
-		if ( 'UTC' != ( $this->existing_timezone = date_default_timezone_get() ) ) {
-			date_default_timezone_set( 'UTC' );
-			$result->run( $this );
+		if ('UTC' != ($this->existing_timezone = date_default_timezone_get())) {
+			date_default_timezone_set('UTC');
+			$result->run($this);
 		}
 
-		date_default_timezone_set( 'Pacific/Fiji' ); // UTC+12
-		$result->run( $this );
+		date_default_timezone_set('Pacific/Fiji'); // UTC+12
+		$result->run($this);
 
-		date_default_timezone_set( 'Pacific/Tahiti' ); // UTC-10: it's a magical place
-		$result->run( $this );
+		date_default_timezone_set('Pacific/Tahiti'); // UTC-10: it's a magical place
+		$result->run($this);
 
-		date_default_timezone_set( $this->existing_timezone );
+		date_default_timezone_set($this->existing_timezone);
 
 		return $result;
 	}
