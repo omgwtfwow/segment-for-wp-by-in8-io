@@ -14,7 +14,7 @@ function s4wp_run_gf_tracking(
     if (typeof jQuery == 'undefined') {
 
         const script = document.createElement("script");
-        script.src = 'https://ajax.googleapis.com/ajax/libs/jquery/' + jquery_ver + '/jquery.min.js';
+        script.src = 'https://ajax.googleapis.com/ajax/libs/jquery/'+jquery_ver+'/jquery.min.js';
         script.type = 'text/javascript';
         script.addEventListener('load', () => {
             console.log(`jQuery ${$.fn.jquery} has been loaded successfully!`);
@@ -22,7 +22,8 @@ function s4wp_run_gf_tracking(
         });
         document.head.appendChild(script);
 
-    } else {
+    }
+    else {
         (function ($) {
 
             form = JSON.parse(form);

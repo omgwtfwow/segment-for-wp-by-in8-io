@@ -167,10 +167,10 @@ class Segment_For_Wp_By_In8_Io_Admin
 
         $random = $this->random;
 
-        // IF FS WRITEABLE
+        //KEYS
 
+        // IF FS WRITEABLE
         if (is_writable(plugin_dir_path(dirname(__FILE__)))) {
-            //KEYS
             $fields[] = array(
                 'name' => 'API_keys',
                 'title' => 'API Keys',
@@ -253,7 +253,9 @@ class Segment_For_Wp_By_In8_Io_Admin
 
                 ),
             );
-        } //If FS is not writeable
+        }
+
+        //If FS is not writeable
         else {
             $fields[] = array(
                 'name' => 'API_keys',

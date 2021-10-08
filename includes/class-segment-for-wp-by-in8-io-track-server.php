@@ -188,7 +188,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                         }
 
 
-                    } elseif ($action === 'gform_after_submission') {
+                    }
+
+                    elseif ($action === 'gform_after_submission') {
                         if (array_key_exists('identify_gravity_forms', $settings["track_gravity_forms_fieldset"])) {
                             if ($settings["track_gravity_forms_fieldset"]["identify_gravity_forms"] == 'yes') {
                                 $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
@@ -200,8 +202,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                             }
                         }
 
+                    }
 
-                    } elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
+                    elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
                         $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
                         Analytics::identify(array(
                             "userId" => $user_id,
@@ -248,20 +251,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = $args["args"][0];
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
-    }
-
-    public function schedule_event($task, $args, $plugin_name)
-    {
-
-        if (mb_strlen(implode($args)) < 8000) {
-            as_enqueue_async_action($task, array($args), $plugin_name);
-
-        } else {
-            syslog(LOG_WARNING, $plugin_name . ": Payload is too large to schedule. 8000 characters max.");
-            return;
-        }
-
+        self::schedule_event('async_task', $args, $this->plugin_name);
     }
 
     /**
@@ -278,7 +268,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -297,7 +287,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -323,7 +313,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
 
     }
@@ -341,7 +331,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -359,7 +349,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -386,7 +376,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['product_id'] = $args["args"][1];
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
 
     }
@@ -412,7 +402,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['args']['product_id'] = $product_id;
         $args['args']['quantity'] = $quantity;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
 
     }
@@ -477,7 +467,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
         if (isset($event_name) && $event_name !== '') {
 
-            self::schedule_event('async_task', array($args), $this->plugin_name);
+            self::schedule_event('async_task', $args, $this->plugin_name);
 
         }
 
@@ -505,7 +495,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args["quantity"] = $args['cart_contents'][$item_key]["quantity"];
         $args['timestamp'] = time();
 
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -525,7 +515,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -545,7 +535,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -564,7 +554,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -583,7 +573,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -603,7 +593,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
     }
 
     /**
@@ -621,7 +611,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
     }
 
     /**
@@ -640,7 +630,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
@@ -659,13 +649,26 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $order_id = $args["args"][0];
         $args['order_id'] = $order_id;
         $args['timestamp'] = time();
-        self::schedule_event('async_task', array($args), $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
     public function custom_events(...$args)
     {
         //TODO
+
+    }
+
+    public function schedule_event($task, $args, $plugin_name)
+    {
+
+        if (mb_strlen(implode($args)) < 8000) {
+
+            as_enqueue_async_action($task, array($args), $plugin_name);
+
+        } else {
+            syslog(LOG_WARNING,$plugin_name . ": Payload is too large to schedule. 8000 characters max.");
+        }
 
     }
 
