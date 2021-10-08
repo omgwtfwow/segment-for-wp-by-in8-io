@@ -465,7 +465,7 @@ class Segment_For_Wp_By_In8_Io
 
             //GRAVITY FORMS SERVER SIDE
             if (array_key_exists('track_gravity_forms_fieldset', $settings) && self::gravity_forms_active()) {
-                if ($settings["track_gravity_forms_fieldset"]["track_gravity_forms_server"] === 'yes') {
+                if ($settings["track_gravity_forms_fieldset"]["track_gravity_forms_server"] === 'yes' && $settings["track_gravity_forms_fieldset"]["track_gravity_forms"] == 'yes') {
                     $this->loader->add_action('gform_after_submission', $segment_php, 'gform_after_submission', 9, 2);
                 }
             }
@@ -817,23 +817,20 @@ class Segment_For_Wp_By_In8_Io
 
                             if (array_key_exists($trait_key, $user_data_keys)) {
                                 $key = $user_data_keys[$trait_key];
-                                if($key ==='created_at') {
+                                if ($key === 'created_at') {
                                     $datetime = new DateTime($user_data->$trait_key);
-                                    $traits[$key] =   $datetime->format('c');
-                                }
-                                else{
+                                    $traits[$key] = $datetime->format('c');
+                                } else {
                                     $traits[$key] = $user_data->$trait_key;
 
                                 }
-                            }
-                            else {
+                            } else {
                                 $key = ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $trait_key)), '_');
                                 $trait_value = get_user_meta($wp_user_id, $trait_key, true);
-                                if($key ==='created_at') {
+                                if ($key === 'created_at') {
                                     $datetime = new DateTime($trait_value);
-                                    $traits[$key] =   $datetime->format('c');
-                                }
-                                else{
+                                    $traits[$key] = $datetime->format('c');
+                                } else {
                                     $traits[$key] = $trait_value;
                                 }
                             }
@@ -1442,9 +1439,7 @@ class Segment_For_Wp_By_In8_Io
             }
 
             return 'Completed Form';
-        }
-
-        elseif (self::woocommerce_active()) {
+        } elseif (self::woocommerce_active()) {
 
             if ($action == 'woocommerce_add_to_cart' ||
                 $action == 'woocommerce_add_to_cart_fragments' ||
@@ -1472,18 +1467,14 @@ class Segment_For_Wp_By_In8_Io
                     return 'Product Removed';
                 }
 
-            }
-
-                elseif ( $action == 'woocommerce_cart_item_removed_server') {
+            } elseif ($action == 'woocommerce_cart_item_removed_server') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_removed_server_event_name"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_events_product_removed_server_event_name"];
                 } else {
                     return 'Product Removed';
                 }
 
-            }
-
-            elseif ($action == 'woocommerce_order_status_pending') {
+            } elseif ($action == 'woocommerce_order_status_pending') {
                 if ($settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_pending"] != "") {
                     return $settings["track_woocommerce_fieldset"]["woocommerce_events"]["woocommerce_events_settings"]["woocommerce_event_order_pending"];
                 } else {
@@ -1640,8 +1631,7 @@ class Segment_For_Wp_By_In8_Io
                 }
 
             }
-        }
-        elseif ($action == 'gform_after_submission') {
+        } elseif ($action == 'gform_after_submission') {
             if (array_key_exists('gravity_form_event_properties', $settings["track_gravity_forms_fieldset"])) {
                 $entry = $data["args"][0];
                 $form = $data["args"][1];
@@ -1674,9 +1664,7 @@ class Segment_For_Wp_By_In8_Io
                 return array_filter($gf_event_props);
 
             }
-        }
-
-        elseif (self::woocommerce_active()) {
+        } elseif (self::woocommerce_active()) {
             if ($action == 'woocommerce_add_to_cart') {
                 if (isset($data['wp_user_id'])) {
                     $wp_user_id = $data["wp_user_id"];
@@ -1719,24 +1707,20 @@ class Segment_For_Wp_By_In8_Io
                 $properties = self::get_product_props_from_product_id($data["product_id"]);
             } elseif ($action == 'woocommerce_cart_item_restored') {
                 $properties = self::get_product_props_from_product_id($data["product_id"]);
-            }
-            elseif ($action == 'woocommerce_remove_cart_item') {
+            } elseif ($action == 'woocommerce_remove_cart_item') {
                 $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
-                $properties['variant'] =  $data["args"]["variation"] ?? null;
+                $properties['variant'] = $data["args"]["variation"] ?? null;
                 $properties['variant_id'] = $data["args"]["variation_id"] ?? null;
-            }
-            elseif ($action == 'woocommerce_cart_item_removed') {
+            } elseif ($action == 'woocommerce_cart_item_removed') {
                 $properties = self::get_product_props_from_product_id($data["args"]["product_id"]);
                 $properties['quantity'] = $data["args"]["quantity"] ?? null;
                 $properties['variant'] = $data["args"]["variation"] ?? null;
                 $properties['variant_id'] = $data["args"]["variation_id"] ?? null;
-            }
-            elseif ($action == 'segment_4_wp_wc_cart_ajax_item_removed') {
+            } elseif ($action == 'segment_4_wp_wc_cart_ajax_item_removed') {
                 $properties = self::get_product_props_from_product_id($data["product_id"]);
                 $properties['variant'] = $data["variation"] ?? null;
                 $properties['variant_id'] = $data["variation_id"] ?? null;
-            }
-            elseif ($action == 'segment_4_wp_wc_cart_ajax_item_added') {
+            } elseif ($action == 'segment_4_wp_wc_cart_ajax_item_added') {
                 $properties = self::get_product_props_from_product_id($data["product_id"]);
                 $properties['variant'] = $data["variation"] ?? null;
                 $properties['variant_id'] = $data["variation_id"] ?? null;
@@ -1762,8 +1746,7 @@ class Segment_For_Wp_By_In8_Io
                     $properties["order_id"] = $data["order_id"];
                     $properties = self::get_order_props_from_order_id($properties["order_id"]);
                 }
-            }
-            elseif ($action == 'woocommerce_payment_complete') {
+            } elseif ($action == 'woocommerce_payment_complete') {
                 if (is_numeric($data["order_id"])) {
                     $properties["order_id"] = $data["order_id"];
                     $properties = self::get_order_props_from_order_id($properties["order_id"]);

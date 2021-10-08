@@ -81,9 +81,7 @@ class Segment_For_Wp_By_In8_Io_Identify
                         <?php
                         Segment_For_Wp_By_In8_Io_Cookie::delete_matching_cookies($cookie_name);
 
-                    }
-
-                    else {
+                    } else {
                         $wp_user_id = $current_user->ID;
                         if ($wp_user_id && $wp_user_id != 0) {
                             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);

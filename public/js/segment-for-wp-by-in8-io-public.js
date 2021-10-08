@@ -46,9 +46,9 @@
                             'properties': properties
                         },
                         success: function (response) {
-                            if(response) {
+                            if (response) {
                                 if ('user_id' in response.data) {
-                                    if (response.data.event==='identify'){
+                                    if (response.data.event === 'identify') {
                                         let user_id = response.data.user_id;
                                         let traits = response.data.traits;
                                         analytics.identify(user_id, (typeof traits === 'undefined') ? {} : traits);

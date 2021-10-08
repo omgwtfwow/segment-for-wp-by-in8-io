@@ -15,11 +15,11 @@ $file = $args["file"];
 $dir = dirname($file);
 $old = $file;
 $file = $dir . '/analytics-' . rand() . '.log';
-if(!file_exists($old)) {
-	exit(0);
+if (!file_exists($old)) {
+    exit(0);
 }
 if (!rename($old, $file)) {
-	exit(1);
+    exit(1);
 }
 
 /**
@@ -32,11 +32,11 @@ $lines = explode("\n", $contents);
  * Initialize the client.
  */
 Segment::init($args["secret"], array(
-	"consumer"      => "socket",
-	"timeout"       => $args["timeout"],
-	"error_handler" => function($code, $msg){
-		exit(1);
-	}
+    "consumer" => "socket",
+    "timeout" => $args["timeout"],
+    "error_handler" => function ($code, $msg) {
+        exit(1);
+    }
 ));
 
 /**
@@ -45,16 +45,16 @@ Segment::init($args["secret"], array(
 $total = 0;
 $successful = 0;
 foreach ($lines as $line) {
-	if (!trim($line)) continue;
-	$payload = json_decode($line, true);
-	$dt = new DateTime($payload["timestamp"]);
-	$ts = floatval($dt->getTimestamp() . "." . $dt->format("u"));
-	$payload["timestamp"] = $ts;
-	$type = $payload["type"];
-	$ret = call_user_func_array(array("Segment", $type), array($payload));
-	if ($ret) $successful++;
-	$total++;
-	if ($total % 100 === 0) Segment::flush();
+    if (!trim($line)) continue;
+    $payload = json_decode($line, true);
+    $dt = new DateTime($payload["timestamp"]);
+    $ts = floatval($dt->getTimestamp() . "." . $dt->format("u"));
+    $payload["timestamp"] = $ts;
+    $type = $payload["type"];
+    $ret = call_user_func_array(array("Segment", $type), array($payload));
+    if ($ret) $successful++;
+    $total++;
+    if ($total % 100 === 0) Segment::flush();
 }
 Segment::flush();
 unlink($file);
