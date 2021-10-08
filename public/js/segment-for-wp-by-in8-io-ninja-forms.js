@@ -89,8 +89,7 @@
                 let identify_value = JSON.parse(JSON.stringify(atob(Cookies.get(cookie_name))));
                 if (identify_value != null) {
                     identify(cookie_name, identify_value);
-                }
-                else{
+                } else {
                     remove_cookie(cookie_name)
                 }
             }
@@ -101,14 +100,14 @@
                 let event_props = data.properties;
                 if (event_name && event_props) {
                     make_track_call(event_name, event_props, cookie_name)
-                }
-                else {
+                } else {
                     remove_cookie(cookie_name)
                 }
             }
         }
 
     }
+
     //this is so that any cookies are cleared in case of ajax, redirects, etc...
     process_ninja_forms_cookies_on_load();
 
@@ -155,8 +154,7 @@
                             let identify_value = JSON.parse(JSON.stringify(atob(Cookies.get(cookie_name))));
                             if (identify_value != null) {
                                 identify(cookie_name, identify_value);
-                            }
-                            else{
+                            } else {
                                 remove_cookie(cookie_name)
                             }
                         }

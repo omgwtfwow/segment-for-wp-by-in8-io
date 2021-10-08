@@ -71,6 +71,9 @@ The new version of the plugin is much much better, but you will need to set it u
 
 == Changelog ==
 
+= 2.2.1 =
+* Fix bug initialising plugin without write permissions are available
+
 = 2.2.0 =
 * Let users increase Socket consumer timeout and cron job interval further (help support less powerful servers)
 

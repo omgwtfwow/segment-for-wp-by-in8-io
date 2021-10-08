@@ -61,8 +61,8 @@ class Segment_For_Wp_By_In8_Io_Track
                     $event_name = $track["event"];
                     $event_opts = array();
                     $event_props = $track["properties"];
-                    if(count($event_props) == 0){
-                        $event_props = Array();
+                    if (count($event_props) == 0) {
+                        $event_props = array();
                     }
                     if ($event_name != "") {
                         if (!is_user_logged_in()) {
@@ -90,19 +90,19 @@ class Segment_For_Wp_By_In8_Io_Track
                                     //name
                                     echo sanitize_text_field($event_name)
                                     ?>",
-                                    <?php
-                                    //props
-                                    echo sanitize_text_field(json_encode($event_props))
-                                    ?>,
-                                    <?php
-                                    //opts
-                                    echo sanitize_text_field(json_encode($event_opts));
-                                    ?>,
-                                    function () {
-                                        Cookies.remove("<?php echo sanitize_text_field($cookie)?>");
-                                    });
-                            </script>
-                            <?php
+                                <?php
+                                //props
+                                echo sanitize_text_field(json_encode($event_props))
+                                ?>,
+                                <?php
+                                //opts
+                                echo sanitize_text_field(json_encode($event_opts));
+                                ?>,
+                                function () {
+                                    Cookies.remove("<?php echo sanitize_text_field($cookie)?>");
+                                });
+                        </script>
+                        <?php
                     }
                 }
             }
