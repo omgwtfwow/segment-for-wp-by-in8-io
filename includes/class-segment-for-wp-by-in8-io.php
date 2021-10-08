@@ -465,7 +465,7 @@ class Segment_For_Wp_By_In8_Io
 
             //GRAVITY FORMS SERVER SIDE
             if (array_key_exists('track_gravity_forms_fieldset', $settings) && self::gravity_forms_active()) {
-                if ($settings["track_gravity_forms_fieldset"]["track_gravity_forms_server"] === 'yes') {
+                if ($settings["track_gravity_forms_fieldset"]["track_gravity_forms_server"] === 'yes' && $settings["track_gravity_forms_fieldset"]["track_gravity_forms"] == 'yes') {
                     $this->loader->add_action('gform_after_submission', $segment_php, 'gform_after_submission', 9, 2);
                 }
             }
