@@ -387,6 +387,14 @@ class Segment_For_Wp_By_In8_Io_Public
      */
     public function gform_confirmation($confirmation, $form, $entry, $ajax)
     {
+        global $wp_scripts;
+        if (isset($wp_scripts->registered['jquery']->ver)) {
+            $ver = $wp_scripts->registered['jquery']->ver;
+            $jquery_ver = str_replace("-wp", "", $ver);
+        } else {
+            $jquery_ver = '1.12.4';
+        }
+
         $settings = $this->settings;
         $js_file = plugin_dir_url(__FILE__) . 'js/segment-for-wp-by-in8-io-gravity-forms.js';
         $ajax_url = esc_url_raw(admin_url('admin-ajax.php'));
@@ -394,6 +402,7 @@ class Segment_For_Wp_By_In8_Io_Public
         $gf_event_name_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_event_name_field"]);
         $gf_wp_user_id_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"]);
         $gf_identify = $settings["track_gravity_forms_fieldset"]["identify_gravity_forms"];
+
         if ($gf_identify === 'yes') {
             $gf_identify = true;
 
@@ -433,9 +442,7 @@ class Segment_For_Wp_By_In8_Io_Public
                             }
                         }
 
-
                     }
-
 
                 }
             } else {
@@ -480,7 +487,8 @@ class Segment_For_Wp_By_In8_Io_Public
 						    '$gf_event_props',
 						    '$identify',
 						    '$user_id',
-						    '$user_traits'
+						    '$user_traits',
+						    '$jquery_ver'
 					)</script>";
 
             } else {
@@ -496,7 +504,8 @@ class Segment_For_Wp_By_In8_Io_Public
                             '$gf_event_props',
                             '$identify',
                             '$user_id',
-                            '$user_traits'
+                            '$user_traits',
+                            '$jquery_ver'
 					)</script>";
                 return $confirmation . $string;
 

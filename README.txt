@@ -73,6 +73,8 @@ The new version of the plugin is much much better, but you will need to set it u
 
 = 2.2.1 =
 * Fix bug initialising plugin without write permissions are available
+* Handle critical error when Server side payload is greater than 8000 characters
+* Fix a bug with client side events for Gravity Forms
 
 = 2.2.0 =
 * Let users increase Socket consumer timeout and cron job interval further (help support less powerful servers)
