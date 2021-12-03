@@ -670,6 +670,27 @@ class Segment_For_Wp_By_In8_Io_Admin
                     ),
                 ),
 
+
+                //Server Side
+                array(
+                    'type' => 'content',
+                    'class' => 'class-name', // for all fieds
+                    'content' => '<h3>Advanced</h3>',
+                    'wrap_class' => 'no-border-bottom',
+                ),
+
+                array(
+                    'id' => 'track_pages_server_side',
+                    'type' => 'switcher',
+                    'title' => 'Track Pages Server Side?',
+                    'description' => '',
+                    'default' => 'no',
+                    'wrap_class' => 'no-border-bottom',
+                    'options' => array(
+                        'cols' => 2,
+                    ),
+                ),
+
             ),
         );
 

@@ -93,12 +93,42 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     {
         $settings = $this->settings;
         $direct = $args['direct'] ?? false;
+        $page = $args['page'] ?? false;
         $action = $args['action_hook'] ?? false;
         $action_server = $action . '_server';
         $wp_user_id = $args['wp_user_id'] ?? null;
         $ajs_anon_id = $args['ajs_anon_id'] ?? null;
         $timestamp = $args['timestamp'];
         $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
+
+        if ($page) {
+
+            $page_data = $args['page_data'];
+
+
+            if ($user_id) {
+
+                Segment::page(array(
+                    "userId" => $user_id,
+                    "name" => $page_data['name'],
+                    "properties" => $page_data['properties'],
+                    "context" => array(
+                        "referrer" => $page_data['referrer']
+                    )
+                ));
+
+            } elseif ($ajs_anon_id) {
+
+                Segment::page(array(
+                    "anonymousId" => $ajs_anon_id,
+                    "name" => "PHP library",
+                    "properties" => array()
+                ));
+            }
+
+        }
+
+
         if ($direct) {
 
             $event_name = $args['event_name'] ?? null;
@@ -188,9 +218,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                         }
 
 
-                    }
-
-                    elseif ($action === 'gform_after_submission') {
+                    } elseif ($action === 'gform_after_submission') {
                         if (array_key_exists('identify_gravity_forms', $settings["track_gravity_forms_fieldset"])) {
                             if ($settings["track_gravity_forms_fieldset"]["identify_gravity_forms"] == 'yes') {
                                 $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
@@ -202,9 +230,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                             }
                         }
 
-                    }
-
-                    elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
+                    } elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
                         $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
                         Analytics::identify(array(
                             "userId" => $user_id,
@@ -252,6 +278,19 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         self::schedule_event('async_task', $args, $this->plugin_name);
+    }
+
+    public function schedule_event($task, $args, $plugin_name)
+    {
+
+        if (mb_strlen(implode($args)) < 8000) {
+
+            as_enqueue_async_action($task, array($args), $plugin_name);
+
+        } else {
+            syslog(LOG_WARNING, $plugin_name . ": Payload is too large to schedule. 8000 characters max.");
+        }
+
     }
 
     /**
@@ -653,22 +692,47 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
     }
 
-    public function custom_events(...$args)
+    /**
+     * @param ...$args '?'
+     */
+    public function page_server_side(...$args)
     {
-        //TODO
+
+        $current_post = get_post();
+        if (!$current_post || !$current_post->post_title) {
+            return;
+        }
+        $trackable_post = Segment_For_Wp_By_In8_Io::check_trackable_post($current_post);
+        if ($trackable_post === false) {
+            //not trackable
+            return;
+        }
+
+        $page_name = Segment_For_Wp_By_In8_Io::get_page_name($current_post);
+        $page_props = Segment_For_Wp_By_In8_Io::get_page_props($current_post);
+
+        $args = array(
+            'action_hook' => current_action(),
+            'args' => json_decode(json_encode(func_get_args()), true)
+        );
+        $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
+        $args['wp_user_id'] = $wp_user_id;
+        $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
+        $args['timestamp'] = time();
+
+        $args['page'] = true;
+        $args['page_data'] = array();
+        $args['page_data']['name'] = $page_name;
+        $args['page_data']['properties'] = $page_props;
+        $args['page_data']['properties']['referrer'] = wp_get_referer();
+
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
-    public function schedule_event($task, $args, $plugin_name)
+    public function custom_events(...$args)
     {
-
-        if (mb_strlen(implode($args)) < 8000) {
-
-            as_enqueue_async_action($task, array($args), $plugin_name);
-
-        } else {
-            syslog(LOG_WARNING,$plugin_name . ": Payload is too large to schedule. 8000 characters max.");
-        }
+        //TODO
 
     }
 
