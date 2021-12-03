@@ -27,49 +27,55 @@
 
     $(function () {
 
-        analytics.ready(function () {
+        //Make sure analytics is defined.
+        if ( typeof analytics == 'function' ) { 
 
-            analytics.on('track', function (event, properties, options) {
+            analytics.ready(function () {
 
-                delete_cookie(event);
+                analytics.on('track', function (event, properties, options) {
+    
+                    delete_cookie(event);
 
-                if (wp_ajax.custom_js_events.includes(event)) {
-
-                    $.ajax({
-                        cache: false,
-                        type: "POST",
-                        url: wp_ajax.ajax_url,
-                        data: {
-                            'action': 'public_ajax_track',
-                            'nonce': wp_ajax._nonce,
-                            'event': event,
-                            'properties': properties
-                        },
-                        success: function (response) {
-                            if (response) {
-                                if ('user_id' in response.data) {
-                                    if (response.data.event === 'identify') {
-                                        let user_id = response.data.user_id;
-                                        let traits = response.data.traits;
-                                        analytics.identify(user_id, (typeof traits === 'undefined') ? {} : traits);
+                    if (wp_ajax.custom_js_events.includes(event)) {
+    
+                        $.ajax({
+                            cache: false,
+                            type: "POST",
+                            url: wp_ajax.ajax_url,
+                            data: {
+                                'action': 'public_ajax_track',
+                                'nonce': wp_ajax._nonce,
+                                'event': event,
+                                'properties': properties
+                            },
+                            success: function (response) {
+                                if (response) {
+                                    if ('user_id' in response.data) {
+                                        if (response.data.event === 'identify') {
+                                            let user_id = response.data.user_id;
+                                            let traits = response.data.traits;
+                                            analytics.identify(user_id, (typeof traits === 'undefined') ? {} : traits);
+                                        }
                                     }
                                 }
+    
+                            },
+                            error: function (xhr, status, error) {
+                                console.log('Status: ' + xhr.status);
+                                console.log('Error: ' + xhr.responseText);
                             }
-
-                        },
-                        error: function (xhr, status, error) {
-                            console.log('Status: ' + xhr.status);
-                            console.log('Error: ' + xhr.responseText);
-                        }
-                    });
-
-                }
-
-
+                        });
+    
+                    }
+    
+    
+                });
+    
+    
             });
 
+        }
 
-        });
 
     });
 
