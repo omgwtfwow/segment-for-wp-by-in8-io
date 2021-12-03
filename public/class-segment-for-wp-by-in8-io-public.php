@@ -356,7 +356,7 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                     $string ='';
 
-                                    foreach ($field->inputs as $input) {
+                                    foreach ( $field["inputs"] as $input) {
 
                                         if(strlen($entry[$input["id"]])>0) {
                                             if(strlen($string)==0){
@@ -508,8 +508,10 @@ class Segment_For_Wp_By_In8_Io_Public
                                 if ($field["type"] == "checkbox") {
 
                                     $string ='';
+                                    $inputs = $field->inputs;
 
-                                    foreach ($field->inputs as $input) {
+
+                                    foreach ( $field["inputs"] as $input) {
 
                                         if(strlen($entry[$input["id"]])>0) {
                                             if(strlen($string)==0){
