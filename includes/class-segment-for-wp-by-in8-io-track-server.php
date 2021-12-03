@@ -108,7 +108,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
             if ($user_id) {
 
-                Segment::page(array(
+                Analytics::page(array(
                     "userId" => $user_id,
                     "name" => $page_data['name'],
                     "properties" => $page_data['properties'],
@@ -119,7 +119,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
             } elseif ($ajs_anon_id) {
 
-                Segment::page(array(
+                Analytics::page(array(
                     "anonymousId" => $ajs_anon_id,
                     "name" => $page_data['name'],
                     "properties" => $page_data['properties'],
