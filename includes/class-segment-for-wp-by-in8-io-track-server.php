@@ -112,19 +112,23 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                     "userId" => $user_id,
                     "name" => $page_data['name'],
                     "properties" => $page_data['properties'],
+                    "timestamp" => $timestamp,
                     "context" => array(
-                        "referrer" => $page_data['referrer']
+                        "referrer" => $page_data['properties']['referrer']
                     )
                 ));
 
-            } elseif ($ajs_anon_id) {
+            }
+
+            elseif ($ajs_anon_id) {
 
                 Analytics::page(array(
                     "anonymousId" => $ajs_anon_id,
                     "name" => $page_data['name'],
                     "properties" => $page_data['properties'],
+                    "timestamp" => $timestamp,
                     "context" => array(
-                        "referrer" => $page_data['referrer']
+                        "referrer" => $page_data['properties']['referrer']
                     )
                 ));
             }
@@ -722,7 +726,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
-
         $args['page'] = true;
         $args['page_data'] = array();
         $args['page_data']['name'] = $page_name;
