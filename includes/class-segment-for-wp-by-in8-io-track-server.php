@@ -750,7 +750,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['page_data']['name'] = $page_name;
         $args['page_data']['properties'] = $page_props;
         $args['page_data']['properties']['referrer'] = $referrer;
-        $args['page_data']['properties']['post_id'] = $current_post->ID;
         $args['page_data']['properties']['url'] = home_url( $wp->request );
         $args['page_data']['properties']['path'] = $path;
         $args['page_data']['properties']['search'] = $query ? "?" . $query : '';
