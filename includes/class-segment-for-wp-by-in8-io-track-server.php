@@ -113,9 +113,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                     "name" => $page_data['name'],
                     "properties" => $page_data['properties'],
                     "timestamp" => $timestamp,
-                    "context" => array(
-                        "referrer" => $page_data['properties']['referrer']
-                    )
+                    "context" => $page_data['context'],
                 ));
 
             }
@@ -127,9 +125,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                     "name" => $page_data['name'],
                     "properties" => $page_data['properties'],
                     "timestamp" => $timestamp,
-                    "context" => array(
-                        "referrer" => $page_data['properties']['referrer']
-                    )
+                    "context" => $page_data['context'],
                 ));
             }
 
@@ -704,11 +700,23 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     public function page_server_side(...$args)
     {
+        $current_post = get_queried_object();
 
-        $current_post = get_post();
         if (!$current_post || !$current_post->post_title) {
             return;
         }
+
+        if ( 
+        ! is_singular() && 
+        ! is_page() && 
+        ! is_single() && 
+        ! is_archive() && 
+        ! is_home() &&
+        ! is_front_page() 
+        ) {
+            return false;
+        }
+
         $trackable_post = Segment_For_Wp_By_In8_Io::check_trackable_post($current_post);
         if ($trackable_post === false) {
             //not trackable
@@ -717,6 +725,15 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
         $page_name = Segment_For_Wp_By_In8_Io::get_page_name($current_post);
         $page_props = Segment_For_Wp_By_In8_Io::get_page_props($current_post);
+
+        $url = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $path = parse_url($url, PHP_URL_PATH);
+        $query = parse_url($url, PHP_URL_QUERY);
+        $referrer = wp_get_referer();
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        $locale = str_replace('_', '-', get_user_locale());
 
         $args = array(
             'action_hook' => current_action(),
@@ -730,7 +747,16 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['page_data'] = array();
         $args['page_data']['name'] = $page_name;
         $args['page_data']['properties'] = $page_props;
-        $args['page_data']['properties']['referrer'] = wp_get_referer();
+        $args['page_data']['properties']['referrer'] = $referrer;
+        $args['page_data']['properties']['url'] = $url;
+        $args['page_data']['properties']['path'] = $path;
+        $args['page_data']['properties']['search'] = $query ? "?" . $query : '';
+
+        $args['page_data']['context'] = array();
+        $args['page_data']['context']['referrer'] = $referrer;
+        $args['page_data']['context']['ip'] = $ip;
+        $args['page_data']['context']['userAgent'] = $user_agent;
+        $args['page_data']['context']['locale'] = $locale;
 
         self::schedule_event('async_task', $args, $this->plugin_name);
 

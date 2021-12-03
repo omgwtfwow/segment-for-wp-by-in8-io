@@ -924,8 +924,8 @@ class Segment_For_Wp_By_In8_Io
                 return $current_post->post_title;
             }
         }
-
-        return "";
+        
+        return $current_post->post_title;
     }
 
     /**
