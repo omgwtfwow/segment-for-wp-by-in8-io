@@ -97,6 +97,17 @@ class Segment_For_Wp_By_In8_Io_Public
 
         $settings = $this->settings;
         $custom_js_events = array();
+
+        $current_user = wp_get_current_user();
+        $current_post = get_post();
+        $trackable_user = Segment_For_Wp_By_In8_Io::check_trackable_user($current_user);
+        $trackable_post = Segment_For_Wp_By_In8_Io::check_trackable_post($current_post);
+
+        if ($trackable_post === false || $trackable_user === false) {
+            //not trackable
+            return;
+        }
+
         if (array_key_exists('track_custom_event_group', $settings)) {
             if (count($settings["track_custom_event_group"]) > 0) {
                 foreach ($settings["track_custom_event_group"] as $event) {
@@ -110,6 +121,8 @@ class Segment_For_Wp_By_In8_Io_Public
             wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/segment-for-wp-by-in8-io-logout.js', array('jquery'), $this->version, true);
             wp_localize_script($this->plugin_name, 'wp_logout', array('cookie_name' => $cookie));
         }
+
+
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/segment-for-wp-by-in8-io-public.js', array('jquery'), $this->version, true);
 
         if (Segment_For_Wp_By_In8_Io::ninja_forms_active() && array_key_exists("track_ninja_forms_fieldset", $settings)) {
