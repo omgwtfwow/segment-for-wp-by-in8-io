@@ -348,9 +348,36 @@ class Segment_For_Wp_By_In8_Io_Public
                             $gf_field_label_key = $property["gravity_form_event_property_field_id"];
                             $gf_label_text = $property["gravity_form_event_property_label"];
                             if ($field["adminLabel"] == $gf_field_label_key) {
+
+
                                 $gf_field_id = $field["id"];
 
-                                $value = $entry[$gf_field_id];
+                                if ($field["type"] == "checkbox") {
+
+                                    $string ='';
+
+                                    foreach ($field->inputs as $input) {
+
+                                        if(strlen($entry[$input["id"]])>0) {
+                                            if(strlen($string)==0){
+                                                $string = $entry[$input["id"]];
+                                            }
+                                            else {
+                                                $string = $string . ', ' . $entry[$input["id"]];
+                                            }
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
+                                else {
+                                    $value = $entry[$gf_field_id];
+
+                                }
 
                                 if ($field["type"] == "multiselect") {
 
@@ -383,6 +410,8 @@ class Segment_For_Wp_By_In8_Io_Public
                                     }
 
                                 }
+
+
 
                             }
                         }
@@ -472,8 +501,36 @@ class Segment_For_Wp_By_In8_Io_Public
                             $gf_field_label_key = $property["gravity_form_event_property_field_id"];
                             $gf_label_text = $property["gravity_form_event_property_label"];
                             if ($field["adminLabel"] == $gf_field_label_key) {
+
+
                                 $gf_field_id = $field["id"];
-                                $value = $entry[$gf_field_id];
+
+                                if ($field["type"] == "checkbox") {
+
+                                    $string ='';
+
+                                    foreach ($field->inputs as $input) {
+
+                                        if(strlen($entry[$input["id"]])>0) {
+                                            if(strlen($string)==0){
+                                                $string = $entry[$input["id"]];
+                                            }
+                                            else {
+                                                $string = $string . ', ' . $entry[$input["id"]];
+                                            }
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
+                                else {
+                                    $value = $entry[$gf_field_id];
+
+                                }
 
                                 if ($field["type"] == "multiselect") {
 
