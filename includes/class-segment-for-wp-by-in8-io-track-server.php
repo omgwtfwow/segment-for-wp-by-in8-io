@@ -121,8 +121,11 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
                 Segment::page(array(
                     "anonymousId" => $ajs_anon_id,
-                    "name" => "PHP library",
-                    "properties" => array()
+                    "name" => $page_data['name'],
+                    "properties" => $page_data['properties'],
+                    "context" => array(
+                        "referrer" => $page_data['referrer']
+                    )
                 ));
             }
 
