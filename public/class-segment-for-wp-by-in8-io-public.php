@@ -352,8 +352,36 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                 $value = $entry[$gf_field_id];
 
+                                if ($field["type"] == "multiselect") {
+
+                                    $selections = json_decode($value);
+                                    $string = '';
+                                    foreach ($selections as $selection) {
+                                        if (strlen($string) == 0) {
+                                            $string = $selection;
+                                        } else {
+                                            $string = $string . ', ' . $selection;
+                                        }
+                                    }
+                                    $value = $string;
+
+
+                                }
+
                                 if ($value && $value != '') {
-                                    $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+
+                                    if ($field["type"] == "number") {
+
+                                        $value = ($value == (int)$value) ? (int)$value : (float)$value;
+
+                                        $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
+
+                                    }
+
+                                    else {
+                                        $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+                                    }
+
                                 }
 
                             }
@@ -445,11 +473,38 @@ class Segment_For_Wp_By_In8_Io_Public
                             $gf_label_text = $property["gravity_form_event_property_label"];
                             if ($field["adminLabel"] == $gf_field_label_key) {
                                 $gf_field_id = $field["id"];
-
                                 $value = $entry[$gf_field_id];
 
+                                if ($field["type"] == "multiselect") {
+
+                                    $selections = json_decode($value);
+                                    $string = '';
+                                    foreach ($selections as $selection) {
+                                        if (strlen($string) == 0) {
+                                            $string = $selection;
+                                        } else {
+                                            $string = $string . ', ' . $selection;
+                                        }
+                                    }
+                                    $value = $string;
+
+
+                                }
+
                                 if ($value && $value != '') {
-                                    $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+
+                                    if ($field["type"] == "number") {
+
+                                        $value = ($value == (int)$value) ? (int)$value : (float)$value;
+
+                                        $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
+
+                                    }
+
+                                    else {
+                                        $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+                                    }
+
                                 }
 
                             }
