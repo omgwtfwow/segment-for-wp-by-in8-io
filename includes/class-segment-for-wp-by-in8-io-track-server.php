@@ -105,7 +105,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
             $page_data = $args['page_data'];
 
-
             if ($user_id) {
 
                 Analytics::page(array(
@@ -132,7 +131,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         }
 
 
-        if ($direct) {
+        elseif ($direct) {
 
             $event_name = $args['event_name'] ?? null;
             $properties = $args['properties'] ?? null;
@@ -176,10 +175,16 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         }
 
         else {
+
             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
             $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server, $args);
             $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
             $properties = array_filter($properties);
+
+            if($action === 'ninja_forms_after_submission') {
+                $event_name = $args["event_name"];
+                $properties = array_filter($args["properties"]);
+            }
 
             if ($event_name) {
 
@@ -199,6 +204,171 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
                         }
                     }
+                }
+
+                if ($action === 'gform_after_submission') {
+
+                    $entry = $args["args"][0];
+                    $form = $args["args"][1];
+                    $gf_event_name_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_event_name_field"]);
+                    $gf_wp_user_id_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"]);
+                    $gf_event_props = array();
+
+                    foreach ($form['fields'] as $field) {
+                        if ($gf_event_name_field != '') {
+                            if ($field["adminLabel"] == $gf_event_name_field) {
+                                $gf_event_name = rgar($entry, $field["id"]);
+                                if ($gf_event_name != '') {
+                                    $args['event_name'] = sanitize_text_field($gf_event_name);
+                                }
+                            }
+                            if ($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"] != '') {
+                                if ($field["adminLabel"] == $gf_wp_user_id_field) {
+                                    $gf_wp_user_id = rgar($entry, $field["id"]);
+                                    $args['gf_wp_user_id'] = sanitize_text_field($gf_wp_user_id);
+                                }
+                            }
+                            if (array_key_exists('gravity_form_event_properties', $settings["track_gravity_forms_fieldset"]) && count($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"]) > 0) {
+                                foreach ($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"] as $property) {
+                                    if ($property["gravity_form_event_property_field_id"] != '') {
+                                        $gf_field_label_key = $property["gravity_form_event_property_field_id"];
+                                        $gf_label_text = $property["gravity_form_event_property_label"];
+                                        if ($field["adminLabel"] == $gf_field_label_key) {
+
+                                            $gf_field_id = $field["id"];
+
+                                            if ($field["type"] == "checkbox") {
+
+                                                $string = '';
+
+                                                foreach ($field["inputs"] as $input) {
+
+                                                    if (strlen($entry[$input["id"]]) > 0) {
+                                                        if (strlen($string) == 0) {
+                                                            $string = $entry[$input["id"]];
+                                                        } else {
+                                                            $string = $string . ', ' . $entry[$input["id"]];
+                                                        }
+                                                    }
+
+                                                }
+
+                                                $value = $string;
+
+
+                                            }
+
+                                            elseif ($field["type"] == "name") {
+                                                $string = '';
+
+                                                foreach ($field["inputs"] as $input) {
+
+                                                    if (strlen($entry[$input["id"]]) > 0) {
+                                                        if (strlen($string) == 0) {
+                                                            $string = $entry[$input["id"]];
+                                                        } else {
+                                                            $string = $string . ' ' . $entry[$input["id"]];
+                                                        }
+                                                    }
+
+                                                }
+
+                                                $value = $string;
+
+
+                                            }
+
+                                            elseif ($field["type"] == "address") {
+                                                $string = '';
+
+                                                foreach ($field["inputs"] as $input) {
+
+                                                    if (strlen($entry[$input["id"]]) > 0) {
+                                                        if (strlen($string) == 0) {
+                                                            $string = $entry[$input["id"]];
+                                                        } else {
+                                                            $string = $string . ' ' . $entry[$input["id"]];
+                                                        }
+                                                    }
+
+                                                }
+
+                                                $value = $string;
+
+
+                                            }
+
+                                            elseif ($field["type"] == "list") {
+
+                                                $string = '';
+                                                $list = maybe_unserialize($entry[$gf_field_id]);
+
+                                                foreach ($list as $item) {
+
+                                                    if (strlen($string) == 0) {
+                                                        $string = sanitize_text_field($item);
+                                                    } else {
+                                                        $string = $string . ', ' . sanitize_text_field($item);
+                                                    }
+
+                                                }
+
+                                                $value = $string;
+
+
+                                            }
+
+                                            else {
+                                                $value = $entry[$gf_field_id];
+
+                                            }
+
+                                            if ($field["type"] == "multiselect") {
+
+                                                $selections = json_decode($value);
+                                                $string = '';
+                                                foreach ($selections as $selection) {
+                                                    if (strlen($string) == 0) {
+                                                        $string = $selection;
+                                                    } else {
+                                                        $string = $string . ', ' . $selection;
+                                                    }
+                                                }
+                                                $value = $string;
+
+
+                                            }
+
+                                            if ($value && $value != '') {
+
+                                                if ($field["type"] == "number") {
+
+                                                    $value = ($value == (int)$value) ? (int)$value : (float)$value;
+
+                                                    $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
+
+                                                } else {
+                                                    $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+                                                }
+
+                                            }
+
+
+                                        }
+                                    }
+
+
+                                }
+
+
+                            }
+
+                        }
+
+                    }
+
+                    $properties = $gf_event_props;
+
                 }
 
                 if ($user_id) {
@@ -229,167 +399,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
                     elseif ($action === 'gform_after_submission') {
 
-                        $entry = $args["args"][0];
-                        $form = $args["args"][1];
-                        $gf_event_name_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_event_name_field"]);
-                        $gf_wp_user_id_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"]);
-                        $gf_event_props = array();
-
-                        foreach ($form['fields'] as $field) {
-                            if ($gf_event_name_field != '') {
-                                if ($field["adminLabel"] == $gf_event_name_field) {
-                                    $gf_event_name = rgar($entry, $field["id"]);
-                                    if ($gf_event_name != '') {
-                                        $args['event_name'] = sanitize_text_field($gf_event_name);
-                                    }
-                                }
-                                if ($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"] != '') {
-                                    if ($field["adminLabel"] == $gf_wp_user_id_field) {
-                                        $gf_wp_user_id = rgar($entry, $field["id"]);
-                                        $args['gf_wp_user_id'] = sanitize_text_field($gf_wp_user_id);
-                                    }
-                                }
-                                if (array_key_exists('gravity_form_event_properties', $settings["track_gravity_forms_fieldset"]) && count($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"]) > 0) {
-                                    foreach ($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"] as $property) {
-                                        if ($property["gravity_form_event_property_field_id"] != '') {
-                                            $gf_field_label_key = $property["gravity_form_event_property_field_id"];
-                                            $gf_label_text = $property["gravity_form_event_property_label"];
-                                            if ($field["adminLabel"] == $gf_field_label_key) {
-
-                                                $gf_field_id = $field["id"];
-
-                                                if ($field["type"] == "checkbox") {
-
-                                                    $string = '';
-
-                                                    foreach ($field["inputs"] as $input) {
-
-                                                        if (strlen($entry[$input["id"]]) > 0) {
-                                                            if (strlen($string) == 0) {
-                                                                $string = $entry[$input["id"]];
-                                                            } else {
-                                                                $string = $string . ', ' . $entry[$input["id"]];
-                                                            }
-                                                        }
-
-                                                    }
-
-                                                    $value = $string;
-
-
-                                                }
-
-                                                elseif ($field["type"] == "name") {
-                                                    $string = '';
-
-                                                    foreach ($field["inputs"] as $input) {
-
-                                                        if (strlen($entry[$input["id"]]) > 0) {
-                                                            if (strlen($string) == 0) {
-                                                                $string = $entry[$input["id"]];
-                                                            } else {
-                                                                $string = $string . ' ' . $entry[$input["id"]];
-                                                            }
-                                                        }
-
-                                                    }
-
-                                                    $value = $string;
-
-
-                                                }
-
-                                                elseif ($field["type"] == "address") {
-                                                    $string = '';
-
-                                                    foreach ($field["inputs"] as $input) {
-
-                                                        if (strlen($entry[$input["id"]]) > 0) {
-                                                            if (strlen($string) == 0) {
-                                                                $string = $entry[$input["id"]];
-                                                            } else {
-                                                                $string = $string . ' ' . $entry[$input["id"]];
-                                                            }
-                                                        }
-
-                                                    }
-
-                                                    $value = $string;
-
-
-                                                }
-
-                                                elseif ($field["type"] == "list") {
-
-                                                    $string = '';
-                                                    $list = maybe_unserialize($entry[$gf_field_id]);
-
-                                                    foreach ($list as $item) {
-
-                                                        if (strlen($string) == 0) {
-                                                            $string = sanitize_text_field($item);
-                                                        } else {
-                                                            $string = $string . ', ' . sanitize_text_field($item);
-                                                        }
-
-                                                    }
-
-                                                    $value = $string;
-
-
-                                                }
-
-                                                else {
-                                                    $value = $entry[$gf_field_id];
-
-                                                }
-
-                                                if ($field["type"] == "multiselect") {
-
-                                                    $selections = json_decode($value);
-                                                    $string = '';
-                                                    foreach ($selections as $selection) {
-                                                        if (strlen($string) == 0) {
-                                                            $string = $selection;
-                                                        } else {
-                                                            $string = $string . ', ' . $selection;
-                                                        }
-                                                    }
-                                                    $value = $string;
-
-
-                                                }
-
-                                                if ($value && $value != '') {
-
-                                                    if ($field["type"] == "number") {
-
-                                                        $value = ($value == (int)$value) ? (int)$value : (float)$value;
-
-                                                        $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
-
-                                                    } else {
-                                                        $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
-                                                    }
-
-                                                }
-
-
-                                            }
-                                        }
-
-
-                                    }
-
-
-                                }
-
-                            }
-
-                        }
-
-                        $properties = $gf_event_props;
-
                         if (array_key_exists('identify_gravity_forms', $settings["track_gravity_forms_fieldset"])) {
                             if ($settings["track_gravity_forms_fieldset"]["identify_gravity_forms"] == 'yes') {
                                 $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
@@ -400,8 +409,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                                 ));
                             }
                         }
-
-
 
                     }
 
@@ -425,7 +432,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
                     ));
 
-                } elseif ($ajs_anon_id) {
+                }
+
+                elseif ($ajs_anon_id) {
 
                     $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, []);
 
@@ -439,6 +448,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                 }
 
             }
+
         }
         Analytics::flush();
     }
@@ -542,14 +552,50 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     public function ninja_forms_after_submission(...$args)
     {
-        $args = array(
-            'action_hook' => current_action(),
-            'args' => json_decode(json_encode(func_get_args()), true)
-        );
+        $settings = $this->settings;
+        $form_data = func_get_args();
+        $args = array();
+        $args['action_hook'] = current_action();
         $wp_user_id = get_current_user_id() == 0 ? null : get_current_user_id();
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
+
+        //process fields
+        $event_properties = array();
+
+        foreach ($form_data[0]["fields"] as $field) {
+            if ($field["value"] != "") {
+                if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_event_name_field"]) {
+                    $args['event_name'] = sanitize_text_field($field["value"]);
+                }
+
+                if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_wp_user_id_field"]) {
+                    $wp_user_id = sanitize_text_field($field["value"]);
+                    $args['wp_user_id'] = $wp_user_id;
+                    if ($settings["track_ninja_forms_fieldset"]["identify_ninja_forms"] == 'yes' && $settings["track_ninja_forms_fieldset"]["ninja_forms_wp_user_id_field"] != '') {
+                        $args['nf_wp_user_id'] = $wp_user_id;
+                    }
+                }
+
+                if (array_key_exists('ninja_form_event_properties', $settings["track_ninja_forms_fieldset"])) {
+                    if (count($settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"]) > 0) {
+                        $ninja_form_event_properties = $settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"];
+                        foreach ($ninja_form_event_properties as $event_property) {
+                            if ($field["admin_label"] == $event_property["ninja_form_event_property_field_id"]) {
+                                $event_properties[$event_property["ninja_form_event_property_label"]] = $field["value"];
+                            }
+                        }
+
+                    }
+                }
+
+                $args['properties'] = $event_properties;
+            }
+
+        }
+
+
         self::schedule_event('async_task', $args, $this->plugin_name);
 
     }

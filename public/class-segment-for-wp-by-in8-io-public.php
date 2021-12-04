@@ -255,7 +255,6 @@ class Segment_For_Wp_By_In8_Io_Public
         );
         $event_properties = array();
         //process fields
-
         foreach ($args["args"][0]["fields"] as $field) {
             if ($field["value"] != "") {
                 if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_event_name_field"]) {
