@@ -413,6 +413,26 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                 }
 
+                                elseif ($field["type"] == "list") {
+
+                                    $string = '';
+                                    $list = maybe_unserialize($entry[$gf_field_id]);
+
+                                    foreach ($list as $item) {
+
+                                        if (strlen($string) == 0) {
+                                            $string = sanitize_text_field($item);
+                                        } else {
+                                            $string = $string . ', ' . sanitize_text_field($item);
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
                                 else {
                                     $value = $entry[$gf_field_id];
 
@@ -602,8 +622,28 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                 }
 
+                                elseif ($field["type"] == "list") {
+
+                                    $string = '';
+                                    $list = maybe_unserialize($entry[$gf_field_id]);
+
+                                    foreach ($list as $item) {
+
+                                        if (strlen($string) == 0) {
+                                            $string = sanitize_text_field($item);
+                                        } else {
+                                            $string = $string . ', ' . sanitize_text_field($item);
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
                                 else {
-                                    $value = $entry[$gf_field_id];
+                                    $value = maybe_unserialize($entry[$gf_field_id]);
 
                                 }
 
