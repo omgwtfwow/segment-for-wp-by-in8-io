@@ -39,10 +39,11 @@ class Segment_For_Wp_By_In8_Io_Page
         $settings = $this->settings;
 
         if (isset($settings['js_api_key']) && $settings['js_api_key'] !== '' && $settings['js_api_key'] !== null) {
-
+            $current_user = wp_get_current_user();
             $current_post = get_post();
+            $trackable_user = Segment_For_Wp_By_In8_Io::check_trackable_user($current_user);
             $trackable_post = Segment_For_Wp_By_In8_Io::check_trackable_post($current_post);
-            if ($trackable_post === false) {
+            if ($trackable_post === false || $trackable_user === false) {
                 //not trackable
                 return;
             } else {

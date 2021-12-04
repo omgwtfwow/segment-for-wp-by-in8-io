@@ -3,9 +3,9 @@ Contributors: juanin8
 Donate link: https://www.juangonzalez.com.au
 Tags: segment, tracking, analytics
 Requires at least: 5.6
-Tested up to: 5.8.1
+Tested up to: 5.8.2
 Requires PHP: 7.0.0
-Stable tag: 2.2.1
+Stable tag: 2.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,7 +50,7 @@ Happy to extend it, let me know.
 
 == Upgrade Notice ==
 
-If you're upgrading between version 1.0 to 2.0: 
+If you're upgrading between version 1.0 to 2.0:
 You will need to reconfigure the plugin again, so test it first and backup before upgrading.
 The new version of the plugin is much much better, but you will need to set it up again.
 
@@ -70,6 +70,14 @@ The new version of the plugin is much much better, but you will need to set it u
 3. Will it slow my site down? Depends. The more destinations and the more events you use, the slower things can go. The same way as if you installed the scripts directly.
 
 == Changelog ==
+
+= 2.3 =
+* Add server side Page tracking
+* Add support for more Gravity Form fields
+* Fix Ninja Forms server side tracking
+* Fix bugs with role filtering
+* Fix bug with some empty page names
+
 
 = 2.2.1 =
 * Fix bug initialising plugin without write permissions for plugin folder

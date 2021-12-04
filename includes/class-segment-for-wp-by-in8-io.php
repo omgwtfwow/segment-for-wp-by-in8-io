@@ -429,6 +429,15 @@ class Segment_For_Wp_By_In8_Io
             $this->loader->add_action('segment_4_wp_file_consumer', $segment_php, 'file_consumer', 1);
             $this->loader->add_action('async_task', $segment_php, 'async_task', 1, 1);
 
+            //PAGES SERVER SIDE
+            if (array_key_exists('track_pages_server_side', $settings)) {
+                if ($settings["track_pages_server_side"] == 'yes') {
+                    $this->loader->add_action('wp_head', $segment_php, 'page_server_side', 1, 1);
+                    $this->loader->add_action('admin_head', $segment_php, 'page_server_side', 1, 1);
+                    $this->loader->add_action('login_head', $segment_php, 'page_server_side', 1, 1);
+                }
+            }
+
             // SIGNUPS SERVER SIDE
             if (array_key_exists('track_signups_fieldset', $settings)) {
                 if ($settings["track_signups_fieldset"]["track_signups_server"] == 'yes' && $settings["track_signups_fieldset"]["track_signups"] == "yes") {
@@ -442,6 +451,7 @@ class Segment_For_Wp_By_In8_Io
                     $this->loader->add_action('wp_login', $segment_php, 'wp_login', 1, 2);
                 }
             }
+
             //LOGOUTS SERVER
             if (array_key_exists('track_logouts_fieldset', $settings)) {
                 if ($settings["track_logouts_fieldset"]["track_logouts_server"] == "yes") {
@@ -559,6 +569,7 @@ class Segment_For_Wp_By_In8_Io
                     }
                 }
             }
+
 
         }
 
@@ -874,11 +885,13 @@ class Segment_For_Wp_By_In8_Io
 
         $settings = self::get_settings();
 
-        function is_wplogin()
-        {
-            $ABSPATH_MY = str_replace(array('\\', '/'), DIRECTORY_SEPARATOR, ABSPATH);
+        if(!function_exists('is_wplogin')) {
+            function is_wplogin()
+            {
+                $ABSPATH_MY = str_replace(array('\\', '/'), DIRECTORY_SEPARATOR, ABSPATH);
 
-            return ((in_array($ABSPATH_MY . 'wp-login.php', get_included_files()) || in_array($ABSPATH_MY . 'wp-register.php', get_included_files())) || (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') || $_SERVER['PHP_SELF'] == '/wp-login.php');
+                return ((in_array($ABSPATH_MY . 'wp-login.php', get_included_files()) || in_array($ABSPATH_MY . 'wp-register.php', get_included_files())) || (isset($_GLOBALS['pagenow']) && $GLOBALS['pagenow'] === 'wp-login.php') || $_SERVER['PHP_SELF'] == '/wp-login.php');
+            }
         }
 
         if (is_wplogin()) {
@@ -911,8 +924,8 @@ class Segment_For_Wp_By_In8_Io
                 return $current_post->post_title;
             }
         }
-
-        return "";
+        
+        return $current_post->post_title;
     }
 
     /**
