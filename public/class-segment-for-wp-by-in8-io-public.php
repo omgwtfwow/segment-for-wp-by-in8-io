@@ -393,6 +393,26 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                 }
 
+                                elseif ($field["type"] == "address") {
+                                    $string = '';
+
+                                    foreach ($field["inputs"] as $input) {
+
+                                        if (strlen($entry[$input["id"]]) > 0) {
+                                            if (strlen($string) == 0) {
+                                                $string = $entry[$input["id"]];
+                                            } else {
+                                                $string = $string . ' ' . $entry[$input["id"]];
+                                            }
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
                                 else {
                                     $value = $entry[$gf_field_id];
 
