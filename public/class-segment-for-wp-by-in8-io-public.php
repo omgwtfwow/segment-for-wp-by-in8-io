@@ -254,12 +254,17 @@ class Segment_For_Wp_By_In8_Io_Public
             'args' => json_decode(json_encode(func_get_args()), true)
         );
         $event_properties = array();
+
         //process fields
         foreach ($args["args"][0]["fields"] as $field) {
             if ($field["value"] != "") {
+
+                // EVENT NAME
                 if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_event_name_field"]) {
                     $args['event_name'] = sanitize_text_field($field["value"]);
                 }
+
+                // WP USER ID
                 if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_wp_user_id_field"]) {
                     $wp_user_id = sanitize_text_field($field["value"]);
                     $args['wp_user_id'] = $wp_user_id;
@@ -267,12 +272,19 @@ class Segment_For_Wp_By_In8_Io_Public
                         $args['nf_wp_user_id'] = $wp_user_id;
                     }
                 }
+
+                // EVENT PROPS
                 if (array_key_exists('ninja_form_event_properties', $settings["track_ninja_forms_fieldset"])) {
                     if (count($settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"]) > 0) {
                         $ninja_form_event_properties = $settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"];
+
                         foreach ($ninja_form_event_properties as $event_property) {
+
                             if ($field["admin_label"] == $event_property["ninja_form_event_property_field_id"]) {
+
                                 $event_properties[$event_property["ninja_form_event_property_label"]] = $field["value"];
+
+
                             }
                         }
 
@@ -347,7 +359,6 @@ class Segment_For_Wp_By_In8_Io_Public
                             $gf_field_label_key = $property["gravity_form_event_property_field_id"];
                             $gf_label_text = $property["gravity_form_event_property_label"];
                             if ($field["adminLabel"] == $gf_field_label_key) {
-
 
                                 $gf_field_id = $field["id"];
 
@@ -483,7 +494,7 @@ class Segment_For_Wp_By_In8_Io_Public
 
         unset($args["args"]);
         $args['properties'] = $gf_event_props;
-        $args['properties'] = $gf_event_props;
+
         if (!isset($args["wp_user_id"])) {
             if (is_user_logged_in()) {
                 $args["wp_user_id"] = sanitize_text_field(get_current_user_id());

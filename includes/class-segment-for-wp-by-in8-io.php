@@ -430,7 +430,6 @@ class Segment_For_Wp_By_In8_Io
             $this->loader->add_action('async_task', $segment_php, 'async_task', 1, 1);
 
             //PAGES SERVER SIDE
-
             if (array_key_exists('track_pages_server_side', $settings)) {
                 if ($settings["track_pages_server_side"] == 'yes') {
                     $this->loader->add_action('wp_head', $segment_php, 'page_server_side', 1, 1);
@@ -452,6 +451,7 @@ class Segment_For_Wp_By_In8_Io
                     $this->loader->add_action('wp_login', $segment_php, 'wp_login', 1, 2);
                 }
             }
+
             //LOGOUTS SERVER
             if (array_key_exists('track_logouts_fieldset', $settings)) {
                 if ($settings["track_logouts_fieldset"]["track_logouts_server"] == "yes") {
