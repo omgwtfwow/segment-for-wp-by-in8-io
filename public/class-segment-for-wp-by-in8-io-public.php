@@ -354,16 +354,35 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                 if ($field["type"] == "checkbox") {
 
-                                    $string ='';
+                                    $string = '';
 
-                                    foreach ( $field["inputs"] as $input) {
+                                    foreach ($field["inputs"] as $input) {
 
-                                        if(strlen($entry[$input["id"]])>0) {
-                                            if(strlen($string)==0){
+                                        if (strlen($entry[$input["id"]]) > 0) {
+                                            if (strlen($string) == 0) {
                                                 $string = $entry[$input["id"]];
-                                            }
-                                            else {
+                                            } else {
                                                 $string = $string . ', ' . $entry[$input["id"]];
+                                            }
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
+                                elseif ($field["type"] == "name") {
+                                    $string = '';
+
+                                    foreach ($field["inputs"] as $input) {
+
+                                        if (strlen($entry[$input["id"]]) > 0) {
+                                            if (strlen($string) == 0) {
+                                                $string = $entry[$input["id"]];
+                                            } else {
+                                                $string = $string . ' ' . $entry[$input["id"]];
                                             }
                                         }
 
@@ -403,14 +422,11 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                         $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
 
-                                    }
-
-                                    else {
+                                    } else {
                                         $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
                                     }
 
                                 }
-
 
 
                             }
@@ -507,18 +523,35 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                 if ($field["type"] == "checkbox") {
 
-                                    $string ='';
-                                    $inputs = $field->inputs;
+                                    $string = '';
 
+                                    foreach ($field["inputs"] as $input) {
 
-                                    foreach ( $field["inputs"] as $input) {
-
-                                        if(strlen($entry[$input["id"]])>0) {
-                                            if(strlen($string)==0){
+                                        if (strlen($entry[$input["id"]]) > 0) {
+                                            if (strlen($string) == 0) {
                                                 $string = $entry[$input["id"]];
-                                            }
-                                            else {
+                                            } else {
                                                 $string = $string . ', ' . $entry[$input["id"]];
+                                            }
+                                        }
+
+                                    }
+
+                                    $value = $string;
+
+
+                                }
+
+                                elseif ($field["type"] == "name") {
+                                    $string = '';
+
+                                    foreach ($field["inputs"] as $input) {
+
+                                        if (strlen($entry[$input["id"]]) > 0) {
+                                            if (strlen($string) == 0) {
+                                                $string = $entry[$input["id"]];
+                                            } else {
+                                                $string = $string . ' ' . $entry[$input["id"]];
                                             }
                                         }
 
@@ -558,9 +591,7 @@ class Segment_For_Wp_By_In8_Io_Public
 
                                         $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
 
-                                    }
-
-                                    else {
+                                    } else {
                                         $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
                                     }
 
