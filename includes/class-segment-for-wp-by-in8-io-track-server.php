@@ -173,12 +173,14 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
             }
 
-        } else {
+        }
+
+        else {
             $user_id = Segment_For_Wp_By_In8_Io::get_user_id($wp_user_id);
             $event_name = Segment_For_Wp_By_In8_Io::get_event_name($action_server, $args);
             $properties = Segment_For_Wp_By_In8_Io::get_event_properties($action, $args);
             $properties = array_filter($properties);
-            $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, []);
+
             if ($event_name) {
 
                 if (!$user_id && Segment_For_Wp_By_In8_Io::is_ecommerce_order_hook($action)) {
@@ -208,7 +210,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                             "traits" => $traits,
                             "timestamp" => $timestamp
                         ));
-                    } elseif ($action === 'ninja_forms_after_submission') {
+                    }
+
+                    elseif ($action === 'ninja_forms_after_submission') {
                         if (array_key_exists('identify_ninja_forms', $settings["track_ninja_forms_fieldset"])) {
                             if ($settings["track_ninja_forms_fieldset"]["identify_ninja_forms"] == 'yes') {
                                 $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
@@ -221,7 +225,171 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                         }
 
 
-                    } elseif ($action === 'gform_after_submission') {
+                    }
+
+                    elseif ($action === 'gform_after_submission') {
+
+                        $entry = $args["args"][0];
+                        $form = $args["args"][1];
+                        $gf_event_name_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_event_name_field"]);
+                        $gf_wp_user_id_field = sanitize_text_field($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"]);
+                        $gf_event_props = array();
+
+                        foreach ($form['fields'] as $field) {
+                            if ($gf_event_name_field != '') {
+                                if ($field["adminLabel"] == $gf_event_name_field) {
+                                    $gf_event_name = rgar($entry, $field["id"]);
+                                    if ($gf_event_name != '') {
+                                        $args['event_name'] = sanitize_text_field($gf_event_name);
+                                    }
+                                }
+                                if ($settings["track_gravity_forms_fieldset"]["gravity_forms_wp_user_id_field"] != '') {
+                                    if ($field["adminLabel"] == $gf_wp_user_id_field) {
+                                        $gf_wp_user_id = rgar($entry, $field["id"]);
+                                        $args['gf_wp_user_id'] = sanitize_text_field($gf_wp_user_id);
+                                    }
+                                }
+                                if (array_key_exists('gravity_form_event_properties', $settings["track_gravity_forms_fieldset"]) && count($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"]) > 0) {
+                                    foreach ($settings["track_gravity_forms_fieldset"]["gravity_form_event_properties"] as $property) {
+                                        if ($property["gravity_form_event_property_field_id"] != '') {
+                                            $gf_field_label_key = $property["gravity_form_event_property_field_id"];
+                                            $gf_label_text = $property["gravity_form_event_property_label"];
+                                            if ($field["adminLabel"] == $gf_field_label_key) {
+
+                                                $gf_field_id = $field["id"];
+
+                                                if ($field["type"] == "checkbox") {
+
+                                                    $string = '';
+
+                                                    foreach ($field["inputs"] as $input) {
+
+                                                        if (strlen($entry[$input["id"]]) > 0) {
+                                                            if (strlen($string) == 0) {
+                                                                $string = $entry[$input["id"]];
+                                                            } else {
+                                                                $string = $string . ', ' . $entry[$input["id"]];
+                                                            }
+                                                        }
+
+                                                    }
+
+                                                    $value = $string;
+
+
+                                                }
+
+                                                elseif ($field["type"] == "name") {
+                                                    $string = '';
+
+                                                    foreach ($field["inputs"] as $input) {
+
+                                                        if (strlen($entry[$input["id"]]) > 0) {
+                                                            if (strlen($string) == 0) {
+                                                                $string = $entry[$input["id"]];
+                                                            } else {
+                                                                $string = $string . ' ' . $entry[$input["id"]];
+                                                            }
+                                                        }
+
+                                                    }
+
+                                                    $value = $string;
+
+
+                                                }
+
+                                                elseif ($field["type"] == "address") {
+                                                    $string = '';
+
+                                                    foreach ($field["inputs"] as $input) {
+
+                                                        if (strlen($entry[$input["id"]]) > 0) {
+                                                            if (strlen($string) == 0) {
+                                                                $string = $entry[$input["id"]];
+                                                            } else {
+                                                                $string = $string . ' ' . $entry[$input["id"]];
+                                                            }
+                                                        }
+
+                                                    }
+
+                                                    $value = $string;
+
+
+                                                }
+
+                                                elseif ($field["type"] == "list") {
+
+                                                    $string = '';
+                                                    $list = maybe_unserialize($entry[$gf_field_id]);
+
+                                                    foreach ($list as $item) {
+
+                                                        if (strlen($string) == 0) {
+                                                            $string = sanitize_text_field($item);
+                                                        } else {
+                                                            $string = $string . ', ' . sanitize_text_field($item);
+                                                        }
+
+                                                    }
+
+                                                    $value = $string;
+
+
+                                                }
+
+                                                else {
+                                                    $value = $entry[$gf_field_id];
+
+                                                }
+
+                                                if ($field["type"] == "multiselect") {
+
+                                                    $selections = json_decode($value);
+                                                    $string = '';
+                                                    foreach ($selections as $selection) {
+                                                        if (strlen($string) == 0) {
+                                                            $string = $selection;
+                                                        } else {
+                                                            $string = $string . ', ' . $selection;
+                                                        }
+                                                    }
+                                                    $value = $string;
+
+
+                                                }
+
+                                                if ($value && $value != '') {
+
+                                                    if ($field["type"] == "number") {
+
+                                                        $value = ($value == (int)$value) ? (int)$value : (float)$value;
+
+                                                        $gf_event_props[sanitize_text_field($gf_label_text)] = $value;
+
+                                                    } else {
+                                                        $gf_event_props[sanitize_text_field($gf_label_text)] = sanitize_text_field($value);
+                                                    }
+
+                                                }
+
+
+                                            }
+                                        }
+
+
+                                    }
+
+
+                                }
+
+                            }
+
+                        }
+
+                        $properties = $gf_event_props;
+
                         if (array_key_exists('identify_gravity_forms', $settings["track_gravity_forms_fieldset"])) {
                             if ($settings["track_gravity_forms_fieldset"]["identify_gravity_forms"] == 'yes') {
                                 $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
@@ -233,7 +401,11 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                             }
                         }
 
-                    } elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
+
+
+                    }
+
+                    elseif (Segment_For_Wp_By_In8_Io::check_associated_identify('hook', $action)) {
                         $traits = Segment_For_Wp_By_In8_Io::get_user_traits($wp_user_id);
                         Analytics::identify(array(
                             "userId" => $user_id,
@@ -242,6 +414,8 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
                         ));
                     }
+
+                    $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, []);
 
                     Analytics::track(array(
                         "userId" => $user_id,
@@ -252,6 +426,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                     ));
 
                 } elseif ($ajs_anon_id) {
+
+                    $properties = apply_filters('segment_for_wp_change_event_properties', $properties, $action, []);
+
                     Analytics::track(array(
                         "anonymousId" => $ajs_anon_id,
                         "event" => $event_name,
@@ -383,6 +560,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function gform_after_submission(...$args)
     {
 
+
         $args = array(
             'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
@@ -391,7 +569,10 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
+
+
         self::schedule_event('async_task', $args, $this->plugin_name);
+
 
     }
 
@@ -706,13 +887,13 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             return;
         }
 
-        if ( 
-        ! is_singular() && 
-        ! is_page() && 
-        ! is_single() && 
-        ! is_archive() && 
-        ! is_home() &&
-        ! is_front_page() 
+        if (
+            ! is_singular() &&
+            ! is_page() &&
+            ! is_single() &&
+            ! is_archive() &&
+            ! is_home() &&
+            ! is_front_page()
         ) {
             return false;
         }
