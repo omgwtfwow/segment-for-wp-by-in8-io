@@ -643,7 +643,7 @@ class Segment_For_Wp_By_In8_Io_Public
                                 }
 
                                 else {
-                                    $value = maybe_unserialize($entry[$gf_field_id]);
+                                    $value = $entry[$gf_field_id];
 
                                 }
 
