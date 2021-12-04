@@ -566,10 +566,13 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
         foreach ($form_data[0]["fields"] as $field) {
             if ($field["value"] != "") {
+
+                // EVENT NAME
                 if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_event_name_field"]) {
                     $args['event_name'] = sanitize_text_field($field["value"]);
                 }
 
+                // WP USER ID
                 if ($field["admin_label"] == $settings["track_ninja_forms_fieldset"]["ninja_forms_wp_user_id_field"]) {
                     $wp_user_id = sanitize_text_field($field["value"]);
                     $args['wp_user_id'] = $wp_user_id;
@@ -578,12 +581,15 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                     }
                 }
 
+                // EVENT PROPS
                 if (array_key_exists('ninja_form_event_properties', $settings["track_ninja_forms_fieldset"])) {
                     if (count($settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"]) > 0) {
                         $ninja_form_event_properties = $settings["track_ninja_forms_fieldset"]["ninja_form_event_properties"];
                         foreach ($ninja_form_event_properties as $event_property) {
                             if ($field["admin_label"] == $event_property["ninja_form_event_property_field_id"]) {
+
                                 $event_properties[$event_property["ninja_form_event_property_label"]] = $field["value"];
+
                             }
                         }
 
@@ -606,7 +612,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function gform_after_submission(...$args)
     {
 
-
         $args = array(
             'action_hook' => current_action(),
             'args' => json_decode(json_encode(func_get_args()), true)
@@ -616,9 +621,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
         $args['timestamp'] = time();
 
-
         self::schedule_event('async_task', $args, $this->plugin_name);
-
 
     }
 

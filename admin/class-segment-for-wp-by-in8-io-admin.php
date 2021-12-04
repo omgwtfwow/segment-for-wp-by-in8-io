@@ -211,7 +211,7 @@ class Segment_For_Wp_By_In8_Io_Admin
                         'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">More info about these</a>',
                         'options' => array(
                             'socket' => 'Socket: Default. If you\'re dealing with less than 100s of requests per second.',
-                            'file' => 'File: Useful if you\'re dealing with 100s of requests per second. NOTE: You need to have Read and Write permissions for the plugin folder for this to work. ',
+                            'file' => 'File: Useful if you\'re dealing with 100s of requests per second. NOTE: The server/user running the cron job needs to have Read and Write permissions for the plugin folder for this to work.',
                         ),
                         'default' => 'socket',
                         'dependency' => array('php_api_key', '!=', ''),
@@ -683,7 +683,7 @@ class Segment_For_Wp_By_In8_Io_Admin
                     'id' => 'track_pages_server_side',
                     'type' => 'switcher',
                     'title' => 'Track Pages Server Side?',
-                    'description' => '',
+                    'description' => 'Make sure you have the server resources to use this.',
                     'default' => 'no',
                     'wrap_class' => 'no-border-bottom',
                     'options' => array(
