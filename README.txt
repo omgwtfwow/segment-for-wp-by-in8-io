@@ -5,7 +5,7 @@ Tags: segment, tracking, analytics
 Requires at least: 5.6
 Tested up to: 5.8.2
 Requires PHP: 7.0.0
-Stable tag: 2.3
+Stable tag: 2.3.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,7 +71,7 @@ The new version of the plugin is much much better, but you will need to set it u
 
 == Changelog ==
 
-= 2.3 =
+= 2.3.0 =
 * Add server side Page tracking
 * Add support for more Gravity Form fields
 * Fix Ninja Forms server side tracking
