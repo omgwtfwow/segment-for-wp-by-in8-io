@@ -234,7 +234,7 @@ class Segment_For_Wp_By_In8_Io_Admin
                         'id' => 'segment_php_consumer_timeout',
                         'type' => 'number',
                         'title' => 'Socket Consumer Timeout',
-                        'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">Docs.</a> The number of seconds to wait for the socket request to time out, defaults to 1. </br></br> This setting affects both consumers.',
+                        'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">Docs.</a> The number of seconds to wait for the socket request to time out, defaults to 1. Try higher value for slower servers.</br></br> This setting affects both consumers.',
                         'dependency' => array('php_api_key', '!=', ''),
                         'default' => '1',
                         'after' => ' <i class="text-muted">seconds</i>',

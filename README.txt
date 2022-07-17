@@ -3,9 +3,9 @@ Contributors: juanin8
 Donate link: https://www.juangonzalez.com.au
 Tags: segment, tracking, analytics
 Requires at least: 5.6
-Tested up to: 5.8.2
+Tested up to: 6.0.1
 Requires PHP: 7.0.0
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
