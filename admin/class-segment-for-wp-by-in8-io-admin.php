@@ -2339,7 +2339,10 @@ class Segment_For_Wp_By_In8_Io_Admin
                 wp_clear_scheduled_hook('segment_4_wp_file_consumer');
                 if (is_writable(plugin_dir_path(dirname(__FILE__)))) {
                     array_map('unlink', glob("$temp_dir/*.*"));
-                    rmdir($temp_dir);
+	                if (file_exists($temp_dir)) {
+		                rmdir($temp_dir);
+	                }
+
                     unset($fields[0]["fields"][4]);
                 }
             }
