@@ -72,7 +72,9 @@ The new version of the plugin is much much better, but you will need to set it u
 == Changelog ==
 
 = 2.3.1 =
-* Fix warnings on plugin activation
+* Fix File consumer
+* Fix php warnings on plugin activation
+
 
 = 2.3.0 =
 * Add server side Page tracking
