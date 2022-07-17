@@ -60,7 +60,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                 }
             ));
 
-        } else {
+        }
+
+        else {
             Segment::init($this->settings["php_api_key"], array(
                 "consumer" => "file",
                 "filename" => plugin_dir_path(dirname(__FILE__)) . 'tmp/analytics.log'
@@ -84,6 +86,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             "send_file" => plugin_dir_path(dirname(__FILE__)) . '/includes/segment_php/send.php',
             "timeout" => $timeout
         );
+
         if (isset($args["secret"]) && isset($args["file"]) && isset($args["timeout"])) {
             include(plugin_dir_path(dirname(__FILE__)) . '/includes/segment_php/send.php');
         }
@@ -173,6 +176,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             }
 
         }
+
 
         else {
 
