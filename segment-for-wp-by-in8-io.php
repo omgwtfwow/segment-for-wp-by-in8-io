@@ -63,7 +63,7 @@ require plugin_dir_path(__FILE__) . 'includes/class-segment-for-wp-by-in8-io.php
 function run_segment_for_wp_by_in8_io()
 {
 
-    add_action('segment_4_wp_file_consumer', 'segment_4_wp_file_consumer');
+	add_action('segment_4_wp_consumer', 'segment_4_wp_consumer');
 
     $plugin = new Segment_For_Wp_By_In8_Io();
     $plugin->run();

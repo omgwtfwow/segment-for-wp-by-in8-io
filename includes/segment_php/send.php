@@ -79,10 +79,6 @@ foreach ($lines as $line) {
     call_user_func([Segment::class, $type], $payload);
 }
 
-$libCurlResponse = Segment::flush();
-if ($libCurlResponse) {
-    $successful += $total - $successful;
-}
 unlink($file);
 
 /**
