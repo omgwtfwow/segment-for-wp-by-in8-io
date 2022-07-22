@@ -22,15 +22,21 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     protected $version;
     /**
-     * @var
+     * The plugin settings
      */
     protected $settings;
 
-    public function __construct($plugin_name, $version, $settings)
+	/**
+	 * The Segment consumer types
+	 */
+	protected $consumer;
+
+    public function __construct($plugin_name, $version, $settings, $consumer)
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->settings = $settings;
+	    $this->consumer = $consumer;
 
     }
 
@@ -42,7 +48,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
         class_alias('Segment', 'Analytics');
 
-        if ($this->settings["segment_php_consumer"] == 'socket') {
+        if ($this->consumer == 'socket') {
 
             $timeout = $this->settings["segment_php_consumer_timeout"];
 
@@ -60,7 +66,10 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
                 }
             ));
 
-        } else {
+        }
+
+        // File consumer
+        else {
             Segment::init($this->settings["php_api_key"], array(
                 "consumer" => "file",
                 "filename" => plugin_dir_path(dirname(__FILE__)) . 'tmp/analytics.log'
@@ -68,6 +77,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         }
 
     }
+
 
     public function file_consumer()
     {
@@ -84,9 +94,11 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             "send_file" => plugin_dir_path(dirname(__FILE__)) . '/includes/segment_php/send.php',
             "timeout" => $timeout
         );
+
         if (isset($args["secret"]) && isset($args["file"]) && isset($args["timeout"])) {
             include(plugin_dir_path(dirname(__FILE__)) . '/includes/segment_php/send.php');
         }
+
     }
 
     public function async_task($args)
@@ -173,6 +185,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             }
 
         }
+
 
         else {
 
@@ -450,7 +463,9 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             }
 
         }
-        Analytics::flush();
+
+	    Analytics::flush();
+
     }
 
     // TODO: refactor all of these events into one function
@@ -467,8 +482,12 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $wp_user_id = $args["args"][0];
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
-        self::schedule_event('async_task', $args, $this->plugin_name);
-    }
+
+	        self::schedule_event('async_task', $args, $this->plugin_name);
+
+
+
+	    }
 
     public function schedule_event($task, $args, $plugin_name)
     {
@@ -932,17 +951,22 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     {
         $current_post = get_queried_object();
 
-        if (!$current_post || !$current_post->post_title) {
-            return;
-        }
+//        if (!$current_post) {
+//            return;
+//        }
 
         if (
             ! is_singular() &&
             ! is_page() &&
             ! is_single() &&
             ! is_archive() &&
+            ! is_post_type_archive() &&
             ! is_home() &&
-            ! is_front_page()
+            ! is_front_page() &&
+            ! is_author() &&
+            ! is_category() &&
+            ! is_tag()
+
         ) {
             return false;
         }
@@ -988,7 +1012,22 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['page_data']['context']['userAgent'] = $user_agent;
         $args['page_data']['context']['locale'] = $locale;
 
-        self::schedule_event('async_task', $args, $this->plugin_name);
+	    if($this->consumer == 'socket'){
+		    self::schedule_event('async_task', $args, $this->plugin_name);
+
+	    }
+
+	    if($this->consumer == 'file'){
+		    Analytics::page(array(
+			    "userId" => $args['wp_user_id']??$args['ajs_anon_id'],
+			    "name" => $args['page_data']['name'],
+			    "properties" => $args['page_data']['properties'],
+			    "timestamp" => $args['timestamp'],
+			    "context" => $args['page_data']['context'],
+		    ));
+
+	    }
+
 
     }
 

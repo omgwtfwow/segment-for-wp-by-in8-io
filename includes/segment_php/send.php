@@ -1,11 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Make sure both are set
  */
-if (!isset($args["secret"])) die();
-if (!isset($args["file"])) die();
-if (!isset($args["timeout"])) die();
+
+if (!isset($args['secret'])) {
+    die('--secret must be given');
+}
+if (!isset($args['file'])) {
+    die('--file must be given');
+}
+if (!isset($args["timeout"])) {
+	die('--timeout must be given');
+};
 $file = $args["file"];
 
 /**
@@ -42,21 +51,34 @@ Segment::init($args["secret"], array(
 /**
  * Payloads
  */
+
 $total = 0;
 $successful = 0;
 foreach ($lines as $line) {
-    if (!trim($line)) continue;
-    $payload = json_decode($line, true);
-    $dt = new DateTime($payload["timestamp"]);
-    $ts = floatval($dt->getTimestamp() . "." . $dt->format("u"));
-    $payload["timestamp"] = $ts;
-    $type = $payload["type"];
-    $ret = call_user_func_array(array("Segment", $type), array($payload));
-    if ($ret) $successful++;
+    if (!trim($line)) {
+        continue;
+    }
     $total++;
-    if ($total % 100 === 0) Segment::flush();
+    $payload = json_decode($line, true);
+    $dt = new DateTime($payload['timestamp']);
+    $ts = (float)($dt->getTimestamp() . '.' . $dt->format('u'));
+    $payload['timestamp'] = date('c', (int)$ts);
+    $type = $payload['type'];
+    $currentBatch[] = $payload;
+    // flush before batch gets too big
+    if (mb_strlen((json_encode(['batch' => $currentBatch, 'sentAt' => date('c')])), '8bit') >= 512000) {
+        $libCurlResponse = Segment::flush();
+        if ($libCurlResponse) {
+            $successful += count($currentBatch) - 1;
+        //} else {
+            // todo: maybe write batch to analytics-error.log for more controlled errorhandling
+        }
+        $currentBatch = [];
+    }
+    $payload['timestamp'] = $ts;
+    call_user_func([Segment::class, $type], $payload);
 }
-Segment::flush();
+
 unlink($file);
 
 /**

@@ -423,11 +423,14 @@ class Segment_For_Wp_By_In8_Io
         //SERVER SIDE
         if (self::server_side_ready()) {
 
-            $segment_php = new Segment_For_Wp_By_In8_Io_Segment_Php_Lib($this->get_plugin_name(), $this->get_version(), $settings);
+            $segment_php = new Segment_For_Wp_By_In8_Io_Segment_Php_Lib($this->get_plugin_name(), $this->get_version(), $settings, $settings["segment_php_consumer"]);
             $this->loader->add_action('init', $segment_php, 'init_segment', 1);
 //            $this->loader->add_action('init', $segment_php, 'init_scheduler', 1);
-            $this->loader->add_action('segment_4_wp_file_consumer', $segment_php, 'file_consumer', 1);
-            $this->loader->add_action('async_task', $segment_php, 'async_task', 1, 1);
+
+            $this->loader->add_action('segment_4_wp_consumer', $segment_php, 'file_consumer', 1);
+//	        $this->loader->add_action('segment_4_wp_consumer', $segment_php, 'default_consumer', 1);
+
+	        $this->loader->add_action('async_task', $segment_php, 'async_task', 1, 1);
 
             //PAGES SERVER SIDE
             if (array_key_exists('track_pages_server_side', $settings)) {
@@ -923,6 +926,10 @@ class Segment_For_Wp_By_In8_Io
             } else {
                 return $current_post->post_title;
             }
+        }
+
+        if (!$current_post->post_title) {
+            return "";
         }
         
         return $current_post->post_title;

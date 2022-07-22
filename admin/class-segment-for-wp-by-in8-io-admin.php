@@ -234,7 +234,7 @@ class Segment_For_Wp_By_In8_Io_Admin
                         'id' => 'segment_php_consumer_timeout',
                         'type' => 'number',
                         'title' => 'Socket Consumer Timeout',
-                        'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">Docs.</a> The number of seconds to wait for the socket request to time out, defaults to 1. </br></br> This setting affects both consumers.',
+                        'description' => '<a href="https://segment.com/docs/connections/sources/catalog/libraries/server/php/#socket-consumer" target="_blank">Docs.</a> The number of seconds to wait for the socket request to time out, defaults to 1. Try higher value for slower servers.</br></br> This setting affects both consumers.',
                         'dependency' => array('php_api_key', '!=', ''),
                         'default' => '1',
                         'after' => ' <i class="text-muted">seconds</i>',
@@ -2331,15 +2331,18 @@ class Segment_For_Wp_By_In8_Io_Admin
                 $timestamp = time();
                 $recurrence = 's4wp_file_consumer';
                 $args = array();
-                if (!wp_next_scheduled('segment_4_wp_file_consumer')) {
-                    wp_schedule_event($timestamp, $recurrence, 'segment_4_wp_file_consumer', $args);
+                if (!wp_next_scheduled('segment_4_wp_consumer')) {
+                    wp_schedule_event($timestamp, $recurrence, 'segment_4_wp_consumer', $args);
                 }
 
             } elseif ($settings["segment_php_consumer"] == 'socket') {
-                wp_clear_scheduled_hook('segment_4_wp_file_consumer');
+                wp_clear_scheduled_hook('segment_4_wp_consumer');
                 if (is_writable(plugin_dir_path(dirname(__FILE__)))) {
                     array_map('unlink', glob("$temp_dir/*.*"));
-                    rmdir($temp_dir);
+	                if (file_exists($temp_dir)) {
+		                rmdir($temp_dir);
+	                }
+
                     unset($fields[0]["fields"][4]);
                 }
             }

@@ -3,17 +3,17 @@ Contributors: juanin8
 Donate link: https://www.juangonzalez.com.au
 Tags: segment, tracking, analytics
 Requires at least: 5.6
-Tested up to: 5.8.2
+Tested up to: 6.0.1
 Requires PHP: 7.0.0
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Segment Analytics for WordPress. Event tracking integrated into hundreds of 3rd party tools, see segment.com | Re-written & extended by https://in8.io
+Segment Analytics for WordPress. Event tracking integrated into hundreds of 3rd party tools, see segment.com | Free WooCommerce, Ninja Form & Gravity Form integrations. | Re-written & extended by https://in8.io
 
 == Description ==
 
-Segment Analytics for WordPress.
+Segment Analytics for WordPress. Free WooCommerce, Ninja Form & Gravity Form integrations.
 Uses Segment's official PHP libraries for Server Side events, as well as a lot of other features functionality.
 I completely rewrote this plugin from the previous version.
 Client side and server side tracking.
@@ -70,6 +70,11 @@ The new version of the plugin is much much better, but you will need to set it u
 3. Will it slow my site down? Depends. The more destinations and the more events you use, the slower things can go. The same way as if you installed the scripts directly.
 
 == Changelog ==
+
+= 2.3.1 =
+* Fix File consumer
+* Fix php warnings on plugin activation
+
 
 = 2.3.0 =
 * Add server side Page tracking
