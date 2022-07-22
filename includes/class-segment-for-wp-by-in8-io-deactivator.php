@@ -42,7 +42,7 @@ class Segment_For_Wp_By_In8_Io_Deactivator
 
         $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
         delete_option($plugin_name_db_version);
-        wp_clear_scheduled_hook('segment_4_wp_file_consumer');
+        wp_clear_scheduled_hook('segment_4_wp_consumer');
     }
 
     static function remove_fs()

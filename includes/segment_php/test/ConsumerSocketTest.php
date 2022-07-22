@@ -1,221 +1,256 @@
 <?php
 
-require_once __DIR__ . "/../lib/Segment/Client.php";
+declare(strict_types=1);
 
-class ConsumerSocketTest extends PHPUnit_Framework_TestCase
+namespace Segment\Test;
+
+use Exception;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use Segment\Client;
+
+class ConsumerSocketTest extends TestCase
 {
-    private $client;
+    private Client $client;
 
-    public function setUp()
+    public function setUp(): void
     {
-        date_default_timezone_set("UTC");
-        $this->client = new Segment_Client(
-            "oq0vdlg7yi",
-            array("consumer" => "socket")
+        date_default_timezone_set('UTC');
+        $this->client = new Client(
+            'oq0vdlg7yi',
+            ['consumer' => 'socket']
         );
     }
 
-    public function testTrack()
+    public function testTrack(): void
     {
-        $this->assertTrue($this->client->track(array(
-            "userId" => "some-user",
-            "event" => "Socket PHP Event",
-        )));
+        self::assertTrue(
+            $this->client->track(
+                [
+                    'userId' => 'some-user',
+                    'event'  => 'Socket PHP Event',
+                ]
+            )
+        );
     }
 
-    public function testIdentify()
+    public function testIdentify(): void
     {
-        $this->assertTrue($this->client->identify(array(
-            "userId" => "Calvin",
-            "traits" => array(
-                "loves_php" => false,
-                "birthday" => time(),
-            ),
-        )));
+        self::assertTrue(
+            $this->client->identify(
+                [
+                    'userId' => 'Calvin',
+                    'traits' => [
+                        'loves_php' => false,
+                        'birthday'  => time(),
+                    ],
+                ]
+            )
+        );
     }
 
-    public function testGroup()
+    public function testGroup(): void
     {
-        $this->assertTrue($this->client->group(array(
-            "userId" => "user-id",
-            "groupId" => "group-id",
-            "traits" => array(
-                "type" => "consumer socket test",
-            ),
-        )));
+        self::assertTrue(
+            $this->client->group(
+                [
+                    'userId'  => 'user-id',
+                    'groupId' => 'group-id',
+                    'traits'  => [
+                        'type' => 'consumer socket test',
+                    ],
+                ]
+            )
+        );
     }
 
-    public function testPage()
+    public function testPage(): void
     {
-        $this->assertTrue($this->client->page(array(
-            "userId" => "user-id",
-            "name" => "analytics-php",
-            "category" => "socket",
-            "properties" => array(
-                "url" => "https://a.url/",
-            ),
-        )));
+        self::assertTrue(
+            $this->client->page(
+                [
+                    'userId'     => 'user-id',
+                    'name'       => 'analytics-php',
+                    'category'   => 'socket',
+                    'properties' => ['url' => 'https://a.url/'],
+                ]
+            )
+        );
     }
 
-    public function testScreen()
+    public function testScreen(): void
     {
-        $this->assertTrue($this->client->screen(array(
-            "anonymousId" => "anonymousId",
-            "name" => "grand theft auto",
-            "category" => "socket",
-            "properties" => array(),
-        )));
+        self::assertTrue(
+            $this->client->screen(
+                [
+                    'anonymousId' => 'anonymousId',
+                    'name'        => 'grand theft auto',
+                    'category'    => 'socket',
+                    'properties'  => [],
+                ]
+            )
+        );
     }
 
-    public function testAlias()
+    public function testAlias(): void
     {
-        $this->assertTrue($this->client->alias(array(
-            "previousId" => "some-socket",
-            "userId" => "new-socket",
-        )));
+        self::assertTrue(
+            $this->client->alias(
+                [
+                    'previousId' => 'some-socket',
+                    'userId'     => 'new-socket',
+                ]
+            )
+        );
     }
 
-    public function testShortTimeout()
+    public function testShortTimeout(): void
     {
-        $client = new Segment_Client(
-            "oq0vdlg7yi",
-            array(
-                "timeout" => 0.01,
-                "consumer" => "socket",
+        $client = new Client(
+            'oq0vdlg7yi',
+            [
+                'timeout'  => 0.01,
+                'consumer' => 'socket',
+            ]
+        );
+
+        self::assertTrue(
+            $client->track(
+                [
+                    'userId' => 'some-user',
+                    'event'  => 'Socket PHP Event',
+                ]
             )
         );
 
-        $this->assertTrue($client->track(array(
-            "userId" => "some-user",
-            "event" => "Socket PHP Event",
-        )));
-
-        $this->assertTrue($client->identify(array(
-            "userId" => "some-user",
-            "traits" => array(),
-        )));
+        self::assertTrue(
+            $client->identify(
+                [
+                    'userId' => 'some-user',
+                    'traits' => [],
+                ]
+            )
+        );
 
         $client->__destruct();
     }
 
-    public function testProductionProblems()
+    public function testProductionProblems(): void
     {
-        $client = new Segment_Client("x",
-            array(
-                "consumer" => "socket",
-                "error_handler" => function () {
-                    throw new Exception("Was called");
+        $client = new Client(
+            'x',
+            [
+                'consumer'      => 'socket',
+                'error_handler' => function () {
+                    throw new Exception('Was called');
                 },
-            )
+            ]
         );
 
         // Shouldn't error out without debug on.
-        $client->track(array("user_id" => "some-user", "event" => "Production Problems"));
+        self::assertTrue($client->track(['user_id' => 'some-user', 'event' => 'Production Problems']));
         $client->__destruct();
     }
 
-    public function testDebugProblems()
+    public function testDebugProblems(): void
     {
-        $options = array(
-            "debug" => true,
-            "consumer" => "socket",
-            "error_handler" => function ($errno, $errmsg) {
-                if (400 != $errno) {
-                    throw new Exception("Response is not 400");
+        $options = [
+            'debug'         => true,
+            'consumer'      => 'socket',
+            'error_handler' => function ($errno, $errmsg) {
+                if ($errno !== 400) {
+                    throw new Exception('Response is not 400');
                 }
             },
-        );
+        ];
 
-        $client = new Segment_Client("x", $options);
+        $client = new Client('x', $options);
 
         // Should error out with debug on.
-        $client->track(array("user_id" => "some-user", "event" => "Socket PHP Event"));
+        self::assertTrue($client->track(['user_id' => 'some-user', 'event' => 'Socket PHP Event']));
         $client->__destruct();
     }
 
-    public function testLargeMessage()
+    public function testLargeMessage(): void
     {
-        $options = array(
-            "debug" => true,
-            "consumer" => "socket",
-        );
+        $options = [
+            'debug'    => true,
+            'consumer' => 'socket',
+        ];
 
-        $client = new Segment_Client("testsecret", $options);
+        $client = new Client('testsecret', $options);
 
-        $big_property = "";
+        $big_property = str_repeat('a', 10000);
 
-        for ($i = 0; $i < 10000; ++$i) {
-            $big_property .= "a";
-        }
-
-        $this->assertTrue($client->track(array(
-            "userId" => "some-user",
-            "event" => "Super Large PHP Event",
-            "properties" => array("big_property" => $big_property),
-        )));
-
-        $client->__destruct();
-    }
-
-    public function testLargeMessageSizeError()
-    {
-        $options = array(
-            "debug" => true,
-            "consumer" => "socket",
-        );
-
-        $client = new Segment_Client("testlargesize", $options);
-
-        $big_property = "";
-
-        for ($i = 0; $i < 32 * 1024; ++$i) {
-            $big_property .= "a";
-        }
-
-        $this->assertFalse(
+        self::assertTrue(
             $client->track(
-                array(
-                    "userId" => "some-user",
-                    "event" => "Super Large PHP Event",
-                    "properties" => array("big_property" => $big_property),
-                )
+                [
+                    'userId'     => 'some-user',
+                    'event'      => 'Super Large PHP Event',
+                    'properties' => ['big_property' => $big_property],
+                ]
+            )
+        );
+
+        $client->__destruct();
+    }
+
+    public function testLargeMessageSizeError(): void
+    {
+        $options = [
+            'debug'    => true,
+            'consumer' => 'socket',
+        ];
+
+        $client = new Client('testlargesize', $options);
+
+        $big_property = str_repeat('a', 32 * 1024);
+
+        self::assertFalse(
+            $client->track(
+                [
+                    'userId'     => 'some-user',
+                    'event'      => 'Super Large PHP Event',
+                    'properties' => ['big_property' => $big_property],
+                ]
             ) && $client->flush()
         );
 
         $client->__destruct();
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testConnectionError()
+    public function testConnectionError(): void
     {
-        $client = new Segment_Client("x", array(
-            "consumer" => "socket",
-            "host" => "api.segment.ioooooo",
-            "error_handler" => function ($errno, $errmsg) {
-                throw new RuntimeException($errmsg, $errno);
-            },
-        ));
+        $this->expectException(RuntimeException::class);
+        $client = new Client(
+            'x',
+            [
+                'consumer'      => 'socket',
+                'host'          => 'api.segment.ioooooo',
+                'error_handler' => function ($errno, $errmsg) {
+                    throw new RuntimeException($errmsg, $errno);
+                },
+            ]
+        );
 
-        $client->track(array("user_id" => "some-user", "event" => "Event"));
+        $client->track(['user_id' => 'some-user', 'event' => 'Event']);
         $client->__destruct();
     }
 
-    public function testRequestCompression()
+    public function testRequestCompression(): void
     {
-        $options = array(
-            "compress_request" => true,
-            "consumer" => "socket",
-            "error_handler" => function ($errno, $errmsg) {
+        $options = [
+            'compress_request' => true,
+            'consumer'         => 'socket',
+            'error_handler'    => function ($errno, $errmsg) {
                 throw new RuntimeException($errmsg, $errno);
             },
-        );
+        ];
 
-        $client = new Segment_Client("x", $options);
+        $client = new Client('x', $options);
 
         # Should error out with debug on.
-        $client->track(array("user_id" => "some-user", "event" => "Socket PHP Event"));
+        self::assertTrue($client->track(['user_id' => 'some-user', 'event' => 'Socket PHP Event']));
         $client->__destruct();
     }
 }

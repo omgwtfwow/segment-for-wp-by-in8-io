@@ -1,31 +1,36 @@
 <?php
 
-require_once __DIR__ . '/../lib/Segment/Client.php';
+declare(strict_types=1);
 
-class ClientTest extends PHPUnit_Framework_TestCase
+namespace Segment\Test;
+
+use PHPUnit\Framework\TestCase;
+use Segment\Client;
+use Segment\Consumer\ForkCurl;
+use Segment\Consumer\LibCurl;
+
+class ClientTest extends TestCase
 {
     /** @test */
-    public function it_uses_the_lib_curl_consumer_as_default()
+    public function it_uses_the_lib_curl_consumer_as_default(): void
     {
-        $client = new Segment_Client('foobar', []);
-        $this->assertInstanceOf(Segment_Consumer_LibCurl::class, $client->getConsumer());
+        $client = new Client('foobar', []);
+        self::assertInstanceOf(LibCurl::class, $client->getConsumer());
     }
 
     /** @test */
-    public function can_provide_the_consumer_configuration_as_string()
+    public function can_provide_the_consumer_configuration_as_string(): void
     {
-        $client = new Segment_Client('foobar', [
-            'consumer' => 'fork_curl',
-        ]);
-        $this->assertInstanceOf(Segment_Consumer_ForkCurl::class, $client->getConsumer());
+        $client = new Client('foobar', ['consumer' => 'fork_curl']);
+        self::assertInstanceOf(ForkCurl::class, $client->getConsumer());
     }
 
     /** @test */
-    public function can_provide_a_class_namespace_as_consumer_configuration()
+    public function can_provide_a_class_namespace_as_consumer_configuration(): void
     {
-        $client = new Segment_Client('foobar', [
-            'consumer' => Segment_Consumer_ForkCurl::class,
+        $client = new Client('foobar', [
+            'consumer' => ForkCurl::class,
         ]);
-        $this->assertInstanceOf(Segment_Consumer_ForkCurl::class, $client->getConsumer());
+        self::assertInstanceOf(ForkCurl::class, $client->getConsumer());
     }
 }

@@ -73,7 +73,7 @@ class Segment_Consumer_File extends Segment_Consumer
             return false;
         }
 
-        if (!is_writable(plugin_dir_path(dirname(__FILE__)) . 'tmp')) {
+        if (!is_writable($this->options["filename"])) {
 
             return false;
         }
