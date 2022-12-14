@@ -73,6 +73,7 @@ The new version of the plugin is much much better, but you will need to set it u
 
 = 2.3.2 =
 * Include more pages in custom post meta functionality
+* Recursive check for string length of server side payload
 
 = 2.3.1 =
 * Fix File consumer
