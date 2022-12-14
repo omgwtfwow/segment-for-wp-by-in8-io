@@ -928,11 +928,8 @@ class Segment_For_Wp_By_In8_Io
             }
         }
 
-        if (!$current_post->post_title) {
-            return "";
-        }
         
-        return $current_post->post_title;
+        return $current_post->post_title??"";
     }
 
     /**
@@ -944,7 +941,7 @@ class Segment_For_Wp_By_In8_Io
     {
         $settings = get_exopite_sof_option('segment-for-wp-by-in8-io');
         $properties = [];
-        if (is_single($current_post) || is_page($current_post)) {
+        if (is_single($current_post) || is_page($current_post) || is_home() || is_wplogin() || is_front_page() || is_404()) {
             if (array_key_exists('include_custom_page_props', $settings)) {
                 if (count($settings['include_custom_page_props']) > 0) {
                     $custom_page_props = $settings['include_custom_page_props'];
@@ -953,8 +950,16 @@ class Segment_For_Wp_By_In8_Io
                         $prop_key = $custom_prop["custom_page_props_key"];
                         //get value based on custom key
                         if ($prop_label != "" && get_post_meta($current_post->ID, $prop_key, true)) {
+
                             $prop_value = get_post_meta($current_post->ID, $prop_key, true);
-                            $properties[$prop_label] = $prop_value;
+
+                            if(is_array($prop_value)){
+                                $properties[$prop_label] = array($prop_value);
+                            }
+
+                            else if(is_string($prop_value)){
+                                $properties[$prop_label] = $prop_value;
+                            }
                         }
                     }
                 }
