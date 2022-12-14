@@ -26,17 +26,17 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
      */
     protected $settings;
 
-	/**
-	 * The Segment consumer types
-	 */
-	protected $consumer;
+    /**
+     * The Segment consumer types
+     */
+    protected $consumer;
 
     public function __construct($plugin_name, $version, $settings, $consumer)
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->settings = $settings;
-	    $this->consumer = $consumer;
+        $this->consumer = $consumer;
 
     }
 
@@ -464,7 +464,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
         }
 
-	    Analytics::flush();
+        Analytics::flush();
 
     }
 
@@ -483,16 +483,23 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['wp_user_id'] = $wp_user_id;
         $args['ajs_anon_id'] = Segment_For_Wp_By_In8_Io::get_ajs_anon_user_id();
 
-	        self::schedule_event('async_task', $args, $this->plugin_name);
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
 
 
-	    }
+    }
 
     public function schedule_event($task, $args, $plugin_name)
     {
 
-        if (mb_strlen(implode($args)) < 8000) {
+        function flatten(array $array) {
+            $return = array();
+            array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
+            return $return;
+        }
+
+
+        if (mb_strlen(implode(flatten($args))) < 8000) {
 
             as_enqueue_async_action($task, array($args), $plugin_name);
 
@@ -1012,22 +1019,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
         $args['page_data']['context']['userAgent'] = $user_agent;
         $args['page_data']['context']['locale'] = $locale;
 
-	    if($this->consumer == 'socket'){
-		    self::schedule_event('async_task', $args, $this->plugin_name);
-
-	    }
-
-	    if($this->consumer == 'file'){
-		    Analytics::page(array(
-			    "userId" => $args['wp_user_id']??$args['ajs_anon_id'],
-			    "name" => $args['page_data']['name'],
-			    "properties" => $args['page_data']['properties'],
-			    "timestamp" => $args['timestamp'],
-			    "context" => $args['page_data']['context'],
-		    ));
-
-	    }
-
+        self::schedule_event('async_task', $args, $this->plugin_name);
 
     }
 
