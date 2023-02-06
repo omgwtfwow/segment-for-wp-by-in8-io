@@ -492,14 +492,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function schedule_event($task, $args, $plugin_name)
     {
 
-        function flatten(array $array) {
-            $return = array();
-            array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
-            return $return;
-        }
-
-
-        if (mb_strlen(implode(flatten($args))) < 8000) {
+        if (mb_strlen(implode($this->flatten($args))) < 8000) {
 
             as_enqueue_async_action($task, array($args), $plugin_name);
 
@@ -507,6 +500,13 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
             syslog(LOG_WARNING, $plugin_name . ": Payload is too large to schedule. 8000 characters max.");
         }
 
+    }
+
+    private function flatten(array $array)
+    {
+        $return = array();
+        array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
+        return $return;
     }
 
     /**
