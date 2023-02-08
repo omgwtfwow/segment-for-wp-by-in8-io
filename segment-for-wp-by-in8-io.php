@@ -9,7 +9,7 @@
  * Plugin Name:       Segment for WP by in8.io
  * Plugin URI:        https://github.com/omgwtfwow/segment-for-wp-by-in8-io
  * Description:       Segment Analytics for WordPress
- * Version:           2.3.2
+ * Version:           2.3.2-modified
  * Author:            Juan
  * Author URI:        https://juangonzalez.com.au
  * License:           GPL-2.0+
