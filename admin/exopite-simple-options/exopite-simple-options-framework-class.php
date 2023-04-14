@@ -971,8 +971,9 @@ if (!class_exists('Exopite_Simple_Options_Framework')) :
              */
             if ($this->is_menu_page_loaded() || $this->is_metabox_enabled_post_type()) :
 
-                $url = $this->get_url($this->dirname);
-                $base = trailingslashit(join('/', array($url, 'assets')));
+                // $url = $this->get_url(plugin_dir_path($this->dirname));
+                $base = trailingslashit(plugins_url('assets', __FILE__ ));
+                // $base = trailingslashit(join('/', array($url, 'assets')));
 
                 if (!wp_style_is('font-awesome') || !wp_style_is('font-awesome-470') || !wp_style_is('FontAwesome')) {
 
