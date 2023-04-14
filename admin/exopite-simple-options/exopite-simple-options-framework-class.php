@@ -582,8 +582,7 @@ if (!class_exists('Exopite_Simple_Options_Framework')) :
         // for TinyMCE Code Plugin
         public function mce_external_plugins($plugins)
         {
-            $url = $this->get_url($this->dirname);
-            $base = trailingslashit(join('/', array($url, 'assets')));
+            $base = trailingslashit(plugins_url('assets', __FILE__ ));
             $plugins['code'] = $base . 'plugin.code.min.js';
 
             return $plugins;
@@ -665,26 +664,6 @@ if (!class_exists('Exopite_Simple_Options_Framework')) :
             require_once 'upload-class.php';
             require_once 'sanitize-class.php';
 
-        }
-
-        /**
-         * Get url from path
-         * works only for local urls
-         *
-         * @param string $path the path
-         *
-         * @return string   the generated url
-         */
-        public function get_url($path = '')
-        {
-
-            $url = str_replace(
-                wp_normalize_path(untrailingslashit(ABSPATH)),
-                site_url(),
-                $path
-            );
-
-            return $url;
         }
 
         public function locate_template($type)
@@ -971,9 +950,7 @@ if (!class_exists('Exopite_Simple_Options_Framework')) :
              */
             if ($this->is_menu_page_loaded() || $this->is_metabox_enabled_post_type()) :
 
-                // $url = $this->get_url(plugin_dir_path($this->dirname));
                 $base = trailingslashit(plugins_url('assets', __FILE__ ));
-                // $base = trailingslashit(join('/', array($url, 'assets')));
 
                 if (!wp_style_is('font-awesome') || !wp_style_is('font-awesome-470') || !wp_style_is('FontAwesome')) {
 
