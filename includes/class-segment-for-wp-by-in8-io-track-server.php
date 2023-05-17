@@ -492,7 +492,7 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
     public function schedule_event($task, $args, $plugin_name)
     {
 
-        if (mb_strlen(implode($this->flatten($args))) < 8000) {
+        if (strlen(json_encode($args)) < 8000) {
 
             as_enqueue_async_action($task, array($args), $plugin_name);
 
@@ -502,12 +502,6 @@ class Segment_For_Wp_By_In8_Io_Segment_Php_Lib
 
     }
 
-    private function flatten(array $array)
-    {
-        $return = array();
-        array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
-        return $return;
-    }
 
     /**
      * @param ...$args 'two args, $user_login (username), $user (object)'
