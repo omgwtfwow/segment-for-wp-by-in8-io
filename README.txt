@@ -3,9 +3,9 @@ Contributors: juanin8
 Donate link: https://www.juangonzalez.com.au
 Tags: segment, tracking, analytics
 Requires at least: 5.6
-Tested up to: 6.1.1
+Tested up to: 6.2.2
 Requires PHP: 7.3.5
-Stable tag: 2.3.3
+Stable tag: 2.3.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,9 @@ The new version of the plugin is much much better, but you will need to set it u
 3. Will it slow my site down? Depends. The more destinations and the more events you use, the slower things can go. The same way as if you installed the scripts directly.
 
 == Changelog ==
+
+= 2.3.4 =
+* Another fix for validation of Server Side tracking
 
 = 2.3.3 =
 * Fix error with flatten function on Server Side tracking
